@@ -14,7 +14,7 @@ setuptools.setup(
     version="1.0.0",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="A simple package for downloading company filings (e.g. 8-K, 10-K, 10-Q, 13-F, SD) from the SEC EDGAR database.",
+    description="Python package for downloading company filings (e.g. 8-K, 10-K, 10-Q, 13-F, SD) from the SEC EDGAR database.",
     long_description=parse_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",

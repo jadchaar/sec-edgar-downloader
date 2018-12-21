@@ -1,6 +1,6 @@
-# TODO: Spawn a thread for each download. I/O will block so just thread downloads to run in parallel
-
+# TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
 # TODO: handle invalid ticker or CIK
+# TODO: add support for Python 3.4, 3.5. Replace f"" formatting strings and make sure Pathlib is compatible.
 
 from datetime import date
 from bs4 import BeautifulSoup
@@ -65,7 +65,7 @@ class Downloader():
             if filing_detail_url[-1] != "l":
                 filing_detail_url += 'l'
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
-            name = full_filing_url.split("/")[-1].replace("txt", "html")
+            name = full_filing_url.split("/")[-1]
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         # TODO: handle 0 results (e.g. 13-F for non-institutional investors)
@@ -144,5 +144,5 @@ class Downloader():
 
 
 if __name__ == "__main__":
-    downloader = SecEdgarDownloader()
-    downloader.get_all_available_filings_for_ticker("AAPL")
+    downloader = Downloader()
+    downloader.get_10k_filing_for_ticker("AAPL")
