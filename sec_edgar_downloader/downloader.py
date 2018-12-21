@@ -1,4 +1,6 @@
-# TODO: Spawn a thread for each download.
+# TODO: Spawn a thread for each download. I/O will block so just thread downloads to run in parallel
+
+# TODO: handle invalid ticker or CIK
 
 from datetime import date
 from bs4 import BeautifulSoup
@@ -10,10 +12,11 @@ import errno
 
 FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
 
-class SecEdgarDownloader():
+class Downloader():
     def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):
         print("Welcome to the SEC EDGAR Downloader!")
 
+        # TODO: should we delete a folder or overrite it when the same data is requested?
         if not Path(download_folder).exists():
             raise IOError(f"The folder for saving company filings ({download_folder}) does not exist.")
 
@@ -30,7 +33,7 @@ class SecEdgarDownloader():
             '8-k': self.get_8k_filing_for_ticker,
             '10-k': self.get_10k_filing_for_ticker,
             '10-q': self.get_10q_filing_for_ticker,
-            '13-f': self.get_13f_filing_for_ticker,
+            '13f': self.get_13f_filing_for_ticker,
             'sd': self.get_sd_filing_for_ticker,
         }
 
@@ -58,7 +61,10 @@ class SecEdgarDownloader():
         filing_document_info = []
         for anchor_element in document_anchor_elements:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
-            full_filing_url = filing_detail_url.replace("-index.htm", ".txt")
+            # Some entries end with .html, some end with .htm
+            if filing_detail_url[-1] != "l":
+                filing_detail_url += 'l'
+            full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1].replace("txt", "html")
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
@@ -109,7 +115,8 @@ class SecEdgarDownloader():
         self.get_filing_wrapper(filing_type, ticker)
 
     def get_13f_filing_for_ticker(self, ticker):
-        filing_type = "13-F"
+
+        filing_type = "13F"
         self.get_filing_wrapper(filing_type, ticker)
 
     def get_sd_filing_for_ticker(self, ticker):
