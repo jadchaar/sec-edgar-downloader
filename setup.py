@@ -11,10 +11,10 @@ def parse_readme():
 
 setuptools.setup(
     name="sec_edgar_downloader",
-    version="1.0.1",
+    version="1.0.2",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="Python package for downloading company filings (e.g. 8-K, 10-K, 10-Q, 13-F, SD) from the SEC EDGAR database.",
+    description="Python package for downloading company filings (e.g. 8-K, 10-K, 10-Q, 13-F, SC 13G, SD) from the SEC EDGAR database.",
     long_description=parse_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",
@@ -42,6 +42,7 @@ setuptools.setup(
         "10-K",
         "10-Q",
         "13-F",
+        "SC 13G",
         "SD",
     ],
 )

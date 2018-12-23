@@ -1,7 +1,6 @@
 # TODO: add docstrings to functions
 # TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
 # TODO: handle invalid ticker or CIK
-# TODO: add support for Python 3.4, 3.5. Replace f"" formatting strings and make sure Pathlib is compatible.
 
 from datetime import date
 from bs4 import BeautifulSoup
@@ -25,8 +24,9 @@ class Downloader():
 
         self.download_folder = download_folder
 
-        # Set default number of results to obtain
-        # TODO: allow users to pass this in?
+        # TODO: Allow users to pass this in
+        # Will have to handle pagination since only 100 are displayed on a single page.
+        # Requires another start query parameter: start=100&count=100
         self.count = 100
         self.base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self.count}"
 
@@ -53,7 +53,7 @@ class Downloader():
     def download_filings(self, edgar_search_url, filing_type, ticker):
         resp = requests.get(edgar_search_url)
         resp.raise_for_status()
-        edgar_results_html = resp.text
+        edgar_results_html = resp.content
 
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
@@ -77,11 +77,10 @@ class Downloader():
         print(f"{len(filing_document_info)} {filing_type} documents available for {ticker}. Beginning download...")
 
         for doc_info in filing_document_info:
-            resp = requests.get(doc_info.url)
+            resp = requests.get(doc_info.url, stream=True)
             resp.raise_for_status()
-            filing_html = resp.text
 
-            save_path = Path(self.download_folder).joinpath("SEC EDGAR Filings", ticker, filing_type, doc_info.filename)
+            save_path = Path(self.download_folder).joinpath("sec-edgar-filings", ticker, filing_type, doc_info.filename)
 
             # Create all parent directories as needed.
             # For example: if we have /hello and we want to create
@@ -94,8 +93,10 @@ class Downloader():
                     if e.errno != errno.EEXIST:
                         raise
 
-            with open(save_path, "w") as f:
-                f.write(filing_html)
+            with open(save_path, 'wb') as f:
+                for chunk in resp.iter_content(chunk_size=1024):
+                    if chunk: # filter out keep-alive chunks
+                        f.write(chunk)
 
         print(f"All {filing_type}s for {ticker} downloaded successfully.")
 
@@ -134,6 +135,7 @@ class Downloader():
         self.get_10k_filing_for_ticker(ticker)
         self.get_10q_filing_for_ticker(ticker)
         self.get_13f_filing_for_ticker(ticker)
+        self.get_sc_13g_filing_for_ticker(ticker)
         self.get_sd_filing_for_ticker(ticker)
 
     def get_all_available_filings_for_ticker_list(self, tickers):
