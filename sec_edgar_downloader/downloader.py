@@ -1,3 +1,4 @@
+# TODO: add docstrings to functions
 # TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
 # TODO: handle invalid ticker or CIK
 # TODO: add support for Python 3.4, 3.5. Replace f"" formatting strings and make sure Pathlib is compatible.
@@ -35,6 +36,7 @@ class Downloader():
             '10-q': self.get_10q_filing_for_ticker,
             '13f': self.get_13f_filing_for_ticker,
             'sd': self.get_sd_filing_for_ticker,
+            'sc 13g': self.get_sc_13g_filing_for_ticker,
         }
 
     # TODO: add validation and verification for ticker
@@ -46,7 +48,7 @@ class Downloader():
     def form_url(self, ticker, filing_type):
         # Put into required format: YYYYMMDD
         before_date = date.today().strftime('%Y%m%d')
-        return f"{self.base_url}&CIK={ticker}&type={filing_type}&dateb={before_date}"
+        return f"{self.base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
     def download_filings(self, edgar_search_url, filing_type, ticker):
         resp = requests.get(edgar_search_url)
@@ -57,7 +59,7 @@ class Downloader():
 
         document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)
 
-        sec_base_url = f"https://www.sec.gov"
+        sec_base_url = "https://www.sec.gov"
         filing_document_info = []
         for anchor_element in document_anchor_elements:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
@@ -68,7 +70,10 @@ class Downloader():
             name = full_filing_url.split("/")[-1]
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
-        # TODO: handle 0 results (e.g. 13-F for non-institutional investors)
+        if len(filing_document_info) == 0:
+            print(f"No {filing_type} documents available for {ticker}.")
+            return
+
         print(f"{len(filing_document_info)} {filing_type} documents available for {ticker}. Beginning download...")
 
         for doc_info in filing_document_info:
@@ -95,13 +100,11 @@ class Downloader():
         print(f"All {filing_type}s for {ticker} downloaded successfully.")
 
     def get_filing_wrapper(self, filing_type, ticker):
-        print(f"Getting {filing_type} filings for {ticker}")
+        print(f"Getting {filing_type} filings for {ticker}.")
         filing_url = self.form_url(ticker, filing_type)
         self.download_filings(filing_url, filing_type, ticker)
 
-    # TODO: Add more filings
-
-    # TODO: ignore filing AMENDS (e.g. 8-K/A)?
+    # TODO: distinguish filing AMENDS (e.g. 8-K/A)?
     def get_8k_filing_for_ticker(self, ticker):
         filing_type = "8-K"
         self.get_filing_wrapper(filing_type, ticker)
@@ -115,8 +118,11 @@ class Downloader():
         self.get_filing_wrapper(filing_type, ticker)
 
     def get_13f_filing_for_ticker(self, ticker):
-
         filing_type = "13F"
+        self.get_filing_wrapper(filing_type, ticker)
+
+    def get_sc_13g_filing_for_ticker(self, ticker):
+        filing_type = "SC 13G"
         self.get_filing_wrapper(filing_type, ticker)
 
     def get_sd_filing_for_ticker(self, ticker):
@@ -138,11 +144,7 @@ class Downloader():
         for filing in filings:
             filing_formatted = filing.lower()
             if filing_formatted not in self.filing_method_dict:
-                print(f"The provided filing ({filing}) is not available.")
+                available_filings = ", ".join([key.upper() for key in self.filing_method_dict.keys()])
+                print(f"The provided filing ({filing}) is not available. Available filings: {available_filings}.")
                 continue
             self.filing_method_dict[filing_formatted](ticker)
-
-
-if __name__ == "__main__":
-    downloader = Downloader()
-    downloader.get_10k_filing_for_ticker("AAPL")
