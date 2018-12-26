@@ -11,7 +11,7 @@ def parse_readme():
 
 setuptools.setup(
     name="sec_edgar_downloader",
-    version="1.1.0",
+    version="1.1.1",
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",

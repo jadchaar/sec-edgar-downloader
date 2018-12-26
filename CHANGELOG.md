@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.1 - 12/26/2018
+
+- Tweaked PyPI description.
+
 ## 1.1.0 - 12/26/2018
 
 - Filing downloads are now handled in chunks to improve download and save speed.
