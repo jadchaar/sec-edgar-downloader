@@ -1,9 +1,12 @@
 # Changelog
 
-## 1.0.2 - 12/23/2018
+## 1.1.0 - 12/26/2018
 
-- Large filing downloads are now handled in chunks, improving file download and save speed significantly.
+- Filing downloads are now handled in chunks to improve download and save speed.
+- Removed get_select_filings_for_ticker() to reduce redundancy.
 - Added support for SC 13G filings.
+- Separated ticker and CIK class methods for easier use.
+- Added ticker symbol validation.
 
 ## 1.0.1 - 12/20/2018
 

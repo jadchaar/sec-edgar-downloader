@@ -1,0 +1,12 @@
+Explains SymbolDirectory files on NASDAQ FTP
+http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
+
+SEC financial statement downloads (ZIP)
+https://www.sec.gov/dera/data/financial-statement-data-sets.html
+
+https://www.sec.gov/fast-answers/answersreada10khtm.html
+https://www.investor.gov/additional-resources/news-alerts/alerts-bulletins/how-read-8-k
+https://www.sec.gov/oiea/Article/edgarguide.html
+https://www.sec.gov/edgar/quickedgar.htm
+
+http://rankandfiled.com
