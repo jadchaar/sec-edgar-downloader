@@ -13,7 +13,7 @@ Install and update this package using [pip](https://pip.pypa.io/en/stable/quicks
 
 ## Example usage
 
-```
+```python
 import sec_edgar_downloader
 
 # Initialize the downloader object
@@ -44,7 +44,4 @@ downloader.get_all_available_filings_for_ticker("AAPL")
 
 # Get all filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for a specified list of tickers
 downloader.get_all_available_filings_for_ticker_list(["AAPL", "MSFT", "V", "FB"])
-
-# Choose particular filings for Apple (Ticker: AAPL)
-downloader.get_select_filings_for_ticker("AAPL", ["10-K", "10-Q", "SD"])
 ```
