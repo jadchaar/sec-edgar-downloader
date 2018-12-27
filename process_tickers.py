@@ -36,15 +36,11 @@ def parse_tickers():
         json.dump(ticker_validation_dict, f)
     print(f"Stock tickers parsed successfully into {ticker_validation_json}")
 
-def move_json_and_cleanup():
-    print("Moving processed JSON file into the package directory...")
-    os.rename(ticker_validation_json, f"{package_directory}/{ticker_validation_json}")
-
+def cleanup():
     print("Cleaning up...")
     os.remove(raw_ticker_data_file)
-
 
 if __name__ == "__main__":
     get_tickers()
     parse_tickers()
-    move_json_and_cleanup()
+    cleanup()

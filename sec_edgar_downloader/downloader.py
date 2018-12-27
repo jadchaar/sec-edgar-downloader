@@ -7,6 +7,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from pathlib import Path
 from collections import namedtuple
+from .ticker_validation import ticker_validation_dict
 
 import requests
 import os
@@ -19,9 +20,8 @@ class InvalidTickerException(Exception):
     pass
 
 # Load the JSON containing the mapping of valid tickers to the corresponding security name
-ticker_validation_json_path = Path.joinpath(Path(__file__).parent, "ticker_validation.json")
-with open(ticker_validation_json_path, "r") as f:
-    ticker_validation_dict = json.load(f)
+# ticker_validation_json_url = "https://raw.githubusercontent.com/jadchaar/sec-edgar-downloader/master/sec_edgar_downloader/ticker_validation.json"
+# ticker_validation_dict = requests.get(ticker_validation_json_url).json()
 
 class Downloader:
     def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):

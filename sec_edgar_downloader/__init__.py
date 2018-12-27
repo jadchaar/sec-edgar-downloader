@@ -1,3 +1,3 @@
-from .downloader import Downloader
+from .Downloader import Downloader
 
 __all__ = ["Downloader"]
