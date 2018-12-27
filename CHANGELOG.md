@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.2 - 12/27/2018
+
+- Fixed the "FileNotFoundError" on import.
+
 ## 1.1.1 - 12/26/2018
 
 - Tweaked PyPI description.

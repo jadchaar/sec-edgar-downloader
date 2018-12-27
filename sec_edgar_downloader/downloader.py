@@ -19,10 +19,6 @@ FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
 class InvalidTickerException(Exception):
     pass
 
-# Load the JSON containing the mapping of valid tickers to the corresponding security name
-# ticker_validation_json_url = "https://raw.githubusercontent.com/jadchaar/sec-edgar-downloader/master/sec_edgar_downloader/ticker_validation.json"
-# ticker_validation_dict = requests.get(ticker_validation_json_url).json()
-
 class Downloader:
     def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):
         print("Welcome to the SEC EDGAR Downloader!")
