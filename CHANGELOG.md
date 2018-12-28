@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.3 - 12/28/2018
+
+- Reduced size of ticker validation data by changing an internal data structure.
+
 ## 1.1.2 - 12/27/2018
 
 - Fixed the "FileNotFoundError" on import.
