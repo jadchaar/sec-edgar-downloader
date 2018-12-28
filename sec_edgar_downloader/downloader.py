@@ -7,7 +7,7 @@ from datetime import date
 from bs4 import BeautifulSoup
 from pathlib import Path
 from collections import namedtuple
-from .ticker_validation import ticker_validation_dict
+from .ticker_validation import ticker_validation_data
 
 import requests
 import os
@@ -38,7 +38,7 @@ class Downloader:
         self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
 
     def _validate_ticker(self, ticker):
-        if ticker not in ticker_validation_dict:
+        if ticker not in ticker_validation_data:
             raise InvalidTickerException(f"The specified ticker ({ticker}) is invalid. Please correct this or enter the stock's CIK.")
 
     # TODO: allow users to specify before date (by passing in year, month, and day)
