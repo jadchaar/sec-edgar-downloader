@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.4 - 12/29/2018
+
+- Internal renaming changes.
+
 ## 1.1.3 - 12/28/2018
 
 - Reduced size of ticker validation data by changing an internal data structure.
