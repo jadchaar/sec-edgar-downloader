@@ -24,8 +24,14 @@ downloader = sec_edgar_downloader.Downloader("/path/to/download/destination")
 # Get all 8-K filings for Apple (Ticker: AAPL)
 downloader.get_8k_filing_for_ticker("AAPL")
 
+# Get the past 5 8-K filings for Apple (Ticker: AAPL)
+downloader.get_8k_filing_for_ticker("AAPL", 5)
+
 # Get all 10-K filings for Microsoft (Ticker: MSFT)
 downloader.get_10k_filing_for_ticker("MSFT")
+
+# Get the latest 10-K filing for Microsoft (Ticker: MSFT)
+downloader.get_10k_filing_for_ticker("MSFT", 1)
 
 # Get all 10-Q filings for Visa (Ticker: V)
 downloader.get_10q_filing_for_ticker("V")

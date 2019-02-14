@@ -48,14 +48,14 @@ class Downloader:
         before_date = date.today().strftime('%Y%m%d')
         return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
-    def _download_filings(self, edgar_search_url, filing_type, ticker):
+    def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_obtain):
         resp = requests.get(edgar_search_url)
         resp.raise_for_status()
         edgar_results_html = resp.content
 
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
-        document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)
+        document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)[:num_filings_to_obtain]
 
         sec_base_url = "https://www.sec.gov"
         filing_document_info = []
@@ -98,7 +98,7 @@ class Downloader:
 
         print(f"All {filing_type}s for {ticker} downloaded successfully.")
 
-    def _get_filing_wrapper(self, filing_type, ticker_or_cik, is_cik = False):
+    def _get_filing_wrapper(self, filing_type, ticker_or_cik, is_cik, num_filings_to_obtain):
         ticker_or_cik = str(ticker_or_cik).upper()
         if is_cik:
             # Strip off leading zeroes
@@ -111,18 +111,18 @@ class Downloader:
                 return
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
-        self._download_filings(filing_url, filing_type, ticker_or_cik)
+        self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
 
     #########################
     ########## 8-K ##########
 
-    def get_8k_filing_for_ticker(self, ticker):
+    def get_8k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_8k_filing_for_cik(self, cik):
+    def get_8k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## 8-K ##########
     #########################
@@ -130,13 +130,13 @@ class Downloader:
     ##########################
     ########## 10-K ##########
 
-    def get_10k_filing_for_ticker(self, ticker):
+    def get_10k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_10k_filing_for_cik(self, cik):
+    def get_10k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## 10-K ##########
     ##########################
@@ -144,13 +144,13 @@ class Downloader:
     ##########################
     ########## 10-Q ##########
 
-    def get_10q_filing_for_ticker(self, ticker):
+    def get_10q_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_10q_filing_for_cik(self, cik):
+    def get_10q_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## 10-Q ##########
     ##########################
@@ -158,13 +158,13 @@ class Downloader:
     #########################
     ########## 13F ##########
 
-    def get_13f_filing_for_ticker(self, ticker):
+    def get_13f_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "13F"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_13f_filing_for_cik(self, cik):
+    def get_13f_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "13F"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## 13F ##########
     #########################
@@ -172,13 +172,13 @@ class Downloader:
     ############################
     ########## SC 13G ##########
 
-    def get_sc_13g_filing_for_ticker(self, ticker):
+    def get_sc_13g_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_sc_13g_filing_for_cik(self, cik):
+    def get_sc_13g_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## SC 13G ##########
     ############################
@@ -186,13 +186,13 @@ class Downloader:
     ########################
     ########## SD ##########
 
-    def get_sd_filing_for_ticker(self, ticker):
+    def get_sd_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
         filing_type = "SD"
-        self._get_filing_wrapper(filing_type, ticker)
+        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
 
-    def get_sd_filing_for_cik(self, cik):
+    def get_sd_filing_for_cik(self, cik, num_filings_to_obtain = 100):
         filing_type = "SD"
-        self._get_filing_wrapper(filing_type, cik, True)
+        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
 
     ########## SD ##########
     ########################

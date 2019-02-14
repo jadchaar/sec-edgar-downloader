@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 - 2/14/2019
+
+- Added the ability to specify the number of filings to download.
+  - For example, you can download the latest 10-K for MSFT with this command: `downloader.get_10k_filing_for_ticker("MSFT", 1)`
+  - This is available for all non-bulk methods: `get_8k_filing_for_ticker`, `get_10k_filing_for_ticker`, `get_10q_filing_for_ticker`, `get_13f_filing_for_ticker`, `get_sc_13g_filing_for_ticker`, `get_sd_filing_for_ticker`, and the CIK equivalents
+
 ## 1.1.4 - 12/29/2018
 
 - Internal renaming changes.
