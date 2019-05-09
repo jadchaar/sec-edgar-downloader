@@ -10,6 +10,9 @@ build37:
 	virtualenv env --python=python3.7
 	env/bin/pip install -r requirements.txt
 
+test:
+	. env/bin/activate && pytest
+
 clean:
 	rm -rf env
 	rm -f sec_edgar_downloader/*.pyc tests/*.pyc

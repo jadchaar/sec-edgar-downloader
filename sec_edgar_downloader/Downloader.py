@@ -3,21 +3,17 @@
 # TODO: distinguish filing AMENDS (e.g. 8-K/A)?
 # TODO: add coloring to the terminal output (e.g. red for errors)
 
-from datetime import date
-from bs4 import BeautifulSoup
-from pathlib import Path
-from collections import namedtuple
-from .ticker_validation import ticker_validation_data
-
-import requests
-import os
 import errno
 import json
+import os
+from collections import namedtuple
+from datetime import date
+from pathlib import Path
+
+import requests
+from bs4 import BeautifulSoup
 
 FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
-
-class InvalidTickerException(Exception):
-    pass
 
 class Downloader:
     def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):
@@ -37,15 +33,10 @@ class Downloader:
         self._count = 100
         self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
 
-    def _validate_ticker(self, ticker):
-        if ticker not in ticker_validation_data:
-            raise InvalidTickerException(f"The specified ticker ({ticker}) is invalid. Please correct this or enter the stock's CIK.")
-
-    # TODO: allow users to specify before date (by passing in year, month, and day)
-    # and formatting it here
+    # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
     def _form_url(self, ticker, filing_type):
         # Put into required format: YYYYMMDD
-        before_date = date.today().strftime('%Y%m%d')
+        before_date = date.today().strftime("%Y%m%d")
         return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
     def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_obtain):
@@ -69,8 +60,9 @@ class Downloader:
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
+            # TODO: misleading message if num_filings_to_obtain = 0
             print(f"No {filing_type} documents available for {ticker}.")
-            return
+            return 0
 
         print(f"{len(filing_document_info)} {filing_type} documents available for {ticker}. Beginning download...")
 
@@ -96,33 +88,22 @@ class Downloader:
                     if chunk: # filter out keep-alive chunks
                         f.write(chunk)
 
-        print(f"All {filing_type}s for {ticker} downloaded successfully.")
+        print(f"{filing_type} filings for {ticker} downloaded successfully.")
 
-    def _get_filing_wrapper(self, filing_type, ticker_or_cik, is_cik, num_filings_to_obtain):
-        ticker_or_cik = str(ticker_or_cik).upper()
-        if is_cik:
-            # Strip off leading zeroes
-            ticker_or_cik = ticker_or_cik.lstrip("0")
-        else:
-            try:
-                self._validate_ticker(ticker_or_cik)
-            except InvalidTickerException as e:
-                print(e)
-                return
+        return num_filings_to_obtain
+
+    def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_obtain):
+        ticker_or_cik = str(ticker_or_cik).upper().lstrip("0") # strip 0s off CIK
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
-        self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
 
     #########################
     ########## 8-K ##########
 
-    def get_8k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_8k_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_8k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## 8-K ##########
     #########################
@@ -130,13 +111,9 @@ class Downloader:
     ##########################
     ########## 10-K ##########
 
-    def get_10k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_10k_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_10k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## 10-K ##########
     ##########################
@@ -144,13 +121,9 @@ class Downloader:
     ##########################
     ########## 10-Q ##########
 
-    def get_10q_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_10q_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_10q_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## 10-Q ##########
     ##########################
@@ -158,13 +131,9 @@ class Downloader:
     #########################
     ########## 13F ##########
 
-    def get_13f_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_13f_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "13F"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_13f_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "13F"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## 13F ##########
     #########################
@@ -172,13 +141,9 @@ class Downloader:
     ############################
     ########## SC 13G ##########
 
-    def get_sc_13g_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_sc_13g_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_sc_13g_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## SC 13G ##########
     ############################
@@ -186,45 +151,22 @@ class Downloader:
     ########################
     ########## SD ##########
 
-    def get_sd_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_sd_filing(self, ticker_or_cik, num_filings_to_obtain = 100):
         filing_type = "SD"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_sd_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "SD"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## SD ##########
     ########################
 
-    def get_all_available_filings_for_ticker(self, ticker):
-        # Validation must be done early here to prevent
-        # the error message from printing multiple times
-        ticker = ticker.upper()
-        try:
-            self._validate_ticker(ticker)
-        except InvalidTickerException as e:
-            print(e)
-            return
-        self.get_8k_filing_for_ticker(ticker)
-        self.get_10k_filing_for_ticker(ticker)
-        self.get_10q_filing_for_ticker(ticker)
-        self.get_13f_filing_for_ticker(ticker)
-        self.get_sc_13g_filing_for_ticker(ticker)
-        self.get_sd_filing_for_ticker(ticker)
+    def get_all_available_filings(self, ticker_or_cik):
+        ticker_or_cik = ticker_or_cik.upper()
+        self.get_8k_filing(ticker_or_cik)
+        self.get_10k_filing(ticker_or_cik)
+        self.get_10q_filing(ticker_or_cik)
+        self.get_13f_filing(ticker_or_cik)
+        self.get_sc_13g_filing(ticker_or_cik)
+        self.get_sd_filing(ticker_or_cik)
 
-    def get_all_available_filings_for_cik(self, cik):
-        self.get_10k_filing_for_cik(cik)
-        self.get_10k_filing_for_cik(cik)
-        self.get_10q_filing_for_cik(cik)
-        self.get_13f_filing_for_cik(cik)
-        self.get_sc_13g_filing_for_cik(cik)
-        self.get_sd_filing_for_cik(cik)
-
-    def get_all_available_filings_for_ticker_list(self, ticker_list):
-        for ticker in ticker_list:
-            self.get_all_available_filings_for_ticker(ticker)
-
-    def get_all_available_filings_for_cik_list(self, cik_list):
-        for cik in cik_list:
-            self.get_all_available_filings_for_cik(cik)
+    def get_all_available_filings_for_symbol_list(self, ticker_or_cik_list):
+        for ticker_or_cik in ticker_or_cik_list:
+            self.get_all_available_filings(ticker_or_cik)
