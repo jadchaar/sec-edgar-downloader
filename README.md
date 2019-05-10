@@ -37,8 +37,11 @@ dl.get_10k_filings("MSFT", 1)
 # Get all 10-Q filings for Visa (ticker: V)
 dl.get_10q_filings("V")
 
-# Get all 13F filings for Vanguard Group Inc (CIK: 0000102909)
-dl.get_13f_filings("0000102909")
+# Get all 13F-NT filings for Vanguard Group (CIK: 0000102909)
+dl.get_13f_nt_filings("0000102909")
+
+# Get all 13F-HR filings for Vanguard Group
+dl.get_13f_hr_filings("0000102909")
 
 # Get all SC 13G filings for Apple
 dl.get_sc_13g_filings("AAPL")
@@ -46,11 +49,12 @@ dl.get_sc_13g_filings("AAPL")
 # Get all SD filings for Apple
 dl.get_sd_filings("AAPL")
 
-# Get all filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for Apple
-dl.get_all_available_filings("AAPL")
+# Get all the latest filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for Apple
+dl.get_all_available_filings("AAPL", 1)
 
-# Get all filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for a specified list of tickers and CIKs
+# Get all the latest filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available,
+# for a specified list of tickers and CIKs
 identifiers = ["AAPL", "MSFT", "0000102909", "V", "FB"]
 for id in identifiers:
-    dl.get_all_available_filings(id)
+    dl.get_all_available_filings(id, 1)
 ```
