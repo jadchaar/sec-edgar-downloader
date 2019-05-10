@@ -16,15 +16,19 @@ def extract_header(file_path):
     header = []
     with open(file_path, "r") as f:
         for line in f:
-            # A blank line indicates the end of the header info
-            if line == "\n":
+            # "FILER:" indicates the end of the useful header info
+            if line == "FILER:\n":
                 break
             header.append(line)
     # Ignore <SEC-DOCUMENT>, <SEC-HEADER>, and <ACCEPTANCE-DATETIME>
     return header[3:]
 
 
-def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_cik):
+def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_full_cik):
+    # no ticker symbol available (only CIK)
+    if ticker_symbol is None:
+        ticker_symbol = strip_cik(ticker_full_cik)
+
     dir_content = os.listdir(base_dir)
     assert len(dir_content) == 1
     assert dir_content[0] == "sec-edgar-filings"
@@ -51,10 +55,14 @@ def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_cik)
     assert next_level_of_dir.suffix == ".txt"
 
     accession_number = next_level_of_dir.stem
-    assert accession_number[:len(ticker_cik)] == ticker_cik
+    # assert accession_number[:len(ticker_full_cik)] == ticker_full_cik
 
     header_contents = parse_filing_document_header(next_level_of_dir)
     assert header_contents["ACCESSION NUMBER"] == accession_number
     # second condition accounts for amendments
     assert header_contents["CONFORMED SUBMISSION TYPE"] == filing_type or header_contents[
         "CONFORMED SUBMISSION TYPE"] == f"{filing_type}/A"
+
+
+def strip_cik(full_cik):
+    return full_cik.lstrip("0")

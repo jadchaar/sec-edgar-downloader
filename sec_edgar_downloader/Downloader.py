@@ -121,8 +121,14 @@ class Downloader:
     #########################
     ########## 13F ##########
 
-    def get_13f_filings(self, ticker_or_cik, num_filings_to_obtain=100):
-        filing_type = "13F"
+    # Reference on difference: https://www.sec.gov/divisions/investment/13ffaq.htm
+
+    def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        filing_type = "13F-NT"
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+
+    def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        filing_type = "13F-HR"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
     ########## 13F ##########
@@ -157,7 +163,8 @@ class Downloader:
         self.get_sc_13g_filing(ticker_or_cik)
         self.get_sd_filing(ticker_or_cik)
 
-# ! TODO: distinguish filing AMENDS (e.g. 8-K/A)?
+# ! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them
+#   -> if we do distinguish amendments, remember to update tests with new arguments
 # TODO: add Sphinx docstrings to functions
 # TODO: allow users to pass in before dates
 # TODO: add coloring to the terminal output (e.g. red for errors)
