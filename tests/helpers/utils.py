@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+
 def parse_filing_document_header(file_path):
     parsed = {}
     header = extract_header(file_path)
@@ -9,6 +10,7 @@ def parse_filing_document_header(file_path):
         if components[0] == "ACCESSION NUMBER" or components[0] == "CONFORMED SUBMISSION TYPE":
             parsed[components[0]] = components[1]
     return parsed
+
 
 def extract_header(file_path):
     header = []
@@ -21,7 +23,12 @@ def extract_header(file_path):
     # Ignore <SEC-DOCUMENT>, <SEC-HEADER>, and <ACCEPTANCE-DATETIME>
     return header[3:]
 
-def verify_directory_structure(base_dir, ticker_symbol, ticker_cik, filing_type):
+
+def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_cik):
+    dir_content = os.listdir(base_dir)
+    assert len(dir_content) == 1
+    assert dir_content[0] == "sec-edgar-filings"
+
     next_level_of_dir = Path.joinpath(base_dir, "sec-edgar-filings")
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
@@ -48,4 +55,6 @@ def verify_directory_structure(base_dir, ticker_symbol, ticker_cik, filing_type)
 
     header_contents = parse_filing_document_header(next_level_of_dir)
     assert header_contents["ACCESSION NUMBER"] == accession_number
-    assert header_contents["CONFORMED SUBMISSION TYPE"] == filing_type
+    # second condition accounts for amendments
+    assert header_contents["CONFORMED SUBMISSION TYPE"] == filing_type or header_contents[
+        "CONFORMED SUBMISSION TYPE"] == f"{filing_type}/A"

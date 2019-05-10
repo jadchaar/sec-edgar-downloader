@@ -24,8 +24,7 @@ class Downloader:
 
         # TODO: should we delete a folder or override it when the same data is requested?
         if not self._download_folder.exists():
-            raise IOError(
-                f"The folder for saving company filings ({self._download_folder}) does not exist.")
+            raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
 
         print(f"Company filings will be saved to: {self._download_folder}")
 
@@ -60,8 +59,7 @@ class Downloader:
                 filing_detail_url += 'l'
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1]
-            filing_document_info.append(FilingInfo(
-                filename=name, url=full_filing_url))
+            filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
             # TODO: misleading message if num_filings_to_obtain = 0
