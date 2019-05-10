@@ -1,8 +1,3 @@
-# TODO: add docstrings to functions
-# TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
-# TODO: distinguish filing AMENDS (e.g. 8-K/A)?
-# TODO: add coloring to the terminal output (e.g. red for errors)
-
 import errno
 import json
 import os
@@ -22,7 +17,6 @@ class Downloader:
 
         self._download_folder = Path(download_folder)
 
-        # TODO: delete a folder or override it when the same data is requested?
         if not self._download_folder.exists():
             raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
 
@@ -62,7 +56,7 @@ class Downloader:
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
-            # TODO: misleading message if num_filings_to_obtain = 0
+            # ! FIX: misleading message if num_filings_to_obtain = 0
             print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
@@ -97,7 +91,7 @@ class Downloader:
     #########################
     ########## 8-K ##########
 
-    def get_8k_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_8k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "8-K"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -107,7 +101,7 @@ class Downloader:
     ##########################
     ########## 10-K ##########
 
-    def get_10k_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_10k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-K"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -117,7 +111,7 @@ class Downloader:
     ##########################
     ########## 10-Q ##########
 
-    def get_10q_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_10q_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-Q"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -127,7 +121,7 @@ class Downloader:
     #########################
     ########## 13F ##########
 
-    def get_13f_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_13f_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "13F"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -137,7 +131,7 @@ class Downloader:
     ############################
     ########## SC 13G ##########
 
-    def get_sc_13g_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SC 13G"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -147,7 +141,7 @@ class Downloader:
     ########################
     ########## SD ##########
 
-    def get_sd_filing(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_sd_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SD"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
@@ -163,6 +157,9 @@ class Downloader:
         self.get_sc_13g_filing(ticker_or_cik)
         self.get_sd_filing(ticker_or_cik)
 
-    def get_all_available_filings_for_symbol_list(self, ticker_or_cik_list):
-        for ticker_or_cik in ticker_or_cik_list:
-            self.get_all_available_filings(ticker_or_cik)
+# ! TODO: distinguish filing AMENDS (e.g. 8-K/A)?
+# TODO: add Sphinx docstrings to functions
+# TODO: allow users to pass in before dates
+# TODO: add coloring to the terminal output (e.g. red for errors)
+# TODO: add "caching" to prevent overriding previous downloads (if already downloaded, skip)
+# TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel

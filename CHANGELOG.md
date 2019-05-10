@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0 - ~/~/2019
+
+- Simplified API by combining ticker and CIK functionality into a single method for each filing type.
+  - Available methods: `get_8k_filings`, `get_10k_filings`, `get_10q_filings`, `get_13f_filings`, `get_sc_13g_filings`, `get_sd_filings`, `get_all_available_filings`.
+  - All these methods can be passed either a CIK or ticker string.
+- Removed ticker validation to facilitate this simplified API change.
+- Added a full suite of unit and integration tests along with an internal Travis CI pipeline for increased reliability.
+
 ## 1.2.0 - 2/14/2019
 
 - Added the ability to specify the number of filings to download.

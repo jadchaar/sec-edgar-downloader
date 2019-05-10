@@ -7,13 +7,13 @@ from utils import verify_directory_structure
 def test_8k_filing_retrieval(default_download_folder, apple_filing_metadata):
     dl = Downloader(default_download_folder)
 
-    num_downloaded = dl.get_8k_filing("AAPL", 1)
+    num_downloaded = dl.get_8k_filings("AAPL", 1)
     assert num_downloaded == 1
 
     # Vanguard Group (CIK: 0000102909) does not file 8-Ks
-    num_downloaded = dl.get_8k_filing("0000102909")
+    num_downloaded = dl.get_8k_filings("0000102909")
     assert num_downloaded == 0
-    num_downloaded = dl.get_8k_filing("102909")
+    num_downloaded = dl.get_8k_filings("102909")
     assert num_downloaded == 0
 
     verify_directory_structure(default_download_folder, "8-K", **apple_filing_metadata)
@@ -23,6 +23,7 @@ def test_8k_filing_retrieval(default_download_folder, apple_filing_metadata):
 # ! TODO: test passing in non-int num_filings
 # ! TODO: test passing in negative num_filings
 # TODO: test passing in CIK and ticker with trailing whitespace and symbols
+# TODO: test passing in CIK as number
 
 
 '''
