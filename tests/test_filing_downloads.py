@@ -32,6 +32,20 @@ def test_10k_filing_retrieval(downloader, apple_filing_metadata, vanguard_filing
     verify_directory_structure(download_location, "10-K", **apple_filing_metadata)
 
 
+def test_10q_filing_retrieval(downloader, apple_filing_metadata, vanguard_filing_metadata):
+    dl, download_location = downloader
+
+    num_downloaded = dl.get_10q_filings(apple_filing_metadata["ticker_symbol"], 1)
+    assert num_downloaded == 1
+
+    # Vanguard Group does not file 10-Q
+    vanguard_full_cik = vanguard_filing_metadata["ticker_full_cik"]
+    num_downloaded = dl.get_10q_filings(vanguard_full_cik)
+    assert num_downloaded == 0
+
+    verify_directory_structure(download_location, "10-Q", **apple_filing_metadata)
+
+
 def test_13f_hr_filing_retrieval(downloader, apple_filing_metadata, vanguard_filing_metadata):
     dl, download_location = downloader
 
@@ -66,18 +80,37 @@ def test_13f_nt_filing_retrieval(downloader, apple_filing_metadata, vanguard_fil
     verify_directory_structure(download_location, "13F-NT", **vanguard_filing_metadata)
 
 
+def test_sc_13g_filing_retrieval(downloader, apple_filing_metadata):
+    dl, download_location = downloader
+
+    num_downloaded = dl.get_sc_13g_filings(apple_filing_metadata["ticker_symbol"], 1)
+    assert num_downloaded == 1
+
+    verify_directory_structure(download_location, "SC 13G", **apple_filing_metadata)
+
+
+def test_sd_filing_retrieval(downloader, apple_filing_metadata, vanguard_filing_metadata):
+    dl, download_location = downloader
+
+    num_downloaded = dl.get_sd_filings(apple_filing_metadata["ticker_symbol"], 1)
+    assert num_downloaded == 1
+
+    # Vanguard Group does not file SD
+    vanguard_full_cik = vanguard_filing_metadata["ticker_full_cik"]
+    num_downloaded = dl.get_sd_filings(vanguard_full_cik)
+    assert num_downloaded == 0
+
+    verify_directory_structure(download_location, "SD", **apple_filing_metadata)
+
+
+# def test_all_available_filing_retrieval(downloader, apple_filing_metadata):
+#     dl, download_location = downloader
+#     assert False
+
 # ! TODO: test passing in non-int num_filings
 # ! TODO: test passing in negative num_filings
+# TODO: test num_filings_to_obtain > 100
 # TODO: test passing in CIK and ticker with trailing whitespace and symbols
 # TODO: test passing in CIK as number
 
 # TODO: test throwing IO error in ctor
-
-'''
-Testing TODO:
-10-K
-10-Q
-SC-13G
-SD
-get_all_available_filings
-'''
