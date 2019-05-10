@@ -30,9 +30,9 @@ def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_full
 
     dir_content = os.listdir(base_dir)
     assert len(dir_content) == 1
-    assert dir_content[0] == "sec-edgar-filings"
+    assert dir_content[0] == "sec_edgar_filings"
 
-    next_level_of_dir = base_dir.joinpath("sec-edgar-filings")
+    next_level_of_dir = base_dir.joinpath("sec_edgar_filings")
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == 1

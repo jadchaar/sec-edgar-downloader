@@ -1,6 +1,3 @@
-import errno
-import json
-import os
 import requests
 from collections import namedtuple
 from datetime import date
@@ -65,7 +62,7 @@ class Downloader:
             resp = requests.get(doc_info.url, stream=True)
             resp.raise_for_status()
 
-            save_path = self._download_folder.joinpath("sec-edgar-filings", ticker, filing_type, doc_info.filename)
+            save_path = self._download_folder.joinpath("sec_edgar_filings", ticker, filing_type, doc_info.filename)
 
             # Create all parent directories as needed. For example, if we have the
             # directory /hello and we want to create /hello/world/my/name/is/bob.txt,
@@ -170,6 +167,7 @@ class Downloader:
 ! TODO: add support for Python 3.5 (remove use of f strings). Pathlib mkdir with exist_ok requires >3.5
 ! TODO: add Sphinx docstrings to functions
 ! TODO: allow users to pass in before dates
+! TODO: add CodeCov
 
 * Stretch goals
 TODO: add coloring to the terminal output (e.g. red for errors)
