@@ -1,4 +1,4 @@
-.PHONY: auto clean
+.PHONY: auto clean cleanall
 
 auto: build37
 
@@ -14,5 +14,8 @@ test:
 	. env/bin/activate && pytest
 
 clean:
-	rm -rf env
+	rm -rf env .pytest_cache
 	rm -f sec_edgar_downloader/*.pyc tests/*.pyc
+
+cleanbuild: clean
+	rm -rf sec_edgar_downloader.egg-info dist build

@@ -1,7 +1,5 @@
 # Cleanup old packages
-rm -rf sec_edgar_downloader.egg-info
-rm -rf dist
-rm -rf build
+make cleanbuild
 
 # Upload package to PyPI
 # https://packaging.python.org/tutorials/packaging-projects/
