@@ -121,7 +121,7 @@ class Downloader:
     #########################
     ########## 13F ##########
 
-    # Reference on difference: https://www.sec.gov/divisions/investment/13ffaq.htm
+    # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
 
     def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "13F-NT"

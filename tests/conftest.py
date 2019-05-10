@@ -2,15 +2,17 @@ import shutil
 import sys
 import pytest
 from pathlib import Path
+from sec_edgar_downloader import Downloader
 
 sys.path.append(str(Path(__file__).parent.joinpath('helpers')))
 
 
 @pytest.fixture(scope="function")
-def default_download_folder(tmpdir):
-    tmp = Path(tmpdir.mkdir("Downloads"))
-    yield tmp
-    shutil.rmtree(tmp)
+def downloader(tmpdir):
+    tmp_dir = Path(tmpdir.mkdir("Downloads"))
+    dl = Downloader(tmp_dir)
+    yield dl, tmp_dir
+    shutil.rmtree(tmp_dir)
 
 
 @pytest.fixture(scope="session")

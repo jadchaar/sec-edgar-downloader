@@ -20,8 +20,7 @@ def extract_header(file_path):
             if line == "FILER:\n":
                 break
             header.append(line)
-    # Ignore <SEC-DOCUMENT>, <SEC-HEADER>, and <ACCEPTANCE-DATETIME>
-    return header[3:]
+    return header
 
 
 def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_full_cik):
