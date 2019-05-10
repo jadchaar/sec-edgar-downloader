@@ -16,16 +16,16 @@ from bs4 import BeautifulSoup
 FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
 
 class Downloader:
-    def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):
+    def __init__(self, download_folder=Path.joinpath(Path.home(), "Downloads")):
         print("Welcome to the SEC EDGAR Downloader!")
 
-        # TODO: should we delete a folder or overrite it when the same data is requested?
-        if not Path(download_folder).exists():
-            raise IOError(f"The folder for saving company filings ({download_folder}) does not exist.")
+        self._download_folder = Path(download_folder)
 
-        print(f"Company filings will be saved to: {download_folder}")
+        # TODO: should we delete a folder or override it when the same data is requested?
+        if not self._download_folder.exists():
+            raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
 
-        self._download_folder = download_folder
+        print(f"Company filings will be saved to: {self._download_folder}")
 
         # TODO: Allow users to pass this in
         # Will have to handle pagination since only 100 are displayed on a single page.

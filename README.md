@@ -1,5 +1,6 @@
 # sec-edgar-downloader
 
+[![Build Status](https://travis-ci.org/jadchaar/sec-edgar-downloader.svg?branch=master)](https://travis-ci.org/jadchaar/sec-edgar-downloader)
 [![image](https://img.shields.io/pypi/v/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)
 [![image](https://img.shields.io/pypi/pyversions/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)
 [![image](https://img.shields.io/pypi/l/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)

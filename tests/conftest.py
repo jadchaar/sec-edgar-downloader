@@ -1,9 +1,13 @@
-import pytest
-from shutil import rmtree
+import shutil
+import sys
 from pathlib import Path
 
-@pytest.fixture
+import pytest
+
+sys.path.append(str(Path.joinpath(Path(__file__).parent, 'helpers')))
+
+@pytest.fixture(scope="function")
 def default_download_folder(tmpdir):
-    tmp = tmpdir.mkdir("dl")
+    tmp = Path(tmpdir.mkdir("Downloads"))
     yield tmp
-    rmtree(tmp)
+    shutil.rmtree(tmp)
