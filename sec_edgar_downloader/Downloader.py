@@ -1,11 +1,10 @@
 import errno
 import json
 import os
+import requests
 from collections import namedtuple
 from datetime import date
 from pathlib import Path
-
-import requests
 from bs4 import BeautifulSoup
 
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
@@ -154,19 +153,29 @@ class Downloader:
     ########## SD ##########
     ########################
 
-    def get_all_available_filings(self, ticker_or_cik):
-        ticker_or_cik = ticker_or_cik.upper()
-        self.get_8k_filing(ticker_or_cik)
-        self.get_10k_filing(ticker_or_cik)
-        self.get_10q_filing(ticker_or_cik)
-        self.get_13f_filing(ticker_or_cik)
-        self.get_sc_13g_filing(ticker_or_cik)
-        self.get_sd_filing(ticker_or_cik)
+    def get_all_available_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        self.get_8k_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_10k_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_10q_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_13f_nt_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_13f_hr_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_sc_13g_filings(ticker_or_cik, num_filings_to_obtain)
+        self.get_sd_filings(ticker_or_cik, num_filings_to_obtain)
 
-# ! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them
-#   -> if we do distinguish amendments, remember to update tests with new arguments
-# TODO: add Sphinx docstrings to functions
-# TODO: allow users to pass in before dates
-# TODO: add coloring to the terminal output (e.g. red for errors)
-# TODO: add "caching" to prevent overriding previous downloads (if already downloaded, skip)
-# TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
+
+"""
+* 2.0.0 release goals
+! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them.
+        If we do distinguish amendments, remember to update tests with new arguments
+! TODO: add support for Python 3.5 (remove use of f strings). Pathlib mkdir with exist_ok requires >3.5
+! TODO: add Sphinx docstrings to functions
+! TODO: allow users to pass in before dates
+
+* Stretch goals
+TODO: add coloring to the terminal output (e.g. red for errors)
+
+* Backlog
+TODO: counts beyond 100 (e.g. if a company has more than 100 filings of a particular type)
+TODO: add "caching" to prevent overriding previous downloads (if already downloaded, skip)
+TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
+"""
