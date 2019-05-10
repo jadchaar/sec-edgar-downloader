@@ -3,7 +3,7 @@ import sys
 import pytest
 from pathlib import Path
 
-sys.path.append(str(Path.joinpath(Path(__file__).parent, 'helpers')))
+sys.path.append(str(Path(__file__).parent.joinpath('helpers')))
 
 
 @pytest.fixture(scope="function")

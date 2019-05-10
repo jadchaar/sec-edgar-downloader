@@ -1,3 +1,6 @@
+# small local test file for sanity checks
+sanity_check.py
+
 # General
 .DS_Store
 .AppleDouble

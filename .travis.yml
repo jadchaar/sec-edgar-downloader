@@ -1,8 +1,9 @@
 language: python
 dist: xenial
 python:
-  - 3.6
-  - 3.7
+    - 3.6
+    - 3.7
+before_install: make clean
 install:
     - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then make build36; fi
     - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then make build37; fi

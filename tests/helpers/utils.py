@@ -29,24 +29,24 @@ def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_cik)
     assert len(dir_content) == 1
     assert dir_content[0] == "sec-edgar-filings"
 
-    next_level_of_dir = Path.joinpath(base_dir, "sec-edgar-filings")
+    next_level_of_dir = base_dir.joinpath("sec-edgar-filings")
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == 1
     assert dir_content[0] == ticker_symbol
 
-    next_level_of_dir = Path.joinpath(next_level_of_dir, ticker_symbol)
+    next_level_of_dir = next_level_of_dir.joinpath(ticker_symbol)
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == 1
     assert dir_content[0] == filing_type
 
-    next_level_of_dir = Path.joinpath(next_level_of_dir, filing_type)
+    next_level_of_dir = next_level_of_dir.joinpath(filing_type)
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == 1
 
-    next_level_of_dir = Path.joinpath(next_level_of_dir, dir_content[0])
+    next_level_of_dir = next_level_of_dir.joinpath(dir_content[0])
     assert next_level_of_dir.is_file()
     assert next_level_of_dir.suffix == ".txt"
 

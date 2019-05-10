@@ -13,16 +13,16 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
+FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
 
 class Downloader:
-    def __init__(self, download_folder=Path.joinpath(Path.home(), "Downloads")):
+    def __init__(self, download_folder=Path.home().joinpath("Downloads")):
         print("Welcome to the SEC EDGAR Downloader!")
 
         self._download_folder = Path(download_folder)
 
-        # TODO: should we delete a folder or override it when the same data is requested?
+        # TODO: delete a folder or override it when the same data is requested?
         if not self._download_folder.exists():
             raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
 
@@ -56,7 +56,7 @@ class Downloader:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
             # Some entries end with .html, some end with .htm
             if filing_detail_url[-1] != "l":
-                filing_detail_url += 'l'
+                filing_detail_url += "l"
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1]
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
@@ -72,21 +72,14 @@ class Downloader:
             resp = requests.get(doc_info.url, stream=True)
             resp.raise_for_status()
 
-            save_path = Path(self._download_folder).joinpath(
-                "sec-edgar-filings", ticker, filing_type, doc_info.filename)
+            save_path = self._download_folder.joinpath("sec-edgar-filings", ticker, filing_type, doc_info.filename)
 
-            # Create all parent directories as needed.
-            # For example: if we have /hello and we want to create
-            # /hello/world/my/name/is/john.txt, this would create
-            # all the directores leading up to john.txt
-            if not Path.exists(Path(save_path).parent):
-                try:
-                    os.makedirs(Path(save_path).parent)
-                except OSError as e:
-                    if e.errno != errno.EEXIST:
-                        raise
+            # Create all parent directories as needed. For example, if we have the
+            # directory /hello and we want to create /hello/world/my/name/is/bob.txt,
+            # this would create all the directories leading up to bob.txt.
+            save_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(save_path, 'wb') as f:
+            with open(save_path, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=1024):
                     if chunk:  # filter out keep-alive chunks
                         f.write(chunk)

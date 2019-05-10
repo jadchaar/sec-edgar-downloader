@@ -20,6 +20,10 @@ def test_8k_filing_retrieval(default_download_folder, apple_filing_metadata):
 
 # TODO: test throwing IO error in ctor
 
+# ! TODO: test passing in non-int num_filings
+# ! TODO: test passing in negative num_filings
+# TODO: test passing in CIK and ticker with trailing whitespace and symbols
+
 
 '''
 Testing TODO:
