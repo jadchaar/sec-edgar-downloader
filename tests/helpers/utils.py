@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 def parse_filing_document_header(file_path):
     parsed = {}
     header = extract_header(file_path)
@@ -18,21 +21,31 @@ def extract_header(file_path):
     # Ignore <SEC-DOCUMENT>, <SEC-HEADER>, and <ACCEPTANCE-DATETIME>
     return header[3:]
 
+def verify_directory_structure(base_dir, ticker_symbol, ticker_cik, filing_type):
+    next_level_of_dir = Path.joinpath(base_dir, "sec-edgar-filings")
+    assert next_level_of_dir.is_dir()
+    dir_content = os.listdir(next_level_of_dir)
+    assert len(dir_content) == 1
+    assert dir_content[0] == ticker_symbol
 
-'''
-==============
-Example Header
-==============
+    next_level_of_dir = Path.joinpath(next_level_of_dir, ticker_symbol)
+    assert next_level_of_dir.is_dir()
+    dir_content = os.listdir(next_level_of_dir)
+    assert len(dir_content) == 1
+    assert dir_content[0] == filing_type
 
-<SEC-DOCUMENT>0000320193-19-000063.txt : 20190430
-<SEC-HEADER>0000320193-19-000063.hdr.sgml : 20190430
-<ACCEPTANCE-DATETIME>20190430163016
-ACCESSION NUMBER:		0000320193-19-000063
-CONFORMED SUBMISSION TYPE:	8-K
-PUBLIC DOCUMENT COUNT:		3
-CONFORMED PERIOD OF REPORT:	20190430
-ITEM INFORMATION:		Results of Operations and Financial Condition
-ITEM INFORMATION:		Financial Statements and Exhibits
-FILED AS OF DATE:		20190430
-DATE AS OF CHANGE:		20190430
-'''
+    next_level_of_dir = Path.joinpath(next_level_of_dir, filing_type)
+    assert next_level_of_dir.is_dir()
+    dir_content = os.listdir(next_level_of_dir)
+    assert len(dir_content) == 1
+
+    next_level_of_dir = Path.joinpath(next_level_of_dir, dir_content[0])
+    assert next_level_of_dir.is_file()
+    assert next_level_of_dir.suffix == ".txt"
+
+    accession_number = next_level_of_dir.stem
+    assert accession_number[:len(ticker_cik)] == ticker_cik
+
+    header_contents = parse_filing_document_header(next_level_of_dir)
+    assert header_contents["ACCESSION NUMBER"] == accession_number
+    assert header_contents["CONFORMED SUBMISSION TYPE"] == filing_type

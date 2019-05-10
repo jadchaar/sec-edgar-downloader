@@ -2,12 +2,12 @@ import sec_edgar_downloader
 
 downloader = sec_edgar_downloader.Downloader()
 
-downloader.get_8k_filing("AAPL", 1)
+# downloader.get_8k_filing("AAPL", 1)
 # downloader.get_10k_filing("AAPL", 1)
 # downloader.get_10q_filing("AAPL", 1)
 
 # downloader.get_10k_filing("DANKMEMES", 1)
-# downloader.get_13f_filing("0000102909", 1)
+downloader.get_13f_filing("0000102909", 1)
 
 
 # downloader.get_all_available_filings("AAPL")

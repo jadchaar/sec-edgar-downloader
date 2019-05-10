@@ -1,8 +1,7 @@
 import shutil
 import sys
-from pathlib import Path
-
 import pytest
+from pathlib import Path
 
 sys.path.append(str(Path.joinpath(Path(__file__).parent, 'helpers')))
 
