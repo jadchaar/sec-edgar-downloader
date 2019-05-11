@@ -121,12 +121,3 @@ def test_all_available_filing_retrieval_institutional_investor(downloader, vangu
 
     expected_filings = ["13F-HR", "13F-NT", "SC 13G"]
     verify_directory_structure(download_location, expected_filings, 2, **vanguard_filing_metadata)
-
-
-# ! TODO: test passing in non-int num_filings
-# ! TODO: test passing in negative num_filings
-# TODO: test num_filings_to_obtain > 100
-# TODO: test passing in CIK and ticker with trailing whitespace and symbols
-# TODO: test passing in CIK as number
-
-# TODO: test throwing IO error in ctor
