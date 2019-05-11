@@ -23,7 +23,7 @@ def extract_header(file_path):
     return header
 
 
-def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_full_cik):
+def verify_directory_structure(base_dir, filing_types, num_downloaded, ticker_symbol, ticker_full_cik):
     # no ticker symbol available (only CIK)
     if ticker_symbol is None:
         ticker_symbol = strip_cik(ticker_full_cik)
@@ -41,26 +41,30 @@ def verify_directory_structure(base_dir, filing_type, ticker_symbol, ticker_full
     next_level_of_dir = next_level_of_dir.joinpath(ticker_symbol)
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
-    assert len(dir_content) == 1
-    assert dir_content[0] == filing_type
+    assert len(dir_content) == len(filing_types)
 
-    next_level_of_dir = next_level_of_dir.joinpath(filing_type)
-    assert next_level_of_dir.is_dir()
-    dir_content = os.listdir(next_level_of_dir)
-    assert len(dir_content) == 1
+    for i in range(len(filing_types)):
+        assert filing_types[i] in dir_content
 
-    next_level_of_dir = next_level_of_dir.joinpath(dir_content[0])
-    assert next_level_of_dir.is_file()
-    assert next_level_of_dir.suffix == ".txt"
+    for ft in filing_types:
+        next_level_of_dir_tmp = next_level_of_dir.joinpath(ft)
+        print(next_level_of_dir_tmp)
+        assert next_level_of_dir_tmp.is_dir()
+        dir_content = os.listdir(next_level_of_dir_tmp)
+        assert len(dir_content) == num_downloaded
 
-    accession_number = next_level_of_dir.stem
-    # assert accession_number[:len(ticker_full_cik)] == ticker_full_cik
+        next_level_of_dir_tmp = next_level_of_dir_tmp.joinpath(dir_content[0])
+        assert next_level_of_dir_tmp.is_file()
+        assert next_level_of_dir_tmp.suffix == ".txt"
 
-    header_contents = parse_filing_document_header(next_level_of_dir)
-    assert header_contents["ACCESSION NUMBER"] == accession_number
-    # second condition accounts for amendments
-    assert header_contents["CONFORMED SUBMISSION TYPE"] == filing_type or header_contents[
-        "CONFORMED SUBMISSION TYPE"] == f"{filing_type}/A"
+        accession_number = next_level_of_dir_tmp.stem
+        # assert accession_number[:len(ticker_full_cik)] == ticker_full_cik
+
+        header_contents = parse_filing_document_header(next_level_of_dir_tmp)
+        assert header_contents["ACCESSION NUMBER"] == accession_number
+        # second condition accounts for amendments
+        assert header_contents["CONFORMED SUBMISSION TYPE"] == ft or header_contents[
+            "CONFORMED SUBMISSION TYPE"] == f"{ft}/A"
 
 
 def strip_cik(full_cik):

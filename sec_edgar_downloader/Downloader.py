@@ -52,7 +52,7 @@ class Downloader:
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
-            # ! FIX: misleading message if num_filings_to_obtain = 0
+            # TODO: misleading message if num_filings_to_obtain = 0
             print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
@@ -151,13 +151,15 @@ class Downloader:
     ########################
 
     def get_all_available_filings(self, ticker_or_cik, num_filings_to_obtain=100):
-        self.get_8k_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_10k_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_10q_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_13f_nt_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_13f_hr_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_sc_13g_filings(ticker_or_cik, num_filings_to_obtain)
-        self.get_sd_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl = 0
+        total_dl += self.get_8k_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_10k_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_10q_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_13f_nt_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_13f_hr_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_obtain)
+        return total_dl
 
 
 """
