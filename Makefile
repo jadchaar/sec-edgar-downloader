@@ -11,11 +11,12 @@ build37:
 	env/bin/pip install -r requirements.txt
 
 test:
-	. env/bin/activate && pytest
+	rm -f .coverage
+	. env/bin/activate && pytest --cov=sec_edgar_downloader tests/
 
 clean:
 	rm -rf env .pytest_cache
-	rm -f sec_edgar_downloader/*.pyc tests/*.pyc
+	rm -f sec_edgar_downloader/*.pyc tests/*.pyc .coverage
 
 cleanbuild: clean
 	rm -rf sec_edgar_downloader.egg-info dist build
