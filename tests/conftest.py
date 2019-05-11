@@ -19,7 +19,8 @@ def downloader(tmpdir):
 def apple_filing_metadata():
     apple_ticker_data = {
         "ticker_symbol": "AAPL",
-        "ticker_full_cik": "0000320193"
+        "ticker_full_cik": "0000320193",
+        "ticker_company_name": "APPLE INC"
     }
     return apple_ticker_data
 
@@ -28,6 +29,7 @@ def apple_filing_metadata():
 def vanguard_filing_metadata():
     vanguard_ticker_data = {
         "ticker_symbol": None,
-        "ticker_full_cik": "0000102909"
+        "ticker_full_cik": "0000102909",
+        "ticker_company_name": "VANGUARD GROUP INC"
     }
     return vanguard_ticker_data
