@@ -12,17 +12,17 @@ build37:
 
 test:
 	rm -f .coverage
-	. env/bin/activate && pytest --cov=sec_edgar_downloader tests
+	. env/bin/activate && pytest --cov-config=setup.cfg --cov=sec_edgar_downloader tests
 
 lint:
-	env/bin/flake8 sec_edgar_downloader tests
+	env/bin/flake8 --config=setup.cfg sec_edgar_downloader tests
 
 clean:
 	rm -rf env .pytest_cache ./**/__pycache__
 	rm -f ./**/*.pyc .coverage
 
 publish: clean build37
-	. env/bin/activate && env/bin/pip install -U twine
+	pip install -U twine
 	env/bin/python3 setup.py sdist bdist_wheel
-	. env/bin/activate && twine upload dist/*
+	twine upload dist/*
 	rm -rf dist build .egg sec_edgar_downloader.egg-info
