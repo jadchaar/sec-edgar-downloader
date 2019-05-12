@@ -169,7 +169,7 @@ class Downloader:
 ! TODO: add support for Python 3.5 (remove use of f strings). Pathlib mkdir with exist_ok requires >3.5
 ! TODO: add Sphinx docstrings to functions
 ! TODO: allow users to pass in before dates
-! TODO: add CodeCov
+! TODO: ability to mute print statements
 
 * Stretch goals
 TODO: add coloring to the terminal output (e.g. red for errors)
