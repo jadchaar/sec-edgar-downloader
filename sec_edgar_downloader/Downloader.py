@@ -2,8 +2,8 @@ from collections import namedtuple
 from datetime import date
 from pathlib import Path
 
-import requests
 from bs4 import BeautifulSoup
+import requests
 
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
@@ -32,7 +32,7 @@ class Downloader:
         before_date = date.today().strftime("%Y%m%d")
         return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
-    def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_obtain):
+    def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_download):
         resp = requests.get(edgar_search_url)
         resp.raise_for_status()
         edgar_results_html = resp.content
@@ -40,7 +40,7 @@ class Downloader:
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
         document_anchor_elements = edgar_results_scraper.find_all(
-            id="documentsbutton", href=True)[:num_filings_to_obtain]
+            id="documentsbutton", href=True)[:num_filings_to_download]
 
         sec_base_url = "https://www.sec.gov"
         filing_document_info = []
@@ -53,11 +53,14 @@ class Downloader:
             name = full_filing_url.split("/")[-1]
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
-        if len(filing_document_info) == 0:
+        # number of filings available may be less than the number requested
+        num_filings_to_download = len(filing_document_info)
+
+        if num_filings_to_download == 0:
             print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
-        print(f"{len(filing_document_info)} {filing_type} documents available for {ticker}. Beginning download...")
+        print(f"{num_filings_to_download} {filing_type} documents available for {ticker}. Beginning download...")
 
         for doc_info in filing_document_info:
             resp = requests.get(doc_info.url, stream=True)
@@ -77,63 +80,63 @@ class Downloader:
 
         print(f"{filing_type} filings for {ticker} downloaded successfully.")
 
-        return len(filing_document_info)
+        return num_filings_to_download
 
-    def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_obtain):
-        num_filings_to_obtain = int(num_filings_to_obtain)
-        if num_filings_to_obtain < 1:
+    def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_download):
+        num_filings_to_download = int(num_filings_to_download)
+        if num_filings_to_download < 1:
             raise ValueError("Please enter a number greater than 1 for the number of filings to download.")
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
-        return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_download)
 
     '''
     Generic download methods
     '''
 
-    def get_8k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_8k_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "8-K"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    def get_10k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_10k_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "10-K"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    def get_10q_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_10q_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "10-Q"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
     # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
-    def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "13F-NT"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "13F-HR"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "SC 13G"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    def get_sd_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_sd_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "SD"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
     '''
     Bulk download methods
     '''
 
-    def get_all_available_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+    def get_all_available_filings(self, ticker_or_cik, num_filings_to_download=100):
         total_dl = 0
-        total_dl += self.get_8k_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_10k_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_10q_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_13f_nt_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_13f_hr_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_obtain)
-        total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_8k_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_10k_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_10q_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_13f_nt_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_13f_hr_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_download)
         return total_dl
 
 
@@ -141,8 +144,8 @@ class Downloader:
 * 2.0.0 release goals
 ! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them.
         If we do distinguish amendments, remember to update tests with new arguments
-! TODO: add support for Python 3.5 (remove use of f strings). Pathlib mkdir with exist_ok requires >3.5
 ! TODO: add Sphinx docstrings to functions
+! TODO: host documentation on readthedocs
 ! TODO: allow users to pass in before dates
 ! TODO: ability to mute print statements
 

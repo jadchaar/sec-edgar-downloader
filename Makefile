@@ -25,6 +25,5 @@ cleanbuild: clean
 	rm -rf sec_edgar_downloader.egg-info dist build
 
 publish: cleanbuild build37
-	env/bin/pip install -U twine
 	env/bin/python3 setup.py sdist bdist_wheel
-	env/bin/python3 -m twine upload dist/*
+	. env/bin/activate && env/bin/pip install -U twine && env/bin/python3 -m twine upload dist/*

@@ -1,7 +1,9 @@
 import shutil
 import sys
-import pytest
 from pathlib import Path
+
+import pytest
+
 from sec_edgar_downloader import Downloader
 
 sys.path.append(str(Path(__file__).parent.joinpath('helpers')))
