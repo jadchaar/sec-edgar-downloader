@@ -11,7 +11,7 @@
 - Removed ticker validation to facilitate this simplified API change.
 - Added a full suite of unit and integration tests along with an internal Travis CI pipeline for increased reliability.
 - Class methods now return the number of filings downloaded.
-- Added support for Python 3.8.
+- Added Python 3.8 support.
 
 ## 1.2.0 - 2/14/2019
 
