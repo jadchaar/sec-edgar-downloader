@@ -46,6 +46,8 @@ setuptools.setup(
         "10-K",
         "10-Q",
         "13F",
+        "13F-NT",
+        "13F-HR",
         "SC 13G",
         "SD",
     ],
