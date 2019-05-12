@@ -148,6 +148,8 @@ class Downloader:
 ! TODO: host documentation on readthedocs
 ! TODO: allow users to pass in before dates
 ! TODO: ability to mute print statements
+! TODO: investigate running tests on Windows as well to ensure file system works properly
+        https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
 
 * Stretch goals
 TODO: add coloring to the terminal output (e.g. red for errors)
