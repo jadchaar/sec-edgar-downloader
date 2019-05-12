@@ -10,6 +10,7 @@
   - All these methods can be passed either a CIK or ticker string.
 - Removed ticker validation to facilitate this simplified API change.
 - Added a full suite of unit and integration tests along with an internal Travis CI pipeline for increased reliability.
+- Class methods now return the number of filings downloaded.
 
 ## 1.2.0 - 2/14/2019
 

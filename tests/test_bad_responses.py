@@ -10,5 +10,5 @@ def test_bad_responses(downloader, apple_filing_metadata):
     for code in codes_to_test:
         dl._base_url = f"https://httpstat.us/{code[0]}?action=getcompany&owner=exclude&count=100"
         with pytest.raises(requests.exceptions.HTTPError) as excinfo:
-            num_downloaded = dl.get_all_available_filings(apple_filing_metadata["ticker_symbol"], 1)
+            dl.get_all_available_filings(apple_filing_metadata["symbol"], 1)
         assert code[1] in str(excinfo.value)

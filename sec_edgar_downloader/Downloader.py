@@ -1,7 +1,8 @@
-import requests
 from collections import namedtuple
 from datetime import date
 from pathlib import Path
+
+import requests
 from bs4 import BeautifulSoup
 
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
@@ -22,7 +23,8 @@ class Downloader:
         # Will have to handle pagination since only 100 are displayed on a single page.
         # Requires another start query parameter: start=100&count=100
         self._count = 100
-        self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
+        self._base_url = "https://www.sec.gov/cgi-bin/browse-edgar" \
+            f"?action=getcompany&owner=exclude&count={self._count}"
 
     # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
     def _form_url(self, ticker, filing_type):
@@ -52,7 +54,6 @@ class Downloader:
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
-            # TODO: misleading message if num_filings_to_obtain = 0
             print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
@@ -76,49 +77,34 @@ class Downloader:
 
         print(f"{filing_type} filings for {ticker} downloaded successfully.")
 
-        return num_filings_to_obtain
+        return len(filing_document_info)
 
     def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_obtain):
-        ticker_or_cik = str(ticker_or_cik).upper().lstrip("0")
+        num_filings_to_obtain = int(num_filings_to_obtain)
+        if num_filings_to_obtain < 1:
+            raise ValueError("Please enter a number greater than 1 for the number of filings to download.")
+        ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
         return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    #########################
-    ########## 8-K ##########
+    '''
+    Generic download methods
+    '''
 
     def get_8k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "8-K"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    ########## 8-K ##########
-    #########################
-
-    ##########################
-    ########## 10-K ##########
-
     def get_10k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-K"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
-
-    ########## 10-K ##########
-    ##########################
-
-    ##########################
-    ########## 10-Q ##########
 
     def get_10q_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-Q"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    ########## 10-Q ##########
-    ##########################
-
-    #########################
-    ########## 13F ##########
-
     # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
-
     def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "13F-NT"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
@@ -127,28 +113,17 @@ class Downloader:
         filing_type = "13F-HR"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    ########## 13F ##########
-    #########################
-
-    ############################
-    ########## SC 13G ##########
-
     def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SC 13G"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
-
-    ########## SC 13G ##########
-    ############################
-
-    ########################
-    ########## SD ##########
 
     def get_sd_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SD"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    ########## SD ##########
-    ########################
+    '''
+    Bulk download methods
+    '''
 
     def get_all_available_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         total_dl = 0

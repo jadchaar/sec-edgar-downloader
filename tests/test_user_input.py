@@ -1,10 +1,58 @@
-import pytest
 from pathlib import Path
 
-# ! TODO: test passing in non-int num_filings
-# ! TODO: test passing in negative num_filings
-# TODO: test num_filings_to_obtain > 100
-# TODO: test passing in CIK and ticker with trailing whitespace and symbols
-# TODO: test passing in CIK as number
+import pytest
 
-# TODO: test throwing IO error in ctor
+from sec_edgar_downloader import Downloader
+
+
+def test_invalid_save_path_constructor():
+    test_path = str(Path.home().joinpath("Downloads", "invalid_dir"))
+    with pytest.raises(IOError) as excinfo:
+        Downloader(test_path)
+    expected_msg = f"The folder for saving company filings ({test_path}) does not exist."
+    assert expected_msg in str(excinfo.value)
+
+
+def test_num_filings_to_download_argument(downloader, apple_filing_metadata):
+    dl, _ = downloader
+    expected_msg = "Please enter a number greater than 1 for the number of filings to download."
+
+    with pytest.raises(ValueError) as excinfo:
+        num_downloaded = dl.get_8k_filings(apple_filing_metadata["symbol"], -1)
+    assert expected_msg in str(excinfo.value)
+
+    with pytest.raises(ValueError) as excinfo:
+        num_downloaded = dl.get_8k_filings(apple_filing_metadata["symbol"], "-1")
+    assert expected_msg in str(excinfo.value)
+
+    with pytest.raises(ValueError) as excinfo:
+        num_downloaded = dl.get_8k_filings(apple_filing_metadata["symbol"], 0)
+    assert expected_msg in str(excinfo.value)
+
+    with pytest.raises(ValueError) as excinfo:
+        num_downloaded = dl.get_8k_filings(apple_filing_metadata["symbol"], 0.9)
+    assert expected_msg in str(excinfo.value)
+
+    num_downloaded = dl.get_8k_filings(apple_filing_metadata["symbol"], 2.9)
+    assert num_downloaded == 2
+
+
+def test_ticker_argument(downloader):
+    dl, _ = downloader
+
+    malformed_apple_ticker = "  \n  \t aApL    \t "
+    num_downloaded = dl.get_8k_filings(malformed_apple_ticker, 1)
+    assert num_downloaded == 1
+
+    cik_num = 102909
+    num_downloaded = dl.get_13f_hr_filings(cik_num, 1)
+    assert num_downloaded == 1
+
+    invalid_ticker = "INVALIDTICKER"
+    num_downloaded = dl.get_all_available_filings(invalid_ticker)
+    assert num_downloaded == 0
+
+    # mutual funds do not file SEC forms
+    mutual_fund_ticker = "VTSAX"
+    num_downloaded = dl.get_all_available_filings(mutual_fund_ticker)
+    assert num_downloaded == 0

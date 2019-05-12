@@ -18,9 +18,9 @@ def downloader(tmpdir):
 @pytest.fixture(scope="session")
 def apple_filing_metadata():
     apple_ticker_data = {
-        "ticker_symbol": "AAPL",
-        "ticker_full_cik": "0000320193",
-        "ticker_company_name": "APPLE INC"
+        "symbol": "AAPL",
+        "full_cik": "0000320193",
+        "company_name": "APPLE INC"
     }
     return apple_ticker_data
 
@@ -28,8 +28,8 @@ def apple_filing_metadata():
 @pytest.fixture(scope="session")
 def vanguard_filing_metadata():
     vanguard_ticker_data = {
-        "ticker_symbol": None,
-        "ticker_full_cik": "0000102909",
-        "ticker_company_name": "VANGUARD GROUP INC"
+        "symbol": None,
+        "full_cik": "0000102909",
+        "company_name": "VANGUARD GROUP INC"
     }
     return vanguard_ticker_data

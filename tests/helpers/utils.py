@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 
 def parse_filing_document_header(file_path):
@@ -11,7 +10,8 @@ def parse_filing_document_header(file_path):
     header = extract_header(file_path)
     for line in header:
         components = [l.strip() for l in line.split(":")]
-        if components[0] == "ACCESSION NUMBER" or components[0] == "CONFORMED SUBMISSION TYPE" or components[0] == "COMPANY CONFORMED NAME":
+        if (components[0] == "ACCESSION NUMBER" or components[0] == "CONFORMED SUBMISSION TYPE" or
+                components[0] == "COMPANY CONFORMED NAME"):
             parsed[components[0]].append(components[1])
     return parsed
 
@@ -27,10 +27,10 @@ def extract_header(file_path):
     return header
 
 
-def verify_directory_structure(base_dir, filing_types, num_downloaded, ticker_symbol, ticker_full_cik, ticker_company_name):
+def verify_directory_structure(base_dir, filing_types, num_downloaded, symbol, full_cik, company_name):
     # no ticker symbol available (only CIK)
-    if ticker_symbol is None:
-        ticker_symbol = strip_cik(ticker_full_cik)
+    if symbol is None:
+        symbol = strip_cik(full_cik)
 
     dir_content = os.listdir(base_dir)
     assert len(dir_content) == 1
@@ -40,9 +40,9 @@ def verify_directory_structure(base_dir, filing_types, num_downloaded, ticker_sy
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == 1
-    assert dir_content[0] == ticker_symbol
+    assert dir_content[0] == symbol
 
-    next_level_of_dir = next_level_of_dir.joinpath(ticker_symbol)
+    next_level_of_dir = next_level_of_dir.joinpath(symbol)
     assert next_level_of_dir.is_dir()
     dir_content = os.listdir(next_level_of_dir)
     assert len(dir_content) == len(filing_types)
@@ -61,7 +61,7 @@ def verify_directory_structure(base_dir, filing_types, num_downloaded, ticker_sy
         assert next_level_of_dir_tmp.suffix == ".txt"
 
         accession_number = next_level_of_dir_tmp.stem
-        # assert accession_number[:len(ticker_full_cik)] == ticker_full_cik
+        # assert accession_number[:len(full_cik)] == full_cik
 
         header_contents = parse_filing_document_header(next_level_of_dir_tmp)
         assert len(header_contents["ACCESSION NUMBER"]) == 1 and len(header_contents["CONFORMED SUBMISSION TYPE"]) == 1
@@ -70,7 +70,7 @@ def verify_directory_structure(base_dir, filing_types, num_downloaded, ticker_sy
         assert header_submission == ft or header_submission == f"{ft}/A"
         # lack of standard SEC-HEADER format makes it hard to exact match the company name
         # without more advanced edge-case parsing, so this is a good estimate of the check
-        assert ticker_company_name in header_contents["COMPANY CONFORMED NAME"]
+        assert company_name in header_contents["COMPANY CONFORMED NAME"]
 
 
 def strip_cik(full_cik):
