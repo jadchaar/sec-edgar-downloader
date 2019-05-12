@@ -7,9 +7,9 @@ python:
     - "3.8-dev"
 before_install: make clean
 install:
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then make build36; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then make build37; fi
-    - if [[ $TRAVIS_PYTHON_VERSION == '3.8-dev' ]]; then make build38; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]]; then make build36; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == "3.7" ]]; then make build37; fi
+    - if [[ $TRAVIS_PYTHON_VERSION == "3.8-dev" ]]; then make build38; fi
     - pip install codecov
 script:
     - make lint
