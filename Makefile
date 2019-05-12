@@ -1,4 +1,4 @@
-.PHONY: auto clean cleanall
+.PHONY: auto test lint clean cleanbuild publish
 
 auto: build37
 
@@ -12,7 +12,10 @@ build37:
 
 test:
 	rm -f .coverage
-	. env/bin/activate && pytest --cov=sec_edgar_downloader tests/
+	. env/bin/activate && pytest --cov=sec_edgar_downloader tests
+
+lint:
+	env/bin/flake8 sec_edgar_downloader tests
 
 clean:
 	rm -rf env .pytest_cache

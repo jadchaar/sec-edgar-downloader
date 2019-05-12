@@ -9,5 +9,7 @@ install:
     - if [[ $TRAVIS_PYTHON_VERSION == '3.6' ]]; then make build36; fi
     - if [[ $TRAVIS_PYTHON_VERSION == '3.7' ]]; then make build37; fi
     - pip install codecov
-script: make test
+script:
+    - make lint
+    - make test
 after_success: codecov
