@@ -27,13 +27,14 @@ setup(
 
         "License :: OSI Approved :: MIT License",
 
-        "Operating System:: POSIX",
-        "Operating System:: Microsoft:: Windows",
-        "Operating System:: MacOS:: MacOS X"
+        "Operating System :: POSIX",
+        "Operating System :: Microsoft :: Windows",
+        "Operating System :: MacOS :: MacOS X"
 
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
     keywords="sec edgar downloader filing financial finance sec.gov 8-k 10-k 10-q 13f 13f-nt 13f-hr sc-13g sd",
     project_urls={

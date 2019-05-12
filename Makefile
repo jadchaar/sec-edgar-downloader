@@ -10,6 +10,10 @@ build37:
 	virtualenv env --python=python3.7
 	env/bin/pip install -r requirements.txt
 
+build38:
+	virtualenv env --python=python3.8
+	env/bin/pip install -r requirements.txt
+
 test:
 	rm -f .coverage
 	. env/bin/activate && pytest --cov-config=setup.cfg --cov=sec_edgar_downloader tests
