@@ -19,7 +19,7 @@ test:
 	. env/bin/activate && pytest --cov-config=setup.cfg --cov=sec_edgar_downloader tests
 
 lint:
-	env/bin/flake8 --config=setup.cfg sec_edgar_downloader tests
+	env/bin/flake8 --config=setup.cfg sec_edgar_downloader tests setup.py
 
 clean:
 	rm -rf env .pytest_cache ./**/__pycache__
