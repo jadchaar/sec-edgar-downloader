@@ -18,8 +18,8 @@ lint:
 	env/bin/flake8 sec_edgar_downloader tests
 
 clean:
-	rm -rf env .pytest_cache
-	rm -f sec_edgar_downloader/**/*.pyc tests/**/*.pyc .coverage
+	rm -rf env .pytest_cache ./**/__pycache__
+	rm -f ./**/*.pyc .coverage
 
 publish: clean build37
 	. env/bin/activate && env/bin/pip install -U twine
