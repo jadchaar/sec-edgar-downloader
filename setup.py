@@ -13,7 +13,7 @@ def parse_readme():
 
 setuptools.setup(
     name="sec_edgar_downloader",
-    version="1.2.0",
+    version="2.0.0",
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
@@ -41,6 +41,8 @@ setuptools.setup(
         "EDGAR",
         "Downloader",
         "Filing",
+        "Financial",
+        "Finance",
         "sec.gov",
         "8-K",
         "10-K",
