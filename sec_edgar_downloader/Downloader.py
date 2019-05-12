@@ -1,51 +1,35 @@
-# TODO: add docstrings to functions
-# TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
-# TODO: distinguish filing AMENDS (e.g. 8-K/A)?
-# TODO: add coloring to the terminal output (e.g. red for errors)
-
-from datetime import date
-from bs4 import BeautifulSoup
-from pathlib import Path
 from collections import namedtuple
-from .ticker_validation import ticker_validation_data
+from datetime import date
+from pathlib import Path
 
 import requests
-import os
-import errno
-import json
+from bs4 import BeautifulSoup
 
-FilingInfo = namedtuple('FilingInfo', ['filename', 'url'])
+FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
-class InvalidTickerException(Exception):
-    pass
 
 class Downloader:
-    def __init__(self, download_folder=str(Path.joinpath(Path.home(), "Downloads"))):
+    def __init__(self, download_folder=Path.home().joinpath("Downloads")):
         print("Welcome to the SEC EDGAR Downloader!")
 
-        # TODO: should we delete a folder or overrite it when the same data is requested?
-        if not Path(download_folder).exists():
-            raise IOError(f"The folder for saving company filings ({download_folder}) does not exist.")
+        self._download_folder = Path(download_folder)
 
-        print(f"Company filings will be saved to: {download_folder}")
+        if not self._download_folder.exists():
+            raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
 
-        self._download_folder = download_folder
+        print(f"Company filings will be saved to: {self._download_folder}")
 
         # TODO: Allow users to pass this in
         # Will have to handle pagination since only 100 are displayed on a single page.
         # Requires another start query parameter: start=100&count=100
         self._count = 100
-        self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
+        self._base_url = "https://www.sec.gov/cgi-bin/browse-edgar" \
+            f"?action=getcompany&owner=exclude&count={self._count}"
 
-    def _validate_ticker(self, ticker):
-        if ticker not in ticker_validation_data:
-            raise InvalidTickerException(f"The specified ticker ({ticker}) is invalid. Please correct this or enter the stock's CIK.")
-
-    # TODO: allow users to specify before date (by passing in year, month, and day)
-    # and formatting it here
+    # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
     def _form_url(self, ticker, filing_type):
         # Put into required format: YYYYMMDD
-        before_date = date.today().strftime('%Y%m%d')
+        before_date = date.today().strftime("%Y%m%d")
         return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
     def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_obtain):
@@ -55,7 +39,8 @@ class Downloader:
 
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
-        document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)[:num_filings_to_obtain]
+        document_anchor_elements = edgar_results_scraper.find_all(
+            id="documentsbutton", href=True)[:num_filings_to_obtain]
 
         sec_base_url = "https://www.sec.gov"
         filing_document_info = []
@@ -63,14 +48,14 @@ class Downloader:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
             # Some entries end with .html, some end with .htm
             if filing_detail_url[-1] != "l":
-                filing_detail_url += 'l'
+                filing_detail_url += "l"
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1]
             filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
 
         if len(filing_document_info) == 0:
             print(f"No {filing_type} documents available for {ticker}.")
-            return
+            return 0
 
         print(f"{len(filing_document_info)} {filing_type} documents available for {ticker}. Beginning download...")
 
@@ -78,153 +63,94 @@ class Downloader:
             resp = requests.get(doc_info.url, stream=True)
             resp.raise_for_status()
 
-            save_path = Path(self._download_folder).joinpath("sec-edgar-filings", ticker, filing_type, doc_info.filename)
+            save_path = self._download_folder.joinpath("sec_edgar_filings", ticker, filing_type, doc_info.filename)
 
-            # Create all parent directories as needed.
-            # For example: if we have /hello and we want to create
-            # /hello/world/my/name/is/john.txt, this would create
-            # all the directores leading up to john.txt
-            if not Path.exists(Path(save_path).parent):
-                try:
-                    os.makedirs(Path(save_path).parent)
-                except OSError as e:
-                    if e.errno != errno.EEXIST:
-                        raise
+            # Create all parent directories as needed. For example, if we have the
+            # directory /hello and we want to create /hello/world/my/name/is/bob.txt,
+            # this would create all the directories leading up to bob.txt.
+            save_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(save_path, 'wb') as f:
+            with open(save_path, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=1024):
-                    if chunk: # filter out keep-alive chunks
+                    if chunk:  # filter out keep-alive chunks
                         f.write(chunk)
 
-        print(f"All {filing_type}s for {ticker} downloaded successfully.")
+        print(f"{filing_type} filings for {ticker} downloaded successfully.")
 
-    def _get_filing_wrapper(self, filing_type, ticker_or_cik, is_cik, num_filings_to_obtain):
-        ticker_or_cik = str(ticker_or_cik).upper()
-        if is_cik:
-            # Strip off leading zeroes
-            ticker_or_cik = ticker_or_cik.lstrip("0")
-        else:
-            try:
-                self._validate_ticker(ticker_or_cik)
-            except InvalidTickerException as e:
-                print(e)
-                return
+        return len(filing_document_info)
+
+    def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_obtain):
+        num_filings_to_obtain = int(num_filings_to_obtain)
+        if num_filings_to_obtain < 1:
+            raise ValueError("Please enter a number greater than 1 for the number of filings to download.")
+        ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
-        self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
+        return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    #########################
-    ########## 8-K ##########
+    '''
+    Generic download methods
+    '''
 
-    def get_8k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_8k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    def get_8k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "8-K"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
-
-    ########## 8-K ##########
-    #########################
-
-    ##########################
-    ########## 10-K ##########
-
-    def get_10k_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_10k_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    def get_10k_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "10-K"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
-
-    ########## 10-K ##########
-    ##########################
-
-    ##########################
-    ########## 10-Q ##########
-
-    def get_10q_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_10q_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    def get_10q_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "10-Q"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+    # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
+    def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        filing_type = "13F-NT"
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    ########## 10-Q ##########
-    ##########################
+    def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        filing_type = "13F-HR"
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    #########################
-    ########## 13F ##########
-
-    def get_13f_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
-        filing_type = "13F"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
-
-    def get_13f_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "13F"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
-
-    ########## 13F ##########
-    #########################
-
-    ############################
-    ########## SC 13G ##########
-
-    def get_sc_13g_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    def get_sc_13g_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "SC 13G"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
-
-    ########## SC 13G ##########
-    ############################
-
-    ########################
-    ########## SD ##########
-
-    def get_sd_filing_for_ticker(self, ticker, num_filings_to_obtain = 100):
+    def get_sd_filings(self, ticker_or_cik, num_filings_to_obtain=100):
         filing_type = "SD"
-        self._get_filing_wrapper(filing_type, ticker, False, num_filings_to_obtain)
+        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_obtain)
 
-    def get_sd_filing_for_cik(self, cik, num_filings_to_obtain = 100):
-        filing_type = "SD"
-        self._get_filing_wrapper(filing_type, cik, True, num_filings_to_obtain)
+    '''
+    Bulk download methods
+    '''
 
-    ########## SD ##########
-    ########################
+    def get_all_available_filings(self, ticker_or_cik, num_filings_to_obtain=100):
+        total_dl = 0
+        total_dl += self.get_8k_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_10k_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_10q_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_13f_nt_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_13f_hr_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_obtain)
+        total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_obtain)
+        return total_dl
 
-    def get_all_available_filings_for_ticker(self, ticker):
-        # Validation must be done early here to prevent
-        # the error message from printing multiple times
-        ticker = ticker.upper()
-        try:
-            self._validate_ticker(ticker)
-        except InvalidTickerException as e:
-            print(e)
-            return
-        self.get_8k_filing_for_ticker(ticker)
-        self.get_10k_filing_for_ticker(ticker)
-        self.get_10q_filing_for_ticker(ticker)
-        self.get_13f_filing_for_ticker(ticker)
-        self.get_sc_13g_filing_for_ticker(ticker)
-        self.get_sd_filing_for_ticker(ticker)
 
-    def get_all_available_filings_for_cik(self, cik):
-        self.get_10k_filing_for_cik(cik)
-        self.get_10k_filing_for_cik(cik)
-        self.get_10q_filing_for_cik(cik)
-        self.get_13f_filing_for_cik(cik)
-        self.get_sc_13g_filing_for_cik(cik)
-        self.get_sd_filing_for_cik(cik)
+"""
+* 2.0.0 release goals
+! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them.
+        If we do distinguish amendments, remember to update tests with new arguments
+! TODO: add support for Python 3.5 (remove use of f strings). Pathlib mkdir with exist_ok requires >3.5
+! TODO: add Sphinx docstrings to functions
+! TODO: allow users to pass in before dates
+! TODO: ability to mute print statements
 
-    def get_all_available_filings_for_ticker_list(self, ticker_list):
-        for ticker in ticker_list:
-            self.get_all_available_filings_for_ticker(ticker)
+* Stretch goals
+TODO: add coloring to the terminal output (e.g. red for errors)
 
-    def get_all_available_filings_for_cik_list(self, cik_list):
-        for cik in cik_list:
-            self.get_all_available_filings_for_cik(cik)
+* Backlog
+TODO: counts beyond 100 (e.g. if a company has more than 100 filings of a particular type)
+TODO: add "caching" to prevent overriding previous downloads (if already downloaded, skip)
+TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
+"""

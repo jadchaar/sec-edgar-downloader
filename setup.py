@@ -4,10 +4,12 @@ import sys
 if sys.version_info < (3, 6):
     raise RuntimeError("This package requires Python 3.6+. Please update your Python environment and try again.")
 
+
 def parse_readme():
     with open("README.md", "r") as fh:
         long_description = fh.read()
     return long_description
+
 
 setuptools.setup(
     name="sec_edgar_downloader",
@@ -15,7 +17,8 @@ setuptools.setup(
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="Python package for downloading company filings (e.g. 8-K, 10-K, 10-Q, 13F, SC 13G, SD) from the SEC EDGAR database.",
+    description="Python package for downloading company filings (8-K, 10-K, 10-Q, 13F-NT, 13F-HR, SC 13G, SD)"
+    "from the SEC EDGAR database.",
     long_description=parse_readme(),
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",
@@ -43,6 +46,8 @@ setuptools.setup(
         "10-K",
         "10-Q",
         "13F",
+        "13F-NT",
+        "13F-HR",
         "SC 13G",
         "SD",
     ],
