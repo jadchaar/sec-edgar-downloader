@@ -9,8 +9,7 @@ setup(
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="Python package for downloading company filings (8-K, 10-K, 10-Q, 13F-NT, 13F-HR, SC 13G, SD)"
-    "from the SEC EDGAR database.",
+    description="Python package for downloading company filings from the SEC EDGAR database.",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",
