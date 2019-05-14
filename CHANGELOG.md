@@ -1,6 +1,11 @@
 # Changelog
 
-## 2.0.0 - ~/~/2019
+## 2.0.1 - 5/13/2019
+
+- Cleaned up README
+- Tweaked package naming in setup.py
+
+## 2.0.0 - 5/13/2019
 
 - The method for obtaining 13F filings has been split up into two methods: one for obtaining 13F-NT filings and another one for obtaining 13F-HR filings.
   - You can read about the differences [here](https://www.sec.gov/divisions/investment/13ffaq.htm).

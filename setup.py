@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="sec-edgar-downloader",
-    version="2.0.0",
+    version="2.0.1",
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
@@ -19,7 +19,7 @@ setup(
     install_requires=["beautifulsoup4", "lxml", "requests"],
     python_requires=">=3.6",
     classifiers=[
-        "Development Status :: 5 - Production/Stable"
+        "Development Status :: 5 - Production/Stable",
 
         "Intended Audience :: Developers",
         "Natural Language :: English",
@@ -29,7 +29,7 @@ setup(
 
         "Operating System :: POSIX",
         "Operating System :: Microsoft :: Windows",
-        "Operating System :: MacOS :: MacOS X"
+        "Operating System :: MacOS :: MacOS X",
 
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",
