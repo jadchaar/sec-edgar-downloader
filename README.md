@@ -9,6 +9,7 @@
 Python package for downloading company filings from the [SEC EDGAR database](https://www.sec.gov/edgar/searchedgar/companysearch.html). Searches can be conducted either by [stock ticker](https://en.wikipedia.org/wiki/Ticker_symbol) or Central Index Key (CIK). You can use the [SEC CIK lookup tool](https://www.sec.gov/edgar/searchedgar/cik.htm) if you cannot find an appropriate ticker. Supported company filings: 8-K, 10-K, 10-Q, 13F-NT, 13F-HR, SC 13G, SD. Learn more about the different types of SEC filings [here](https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp).
 
 ## Installation
+
 Install and update this package using [pip](https://pip.pypa.io/en/stable/quickstart/):
 
 `pip install -U sec-edgar-downloader`

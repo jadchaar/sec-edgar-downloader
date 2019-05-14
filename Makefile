@@ -23,10 +23,11 @@ lint:
 
 clean:
 	rm -rf env .pytest_cache ./**/__pycache__
+	rm -rf dist build .egg sec_edgar_downloader.egg-info
 	rm -f ./**/*.pyc .coverage
 
-publish: clean build37
-	pip install -U twine
-	env/bin/python3 setup.py sdist bdist_wheel
+publish: clean
+	pip install -U twine wheel
+	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
 	rm -rf dist build .egg sec_edgar_downloader.egg-info

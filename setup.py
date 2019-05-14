@@ -4,7 +4,7 @@ with open("README.md", "r") as f:
     readme = f.read()
 
 setup(
-    name="sec_edgar_downloader",
+    name="sec-edgar-downloader",
     version="2.0.0",
     license="MIT",
     author="Jad Chaar",
