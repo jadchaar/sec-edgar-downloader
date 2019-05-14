@@ -13,7 +13,7 @@ setup(
     "from the SEC EDGAR database.",
     long_description=readme,
     long_description_content_type="text/markdown",
-    url="https://github.com/jadchaar/sec-edgar-downloader",
+    url="https://github.com/jadchaar/sec_edgar_downloader",
     packages=find_packages(exclude=["docs", "tests"]),
     zip_safe=False,
     install_requires=["beautifulsoup4", "lxml", "requests"],
@@ -38,7 +38,7 @@ setup(
     ],
     keywords="sec edgar downloader filing financial finance sec.gov 8-k 10-k 10-q 13f 13f-nt 13f-hr sc-13g sd",
     project_urls={
-        "Bug Reports": "https://github.com/jadchaar/sec-edgar-downloader/issues",
-        "Source": "https://github.com/jadchaar/sec-edgar-downloader",
+        "Bug Reports": "https://github.com/jadchaar/sec_edgar_downloader/issues",
+        "Source": "https://github.com/jadchaar/sec_edgar_downloader",
     },
 )
