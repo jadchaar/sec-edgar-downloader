@@ -2,16 +2,15 @@ import os
 
 
 def parse_filing_document_header(file_path):
-    parsed = {
-        "ACCESSION NUMBER": [],
-        "CONFORMED SUBMISSION TYPE": [],
-        "COMPANY CONFORMED NAME": []
-    }
+    parsed = {"ACCESSION NUMBER": [], "CONFORMED SUBMISSION TYPE": [], "COMPANY CONFORMED NAME": []}
     header = extract_header(file_path)
     for line in header:
         components = [l.strip() for l in line.split(":")]
-        if (components[0] == "ACCESSION NUMBER" or components[0] == "CONFORMED SUBMISSION TYPE" or
-                components[0] == "COMPANY CONFORMED NAME"):
+        if (
+            components[0] == "ACCESSION NUMBER"
+            or components[0] == "CONFORMED SUBMISSION TYPE"
+            or components[0] == "COMPANY CONFORMED NAME"
+        ):
             parsed[components[0]].append(components[1])
     return parsed
 

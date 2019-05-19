@@ -1,4 +1,4 @@
-.PHONY: auto test lint clean cleanbuild publish
+.PHONY: auto build36 build37 build38 test flake8 format clean cleanbuild publish
 
 auto: build37
 
@@ -18,8 +18,11 @@ test:
 	rm -f .coverage
 	. env/bin/activate && pytest --cov-config=setup.cfg --cov=sec_edgar_downloader tests
 
-lint:
-	env/bin/flake8 --config=setup.cfg sec_edgar_downloader tests setup.py
+flake8:
+	env/bin/flake8 sec_edgar_downloader tests setup.py
+
+format:
+	black sec_edgar_downloader tests setup.py --line-length 120 --target-version py36
 
 clean:
 	rm -rf env .pytest_cache ./**/__pycache__
