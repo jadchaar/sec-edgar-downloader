@@ -1,4 +1,4 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
 with open("README.md", "r") as f:
     readme = f.read()
@@ -13,27 +13,21 @@ setup(
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",
-    packages=find_packages(exclude=["docs", "tests"]),
+    packages=["sec_edgar_downloader"],
     zip_safe=False,
     install_requires=["beautifulsoup4", "lxml", "requests"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
-
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Topic :: Software Development :: Libraries :: Python Modules",
-
         "License :: OSI Approved :: MIT License",
-
-        "Operating System :: POSIX",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: MacOS :: MacOS X",
-
-        "Programming Language :: Python :: 3 :: Only",
+        "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3 :: Only",
     ],
     keywords="sec edgar downloader filing financial finance sec.gov 8-k 10-k 10-q 13f 13f-nt 13f-hr sc-13g sd",
     project_urls={

@@ -23,8 +23,7 @@ class Downloader:
         # Will have to handle pagination since only 100 are displayed on a single page.
         # Requires another start query parameter: start=100&count=100
         self._count = 100
-        self._base_url = "https://www.sec.gov/cgi-bin/browse-edgar" \
-            f"?action=getcompany&owner=exclude&count={self._count}"
+        self._base_url = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
 
     # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
     def _form_url(self, ticker, filing_type):
@@ -39,15 +38,16 @@ class Downloader:
 
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
-        document_anchor_elements = edgar_results_scraper.find_all(
-            id="documentsbutton", href=True)[:num_filings_to_download]
+        document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)[
+            :num_filings_to_download
+        ]
 
         sec_base_url = "https://www.sec.gov"
         filing_document_info = []
         for anchor_element in document_anchor_elements:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
             # Some entries end with .html, some end with .htm
-            if filing_detail_url[-1] != "l":
+            if filing_detail_url[-1] != "l":  # pragma: no branch
                 filing_detail_url += "l"
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1]
@@ -75,7 +75,8 @@ class Downloader:
 
             with open(save_path, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=1024):
-                    if chunk:  # filter out keep-alive chunks
+                    # filter out keep-alive chunks
+                    if chunk:  # pragma: no branch
                         f.write(chunk)
 
         print(f"{filing_type} filings for {ticker} downloaded successfully.")
@@ -91,9 +92,9 @@ class Downloader:
         filing_url = self._form_url(ticker_or_cik, filing_type)
         return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_download)
 
-    '''
+    """
     Generic download methods
-    '''
+    """
 
     def get_8k_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "8-K"
@@ -124,9 +125,9 @@ class Downloader:
         filing_type = "SD"
         return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
 
-    '''
+    """
     Bulk download methods
-    '''
+    """
 
     def get_all_available_filings(self, ticker_or_cik, num_filings_to_download=100):
         total_dl = 0
