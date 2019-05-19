@@ -16,7 +16,7 @@ build38:
 
 test:
 	rm -f .coverage
-	. env/bin/activate && pytest --cov-config=setup.cfg --cov=sec_edgar_downloader tests
+	. env/bin/activate && pytest
 
 flake8:
 	env/bin/flake8 sec_edgar_downloader tests setup.py
