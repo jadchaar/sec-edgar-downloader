@@ -5,7 +5,7 @@
 [![PyPI Version](https://img.shields.io/pypi/v/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)
 [![Supported Python Versions](https://img.shields.io/pypi/pyversions/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)
 [![License](https://img.shields.io/pypi/l/sec-edgar-downloader.svg)](https://python.org/pypi/sec-edgar-downloader)
-[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/jadchaar/sec-edgar-downloader)
+[![Code Style: Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/python/black)
 
 Python package for downloading company filings from the [SEC EDGAR database](https://www.sec.gov/edgar/searchedgar/companysearch.html). Searches can be conducted either by [stock ticker](https://en.wikipedia.org/wiki/Ticker_symbol) or [Central Index Key (CIK)](https://en.wikipedia.org/wiki/Central_Index_Key). You can use the [SEC CIK lookup tool](https://www.sec.gov/edgar/searchedgar/cik.htm) if you cannot find an appropriate ticker. Supported company filings: 8-K, 10-K, 10-Q, 13F-NT, 13F-HR, SC 13G, SD. Learn more about the different types of SEC filings [here](https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp).
 
