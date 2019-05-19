@@ -47,7 +47,7 @@ class Downloader:
         for anchor_element in document_anchor_elements:
             filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
             # Some entries end with .html, some end with .htm
-            if filing_detail_url[-1] != "l":  # pragma: no cover
+            if filing_detail_url[-1] != "l":  # pragma: no branch
                 filing_detail_url += "l"
             full_filing_url = filing_detail_url.replace("-index.html", ".txt")
             name = full_filing_url.split("/")[-1]
@@ -76,7 +76,7 @@ class Downloader:
             with open(save_path, "wb") as f:
                 for chunk in resp.iter_content(chunk_size=1024):
                     # filter out keep-alive chunks
-                    if chunk:  # pragma: no cover
+                    if chunk:  # pragma: no branch
                         f.write(chunk)
 
         print(f"{filing_type} filings for {ticker} downloaded successfully.")
