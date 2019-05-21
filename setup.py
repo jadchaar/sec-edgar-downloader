@@ -1,11 +1,12 @@
 from setuptools import setup
+from sec_edgar_downloader import __version__
 
 with open("README.md", "r") as f:
     readme = f.read()
 
 setup(
     name="sec-edgar-downloader",
-    version="2.0.1",
+    version=__version__,
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
