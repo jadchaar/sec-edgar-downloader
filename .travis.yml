@@ -1,11 +1,9 @@
-sudo: false
 language: python
-cache: pip
 dist: xenial
 python:
     - 3.6
     - 3.7
-    - "3.8-dev"
+    - 3.8-dev
 install:
     - if [[ $TRAVIS_PYTHON_VERSION == "3.6" ]]; then make build36; fi
     - if [[ $TRAVIS_PYTHON_VERSION == "3.7" ]]; then make build37; fi
