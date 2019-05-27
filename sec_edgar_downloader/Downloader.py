@@ -23,7 +23,7 @@ class Downloader:
         # Will have to handle pagination since only 100 are displayed on a single page.
         # Requires another start query parameter: start=100&count=100
         self._count = 100
-        self._base_url = "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
+        self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
 
     # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
     def _form_url(self, ticker, filing_type):
@@ -163,25 +163,3 @@ class Downloader:
         total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_download)
         total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_download)
         return total_dl
-
-
-"""
-* 2.0.0 release goals
-! TODO: distinguish filing amendments (e.g. 8-K/A) - allow user to pass in argument for whether or not to include them.
-        If we do distinguish amendments, remember to update tests with new arguments
-! TODO: add Sphinx docstrings to functions
-! TODO: host documentation on readthedocs
-! TODO: allow users to pass in before dates
-! TODO: ability to mute print statements
-! TODO: investigate running tests on Windows as well to ensure file system works properly
-        https://docs.travis-ci.com/user/languages/python/#running-python-tests-on-multiple-operating-systems
-
-* Stretch goals
-TODO: add coloring to the terminal output (e.g. red for errors)
-TODO: explore use of mocking to test lines with "pragma: no branch"
-
-* Backlog
-TODO: counts beyond 100 (e.g. if a company has more than 100 filings of a particular type)
-TODO: add "caching" to prevent overriding previous downloads (if already downloaded, skip)
-TODO: spawn a thread for each download. I/O will block so just thread downloads to run in parallel
-"""
