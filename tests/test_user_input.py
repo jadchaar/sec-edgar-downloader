@@ -1,18 +1,4 @@
-from pathlib import Path
-
 import pytest
-
-from sec_edgar_downloader import Downloader
-
-
-def test_invalid_save_path_constructor():
-    test_path = str(Path.home().joinpath("Downloads", "invalid_dir"))
-    with pytest.raises(IOError) as excinfo:
-        Downloader(test_path)
-    expected_msg = (
-        f"The folder for saving company filings ({test_path}) does not exist."
-    )
-    assert expected_msg in str(excinfo.value)
 
 
 def test_num_filings_to_download_argument(downloader, apple_filing_metadata):

@@ -15,12 +15,7 @@ class Downloader:
         if download_folder is None:
             self._download_folder = Path.home().joinpath("Downloads")
         else:
-            self._download_folder = Path(download_folder)
-
-        if not self._download_folder.exists():
-            raise IOError(
-                f"The folder for saving company filings ({self._download_folder}) does not exist."
-            )
+            self._download_folder = Path(download_folder).expanduser().resolve()
 
         print(f"Company filings will be saved to: {self._download_folder}")
 
