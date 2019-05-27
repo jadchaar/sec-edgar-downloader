@@ -1,4 +1,5 @@
 from setuptools import setup
+
 from sec_edgar_downloader import __version__
 
 with open("README.md", "r") as f:
@@ -24,9 +25,6 @@ setup(
         "Natural Language :: English",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: POSIX",
-        "Operating System :: Microsoft :: Windows",
-        "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",

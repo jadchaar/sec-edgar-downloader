@@ -1,31 +1,34 @@
-.PHONY: auto build36 build37 build38 test flake8 format clean cleanbuild publish
+.PHONY: auto test clean publish
 
-auto: build37
+auto: build36
 
 build36:
-	virtualenv env --python=python3.6
-	env/bin/pip install -r requirements.txt
+	virtualenv local --python=python3.6
+	local/bin/pip install -r requirements.txt
+	local/bin/pre-commit install
 
 build37:
-	virtualenv env --python=python3.7
-	env/bin/pip install -r requirements.txt
+	virtualenv local --python=python3.7
+	local/bin/pip install -r requirements.txt
+	local/bin/pre-commit install
 
 build38:
-	virtualenv env --python=python3.8
-	env/bin/pip install -r requirements.txt
+	virtualenv local --python=python3.8
+	local/bin/pip install -r requirements.txt
+	local/bin/pre-commit install
 
 test:
 	rm -f .coverage
-	. env/bin/activate && pytest
+	. local/bin/activate && pytest
 
-flake8:
-	env/bin/flake8 sec_edgar_downloader tests setup.py
+lint:
+	local/bin/pre-commit run --all-files
 
-format:
-	black sec_edgar_downloader tests setup.py --line-length 120 --target-version py36
+lint-ci:
+	local/bin/pre-commit run --all-files --show-diff-on-failure
 
 clean:
-	rm -rf env .pytest_cache ./**/__pycache__
+	rm -rf local .pytest_cache ./**/__pycache__
 	rm -rf dist build .egg sec_edgar_downloader.egg-info
 	rm -f ./**/*.pyc .coverage
 

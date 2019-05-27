@@ -2,20 +2,25 @@ from collections import namedtuple
 from datetime import date
 from pathlib import Path
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
 
 class Downloader:
-    def __init__(self, download_folder=Path.home().joinpath("Downloads")):
+    def __init__(self, download_folder=None):
         print("Welcome to the SEC EDGAR Downloader!")
 
-        self._download_folder = Path(download_folder)
+        if download_folder is None:
+            self._download_folder = Path.home().joinpath("Downloads")
+        else:
+            self._download_folder = Path(download_folder)
 
         if not self._download_folder.exists():
-            raise IOError(f"The folder for saving company filings ({self._download_folder}) does not exist.")
+            raise IOError(
+                f"The folder for saving company filings ({self._download_folder}) does not exist."
+            )
 
         print(f"Company filings will be saved to: {self._download_folder}")
 
@@ -31,16 +36,18 @@ class Downloader:
         before_date = date.today().strftime("%Y%m%d")
         return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
 
-    def _download_filings(self, edgar_search_url, filing_type, ticker, num_filings_to_download):
+    def _download_filings(
+        self, edgar_search_url, filing_type, ticker, num_filings_to_download
+    ):
         resp = requests.get(edgar_search_url)
         resp.raise_for_status()
         edgar_results_html = resp.content
 
         edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
 
-        document_anchor_elements = edgar_results_scraper.find_all(id="documentsbutton", href=True)[
-            :num_filings_to_download
-        ]
+        document_anchor_elements = edgar_results_scraper.find_all(
+            id="documentsbutton", href=True
+        )[:num_filings_to_download]
 
         sec_base_url = "https://www.sec.gov"
         filing_document_info = []
@@ -60,13 +67,17 @@ class Downloader:
             print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
-        print(f"{num_filings_to_download} {filing_type} documents available for {ticker}. Beginning download...")
+        print(
+            f"{num_filings_to_download} {filing_type} documents available for {ticker}. Beginning download..."
+        )
 
         for doc_info in filing_document_info:
             resp = requests.get(doc_info.url, stream=True)
             resp.raise_for_status()
 
-            save_path = self._download_folder.joinpath("sec_edgar_filings", ticker, filing_type, doc_info.filename)
+            save_path = self._download_folder.joinpath(
+                "sec_edgar_filings", ticker, filing_type, doc_info.filename
+            )
 
             # Create all parent directories as needed. For example, if we have the
             # directory /hello and we want to create /hello/world/my/name/is/bob.txt,
@@ -86,11 +97,15 @@ class Downloader:
     def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_download):
         num_filings_to_download = int(num_filings_to_download)
         if num_filings_to_download < 1:
-            raise ValueError("Please enter a number greater than 1 for the number of filings to download.")
+            raise ValueError(
+                "Please enter a number greater than 1 for the number of filings to download."
+            )
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         filing_url = self._form_url(ticker_or_cik, filing_type)
-        return self._download_filings(filing_url, filing_type, ticker_or_cik, num_filings_to_download)
+        return self._download_filings(
+            filing_url, filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     """
     Generic download methods
@@ -98,32 +113,46 @@ class Downloader:
 
     def get_8k_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "8-K"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     def get_10k_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "10-K"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     def get_10q_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "10-Q"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
     def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "13F-NT"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "13F-HR"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "SC 13G"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     def get_sd_filings(self, ticker_or_cik, num_filings_to_download=100):
         filing_type = "SD"
-        return self._get_filing_wrapper(filing_type, ticker_or_cik, num_filings_to_download)
+        return self._get_filing_wrapper(
+            filing_type, ticker_or_cik, num_filings_to_download
+        )
 
     """
     Bulk download methods
@@ -154,6 +183,7 @@ class Downloader:
 
 * Stretch goals
 TODO: add coloring to the terminal output (e.g. red for errors)
+TODO: explore use of mocking to test lines with "pragma: no branch"
 
 * Backlog
 TODO: counts beyond 100 (e.g. if a company has more than 100 filings of a particular type)

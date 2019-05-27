@@ -2,7 +2,11 @@ import os
 
 
 def parse_filing_document_header(file_path):
-    parsed = {"ACCESSION NUMBER": [], "CONFORMED SUBMISSION TYPE": [], "COMPANY CONFORMED NAME": []}
+    parsed = {
+        "ACCESSION NUMBER": [],
+        "CONFORMED SUBMISSION TYPE": [],
+        "COMPANY CONFORMED NAME": [],
+    }
     header = extract_header(file_path)
     for line in header:
         components = [l.strip() for l in line.split(":")]
@@ -26,7 +30,9 @@ def extract_header(file_path):
     return header
 
 
-def verify_directory_structure(base_dir, filing_types, num_downloaded, symbol, full_cik, company_name):
+def verify_directory_structure(
+    base_dir, filing_types, num_downloaded, symbol, full_cik, company_name
+):
     # no ticker symbol available (only CIK)
     if symbol is None:
         symbol = strip_cik(full_cik)
@@ -63,7 +69,10 @@ def verify_directory_structure(base_dir, filing_types, num_downloaded, symbol, f
         # assert accession_number[:len(full_cik)] == full_cik
 
         header_contents = parse_filing_document_header(next_level_of_dir_tmp)
-        assert len(header_contents["ACCESSION NUMBER"]) == 1 and len(header_contents["CONFORMED SUBMISSION TYPE"]) == 1
+        assert (
+            len(header_contents["ACCESSION NUMBER"]) == 1
+            and len(header_contents["CONFORMED SUBMISSION TYPE"]) == 1
+        )
         assert header_contents["ACCESSION NUMBER"][0] == accession_number
         header_submission = header_contents["CONFORMED SUBMISSION TYPE"][0]
         assert header_submission == ft or header_submission == f"{ft}/A"
