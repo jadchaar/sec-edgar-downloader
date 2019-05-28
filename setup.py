@@ -31,7 +31,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    keywords="sec edgar downloader filing financial finance sec.gov 8-k 10-k 10-q 13f 13f-nt 13f-hr sc-13g sd",
+    keywords="sec edgar filing financial finance sec.gov",
     project_urls={
         "Bug Reports": "https://github.com/jadchaar/sec-edgar-downloader/issues",
         "Repository": "https://github.com/jadchaar/sec-edgar-downloader",

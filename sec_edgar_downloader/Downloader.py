@@ -1,6 +1,7 @@
 from collections import namedtuple
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlencode
 
 import requests
 from bs4 import BeautifulSoup
@@ -19,17 +20,24 @@ class Downloader:
 
         print(f"Company filings will be saved to: {self._download_folder}")
 
-        # TODO: Allow users to pass this in
-        # Will have to handle pagination since only 100 are displayed on a single page.
-        # Requires another start query parameter: start=100&count=100
-        self._count = 100
-        self._base_url = f"https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&owner=exclude&count={self._count}"
+        self._sec_base_url = "https://www.sec.gov"
+        self._sec_edgar_base_url = f"{self._sec_base_url}/cgi-bin/browse-edgar?"
 
-    # TODO: allow users to specify before date (by passing in year, month, and day) and format it here
+    # TODO: allow users to specify before date
     def _form_url(self, ticker, filing_type):
         # Put into required format: YYYYMMDD
         before_date = date.today().strftime("%Y%m%d")
-        return f"{self._base_url}&CIK={ticker}&type={filing_type.replace(' ', '+')}&dateb={before_date}"
+        query_params = {
+            "action": "getcompany",
+            "owner": "exclude",
+            "start": 0,
+            "count": 100,  # TODO: Allow users to pass this in
+            "CIK": ticker,
+            "type": filing_type,
+            "dateb": before_date,
+            # "output": "atom",
+        }
+        return f"{self._sec_edgar_base_url}{urlencode(query_params)}"
 
     def _download_filings(
         self, edgar_search_url, filing_type, ticker, num_filings_to_download
@@ -44,10 +52,9 @@ class Downloader:
             id="documentsbutton", href=True
         )[:num_filings_to_download]
 
-        sec_base_url = "https://www.sec.gov"
         filing_document_info = []
         for anchor_element in document_anchor_elements:
-            filing_detail_url = f"{sec_base_url}{anchor_element['href']}"
+            filing_detail_url = f"{self._sec_base_url}{anchor_element['href']}"
             # Some entries end with .html, some end with .htm
             if filing_detail_url[-1] != "l":  # pragma: no branch
                 filing_detail_url += "l"
@@ -63,7 +70,8 @@ class Downloader:
             return 0
 
         print(
-            f"{num_filings_to_download} {filing_type} documents available for {ticker}. Beginning download..."
+            f"{num_filings_to_download} {filing_type} documents available for {ticker}.",
+            "Beginning download...",
         )
 
         for doc_info in filing_document_info:
