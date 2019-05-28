@@ -1,4 +1,4 @@
-from utils import strip_cik, verify_directory_structure
+from .utils import strip_cik, verify_directory_structure
 
 
 def test_8k_filing_retrieval(

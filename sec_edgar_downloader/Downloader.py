@@ -1,12 +1,10 @@
-from collections import namedtuple
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlencode
 
 import requests
-from bs4 import BeautifulSoup
 
-FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
+from .utils import parse_edgar_rss_feed
 
 
 class Downloader:
@@ -35,32 +33,16 @@ class Downloader:
             "CIK": ticker,
             "type": filing_type,
             "dateb": before_date,
-            # "output": "atom",
+            "output": "atom",
         }
         return f"{self._sec_edgar_base_url}{urlencode(query_params)}"
 
     def _download_filings(
         self, edgar_search_url, filing_type, ticker, num_filings_to_download
     ):
-        resp = requests.get(edgar_search_url)
-        resp.raise_for_status()
-        edgar_results_html = resp.content
-
-        edgar_results_scraper = BeautifulSoup(edgar_results_html, "lxml")
-
-        document_anchor_elements = edgar_results_scraper.find_all(
-            id="documentsbutton", href=True
-        )[:num_filings_to_download]
-
-        filing_document_info = []
-        for anchor_element in document_anchor_elements:
-            filing_detail_url = f"{self._sec_base_url}{anchor_element['href']}"
-            # Some entries end with .html, some end with .htm
-            if filing_detail_url[-1] != "l":  # pragma: no branch
-                filing_detail_url += "l"
-            full_filing_url = filing_detail_url.replace("-index.html", ".txt")
-            name = full_filing_url.split("/")[-1]
-            filing_document_info.append(FilingInfo(filename=name, url=full_filing_url))
+        filing_document_info = parse_edgar_rss_feed(
+            edgar_search_url, num_filings_to_download
+        )
 
         # number of filings available may be less than the number requested
         num_filings_to_download = len(filing_document_info)
