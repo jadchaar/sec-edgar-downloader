@@ -4,7 +4,7 @@ from urllib.parse import urlencode
 
 import requests
 
-from .utils import parse_edgar_rss_feed
+from .utils import parse_edgar_rss_feed, validate_before_date
 
 
 class Downloader:
@@ -21,10 +21,7 @@ class Downloader:
         self._sec_base_url = "https://www.sec.gov"
         self._sec_edgar_base_url = f"{self._sec_base_url}/cgi-bin/browse-edgar?"
 
-    # TODO: allow users to specify before date
-    def _form_url(self, ticker, filing_type):
-        # Put into required format: YYYYMMDD
-        before_date = date.today().strftime("%Y%m%d")
+    def _form_edgar_search_url(self, ticker, filing_type, before_date):
         query_params = {
             "action": "getcompany",
             "owner": "exclude",
@@ -79,15 +76,26 @@ class Downloader:
 
         return num_filings_to_download
 
-    def _get_filing_wrapper(self, filing_type, ticker_or_cik, num_filings_to_download):
+    def _get_filing_wrapper(
+        self, filing_type, ticker_or_cik, num_filings_to_download, before_date
+    ):
+        if before_date is None:
+            before_date = date.today().strftime("%Y%m%d")
+
         num_filings_to_download = int(num_filings_to_download)
+        before_date = str(before_date)
+        # Check that date is in required format: YYYYMMDD
+        # Throws a ValueError if the date is not in the correct format
+        validate_before_date(before_date)
         if num_filings_to_download < 1:
             raise ValueError(
                 "Please enter a number greater than 1 for the number of filings to download."
             )
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
-        filing_url = self._form_url(ticker_or_cik, filing_type)
+        filing_url = self._form_edgar_search_url(
+            ticker_or_cik, filing_type, before_date
+        )
         return self._download_filings(
             filing_url, filing_type, ticker_or_cik, num_filings_to_download
         )
@@ -96,60 +104,90 @@ class Downloader:
     Generic download methods
     """
 
-    def get_8k_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_8k_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "8-K"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
-    def get_10k_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_10k_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "10-K"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
-    def get_10q_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_10q_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "10-Q"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
     # Differences explained here: https://www.sec.gov/divisions/investment/13ffaq.htm
-    def get_13f_nt_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_13f_nt_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "13F-NT"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
-    def get_13f_hr_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_13f_hr_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "13F-HR"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
-    def get_sc_13g_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_sc_13g_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "SC 13G"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
-    def get_sd_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_sd_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         filing_type = "SD"
         return self._get_filing_wrapper(
-            filing_type, ticker_or_cik, num_filings_to_download
+            filing_type, ticker_or_cik, num_filings_to_download, before_date
         )
 
     """
     Bulk download methods
     """
 
-    def get_all_available_filings(self, ticker_or_cik, num_filings_to_download=100):
+    def get_all_available_filings(
+        self, ticker_or_cik, num_filings_to_download=100, before_date=None
+    ):
         total_dl = 0
-        total_dl += self.get_8k_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_10k_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_10q_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_13f_nt_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_13f_hr_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_sc_13g_filings(ticker_or_cik, num_filings_to_download)
-        total_dl += self.get_sd_filings(ticker_or_cik, num_filings_to_download)
+        total_dl += self.get_8k_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_10k_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_10q_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_13f_nt_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_13f_hr_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_sc_13g_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
+        total_dl += self.get_sd_filings(
+            ticker_or_cik, num_filings_to_download, before_date
+        )
         return total_dl

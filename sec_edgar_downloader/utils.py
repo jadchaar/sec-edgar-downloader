@@ -1,7 +1,8 @@
+import xml.etree.ElementTree as ET
 from collections import namedtuple
+from datetime import datetime
 
 import requests
-from lxml import etree
 
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
@@ -15,11 +16,16 @@ def parse_edgar_rss_feed(edgar_search_url, num_filings_to_download):
     if resp.headers["Content-Type"] != "application/atom+xml":
         return []
 
-    xml_root = etree.fromstring(resp.content)
+    xml_root = ET.ElementTree(ET.fromstring(resp.content))
     xml_ns_map = {"w3": "http://www.w3.org/2005/Atom"}
     filing_href_elts = xml_root.findall(".//w3:filing-href", namespaces=xml_ns_map)[
         :num_filings_to_download
     ]
+
+    # [.='10-K'] is not compatible with Python 3.6
+    # filing_href_elts = xml_root.findall(
+    #     ".//w3:filing-type[.='10-K']/..//w3:filing-href", namespaces=xml_ns_map
+    # )[:100]
 
     filing_info = []
     for elt in filing_href_elts:
@@ -31,3 +37,12 @@ def parse_edgar_rss_feed(edgar_search_url, num_filings_to_download):
         filing_info.append(FilingInfo(filename=edgar_filename, url=filing_url))
 
     return filing_info
+
+
+def validate_before_date(before_date):
+    try:
+        datetime.strptime(before_date, "%Y%m%d")
+    except ValueError as e:
+        raise Exception(
+            "Incorrect before_date format. Please enter a date of the form YYYYMMDD."
+        ) from e

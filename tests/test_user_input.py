@@ -46,3 +46,12 @@ def test_ticker_argument(downloader):
     mutual_fund_ticker = "VTSAX"
     num_downloaded = dl.get_all_available_filings(mutual_fund_ticker)
     assert num_downloaded == 0
+
+
+def test_before_date_argument(downloader, apple_filing_metadata):
+    dl, _ = downloader
+    expected_msg = "Please enter a date of the form YYYYMMDD."
+
+    with pytest.raises(Exception) as excinfo:
+        dl.get_8k_filings(apple_filing_metadata["symbol"], 1, "January 30, 2019")
+    assert expected_msg in str(excinfo.value)
