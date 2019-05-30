@@ -6,10 +6,6 @@ repos:
       hooks:
           - id: bandit
             args: [-lll, --quiet, --exclude=tests/**]
-    - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
-      rev: v1.1.0
-      hooks:
-          - id: python-safety-dependencies-check
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v2.2.3
       hooks:
