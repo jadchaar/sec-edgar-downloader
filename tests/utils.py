@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 
 def parse_filing_document_header(file_path):
@@ -6,6 +7,7 @@ def parse_filing_document_header(file_path):
         "ACCESSION NUMBER": [],
         "CONFORMED SUBMISSION TYPE": [],
         "COMPANY CONFORMED NAME": [],
+        "FILED AS OF DATE": [],
     }
     header = extract_header(file_path)
     for line in header:
@@ -14,6 +16,7 @@ def parse_filing_document_header(file_path):
             components[0] == "ACCESSION NUMBER"
             or components[0] == "CONFORMED SUBMISSION TYPE"
             or components[0] == "COMPANY CONFORMED NAME"
+            or components[0] == "FILED AS OF DATE"
         ):
             parsed[components[0]].append(components[1])
     return parsed
@@ -31,7 +34,13 @@ def extract_header(file_path):
 
 
 def verify_directory_structure(
-    base_dir, filing_types, num_downloaded, symbol, full_cik, company_name
+    base_dir,
+    filing_types,
+    num_downloaded,
+    symbol,
+    full_cik,
+    company_name,
+    before_date=None,
 ):
     # no ticker symbol available (only CIK)
     if symbol is None:
@@ -79,6 +88,12 @@ def verify_directory_structure(
         # lack of standard SEC-HEADER format makes it hard to exact match the company name
         # without more advanced edge-case parsing, so this is a good estimate of the check
         assert company_name in header_contents["COMPANY CONFORMED NAME"]
+
+        if before_date is not None:
+            filing_date = datetime.strptime(
+                header_contents["FILED AS OF DATE"][0], "%Y%m%d"
+            )
+            assert filing_date <= datetime.strptime(before_date, "%Y%m%d")
 
 
 def strip_cik(full_cik):

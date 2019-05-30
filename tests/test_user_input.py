@@ -55,3 +55,9 @@ def test_before_date_argument(downloader, apple_filing_metadata):
     with pytest.raises(Exception) as excinfo:
         dl.get_8k_filings(apple_filing_metadata["symbol"], 1, "January 30, 2019")
     assert expected_msg in str(excinfo.value)
+
+    before_date_num = 20190130
+    num_downloaded = dl.get_8k_filings(
+        apple_filing_metadata["symbol"], 1, before_date_num
+    )
+    assert num_downloaded == 1

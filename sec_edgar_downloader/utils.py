@@ -22,9 +22,15 @@ def parse_edgar_rss_feed(edgar_search_url, num_filings_to_download):
         :num_filings_to_download
     ]
 
+    # https://docs.python.org/3.7/library/xml.etree.elementtree.html#supported-xpath-syntax
     # [.='10-K'] is not compatible with Python 3.6
     # filing_href_elts = xml_root.findall(
-    #     ".//w3:filing-type[.='10-K']/..//w3:filing-href", namespaces=xml_ns_map
+    #     ".//w3:filing-type[.='10-K']/../w3:filing-href", namespaces=xml_ns_map
+    # )[:100]
+
+    # works on python 3.6 and up
+    # filing_href_elts = xml_root.findall(
+    #     ".//w3:content[w3:filing-type='10-K']/w3:filing-href", namespaces=xml_ns_map
     # )[:100]
 
     filing_info = []

@@ -25,6 +25,20 @@ def apple_filing_metadata():
 
 
 @pytest.fixture(scope="session")
+def apple_filing_metadata_pre_2007():
+    """
+    Prior to 2007, Apple filed with the SEC as
+    APPLE COMPUTER INC rather than APPLE INC
+    """
+    apple_ticker_data = {
+        "symbol": "AAPL",
+        "full_cik": "0000320193",
+        "company_name": "APPLE COMPUTER INC",
+    }
+    return apple_ticker_data
+
+
+@pytest.fixture(scope="session")
 def vanguard_filing_metadata():
     vanguard_ticker_data = {
         "symbol": None,
