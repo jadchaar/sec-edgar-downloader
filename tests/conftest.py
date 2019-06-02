@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from sec_edgar_downloader import Downloader
+from sec_edgar_downloader.utils import form_query_string
 
 
 @pytest.fixture(scope="function")
@@ -12,6 +13,12 @@ def downloader(tmpdir):
     dl = Downloader(tmp_dir)
     yield dl, tmp_dir
     shutil.rmtree(tmp_dir)
+
+
+@pytest.fixture(scope="session")
+def apple_10k_edgar_search_xml_url():
+    qs = form_query_string("AAPL", "10-K", "20190531")
+    return f"https://www.sec.gov/cgi-bin/browse-edgar?{qs}"
 
 
 @pytest.fixture(scope="session")

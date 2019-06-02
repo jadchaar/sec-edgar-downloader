@@ -41,6 +41,7 @@ def verify_directory_structure(
     full_cik,
     company_name,
     before_date=None,
+    amends_included=False,
 ):
     # no ticker symbol available (only CIK)
     if symbol is None:
@@ -84,7 +85,10 @@ def verify_directory_structure(
         )
         assert header_contents["ACCESSION NUMBER"][0] == accession_number
         header_submission = header_contents["CONFORMED SUBMISSION TYPE"][0]
-        assert header_submission == ft or header_submission == f"{ft}/A"
+        if amends_included:
+            assert header_submission == ft or header_submission == f"{ft}/A"
+        else:
+            assert header_submission == ft
         # lack of standard SEC-HEADER format makes it hard to exact match the company name
         # without more advanced edge-case parsing, so this is a good estimate of the check
         assert company_name in header_contents["COMPANY CONFORMED NAME"]

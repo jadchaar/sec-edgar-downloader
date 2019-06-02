@@ -1,4 +1,4 @@
-from .utils import verify_directory_structure
+from .testing_utils import verify_directory_structure
 
 
 def test_before_date_filing_retrieval(downloader, apple_filing_metadata_pre_2007):
