@@ -1,6 +1,6 @@
 beautifulsoup4==4.7.1
 lxml==4.3.3
 pre-commit==1.16.1
-pytest==4.5.0
+pytest==4.6.0
 pytest-cov==2.7.1
 requests==2.22.0
