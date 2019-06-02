@@ -23,10 +23,9 @@ def form_query_string(ticker, filing_type, before_date):
     return urlencode(query_params)
 
 
-def extract_elements_from_xml(xml_byte_object, xpath_selector, xml_ns_map=None):
-    if xml_ns_map is None:
-        xml_ns_map = {"w3": "http://www.w3.org/2005/Atom"}
+def extract_elements_from_xml(xml_byte_object, xpath_selector):
     xml_root = etree.fromstring(xml_byte_object)
+    xml_ns_map = {"w3": "http://www.w3.org/2005/Atom"}
     return xml_root.xpath(xpath_selector, namespaces=xml_ns_map)
 
 
