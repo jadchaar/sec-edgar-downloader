@@ -14,7 +14,6 @@ build37:
 
 build38:
 	virtualenv venv --python=python3.8
-	venv/bin/pip install -U Cython
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pre-commit install
 
