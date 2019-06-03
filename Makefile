@@ -14,6 +14,7 @@ build37:
 
 build38:
 	virtualenv venv --python=python3.8
+	venv/bin/pip install -U Cython
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pre-commit install
 
@@ -33,7 +34,7 @@ clean:
 	rm -f ./**/*.pyc .coverage
 
 publish: clean
-	pip install -U twine wheel
+	pip install -U setuptools twine wheel
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
 	rm -rf dist build .egg sec_edgar_downloader.egg-info
