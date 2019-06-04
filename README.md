@@ -11,7 +11,7 @@ Python package for downloading company filings from the [SEC EDGAR database](htt
 
 ## Installation
 
-Install and update this package using [pip](https://pip.pypa.io/en/stable/quickstart/):
+Install and update this package using [pip](https://pip.pypa.io/en/stable/quickstart/) or [pipenv](https://docs.pipenv.org/en/latest/):
 
 `pip install -U sec-edgar-downloader`
 
@@ -61,3 +61,7 @@ identifiers = ["AAPL", "MSFT", "0000102909", "V", "FB"]
 for id in identifiers:
     dl.get_all_available_filings(id, 1)
 ```
+
+## Contributing
+
+If you encounter a bug or would like to see a new company filing or feature added to `sec-edgar-downloader`, please [file an issue](https://github.com/jadchaar/sec-edgar-downloader/issues) or [submit a pull request](https://help.github.com/en/articles/creating-a-pull-request).

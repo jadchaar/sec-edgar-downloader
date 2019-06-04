@@ -1,17 +1,19 @@
 from setuptools import setup
 
-from sec_edgar_downloader import __version__
-
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
+
+about = {}
+with open("sec_edgar_downloader/__version__.py", "r", encoding="utf-8") as f:
+    exec(f.read(), about)
 
 setup(
     name="sec-edgar-downloader",
-    version=__version__,
+    version=about["__version__"],
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="Python package for downloading company filings from the SEC EDGAR database.",
+    description="Download company filings from the SEC EDGAR database using Python.",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",

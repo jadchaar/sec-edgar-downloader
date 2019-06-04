@@ -1,19 +1,11 @@
-.PHONY: auto test clean publish
+.PHONY: test clean publish
 
-auto: build36
+build36: PYTHON_VER = python3.6
+build37: PYTHON_VER = python3.7
+build38: PYTHON_VER = python3.8
 
-build36:
-	virtualenv venv --python=python3.6
-	venv/bin/pip install -r requirements.txt
-	venv/bin/pre-commit install
-
-build37:
-	virtualenv venv --python=python3.7
-	venv/bin/pip install -r requirements.txt
-	venv/bin/pre-commit install
-
-build38:
-	virtualenv venv --python=python3.8
+build36 build37 build38:
+	virtualenv venv --python=$(PYTHON_VER)
 	venv/bin/pip install -r requirements.txt
 	venv/bin/pre-commit install
 
@@ -22,9 +14,6 @@ test:
 	. venv/bin/activate && pytest
 
 lint:
-	venv/bin/pre-commit run --all-files
-
-lint-ci:
 	venv/bin/pre-commit run --all-files --show-diff-on-failure
 
 clean:

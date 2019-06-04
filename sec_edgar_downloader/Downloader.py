@@ -3,7 +3,7 @@ from pathlib import Path
 
 import requests
 
-from .utils import form_query_string, parse_edgar_rss_feed, validate_before_date
+from ._utils import form_query_string, parse_edgar_rss_feed, validate_before_date
 
 
 class Downloader:
