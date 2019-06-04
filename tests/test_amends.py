@@ -1,6 +1,6 @@
 import requests
 
-from sec_edgar_downloader.utils import extract_elements_from_xml
+from sec_edgar_downloader._utils import extract_elements_from_xml
 
 
 def test_include_amends_from_xml(apple_10k_edgar_search_xml_url):

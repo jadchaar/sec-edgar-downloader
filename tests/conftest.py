@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from sec_edgar_downloader import Downloader
-from sec_edgar_downloader.utils import form_query_string
+from sec_edgar_downloader._utils import form_query_string
 
 
 @pytest.fixture(scope="function")
