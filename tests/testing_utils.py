@@ -24,7 +24,7 @@ def parse_filing_document_header(file_path):
 
 def extract_header(file_path):
     header = []
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             # </SEC-HEADER> indicates the end of the header info
             if line == "</SEC-HEADER>\n":

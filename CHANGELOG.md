@@ -2,8 +2,14 @@
 
 ## 2.1.0 - ~/~/2019
 
+- Added `before_date` parameter to each filing download method. If this value is not specified, it will default to the current date.
+- Added `include_amends` parameter to each filing download method. If this value is not specified, it will default to false.
 - Added support for passing relative (e.g. `./`, `../`) and user (e.g. `~/`) download paths to the `Downloader` constructor
-- An `IOError` is no longer thrown when an invalid download path is passed to the `Downloader` constructor. Instead, `sec_edgar_downloader` will create all the necessary directories in the path if they do not exist.
+- An `IOError` is no longer thrown when an invalid download path is passed to the `Downloader` constructor. Instead,`sec_edgar_downloader` will create all the necessary directories in the path if they do not exist.
+- Filing documents are no longer downloaded in streamed chunks.
+- Downloads are now written to disk with UTF-8 encoding.
+- Added `__version__` variable to package.
+- Travis CI now uses tox to lint and run tests.
 
 ## 2.0.1 - 5/13/2019
 

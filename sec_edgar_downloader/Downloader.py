@@ -45,7 +45,7 @@ class Downloader:
         )
 
         for doc_info in filing_document_info:
-            resp = requests.get(doc_info.url, stream=True)
+            resp = requests.get(doc_info.url)
             resp.raise_for_status()
 
             save_path = self._download_folder.joinpath(
@@ -57,11 +57,8 @@ class Downloader:
             # this would create all the directories leading up to bob.txt.
             save_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(save_path, "wb") as f:
-                for chunk in resp.iter_content(chunk_size=1024):
-                    # filter out keep-alive chunks
-                    if chunk:  # pragma: no branch
-                        f.write(chunk)
+            with open(save_path, "w", encoding="utf-8") as f:
+                f.write(resp.text)
 
         print(f"{filing_type} filings for {ticker} downloaded successfully.")
 
