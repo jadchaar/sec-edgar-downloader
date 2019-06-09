@@ -22,7 +22,7 @@ clean:
 	rm -f ./**/*.pyc .coverage
 
 publish: clean
-	pip install -U setuptools twine wheel
+	pip3 install -U setuptools twine wheel
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
 	rm -rf dist build .egg sec_edgar_downloader.egg-info
