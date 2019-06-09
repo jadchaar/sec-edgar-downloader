@@ -1,23 +1,25 @@
 from setuptools import setup
 
-from sec_edgar_downloader import __version__
-
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     readme = f.read()
+
+about = {}
+with open("sec_edgar_downloader/_version.py", "r", encoding="utf-8") as f:
+    exec(f.read(), about)
 
 setup(
     name="sec-edgar-downloader",
-    version=__version__,
+    version=about["__version__"],
     license="MIT",
     author="Jad Chaar",
     author_email="jad.chaar@gmail.com",
-    description="Python package for downloading company filings from the SEC EDGAR database.",
+    description="Download company filings from the SEC EDGAR database using Python.",
     long_description=readme,
     long_description_content_type="text/markdown",
     url="https://github.com/jadchaar/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,
-    install_requires=["beautifulsoup4", "lxml", "requests"],
+    install_requires=["lxml", "requests"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -31,7 +33,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    keywords="sec edgar downloader filing financial finance sec.gov 8-k 10-k 10-q 13f 13f-nt 13f-hr sc-13g sd",
+    keywords="sec edgar filing financial finance sec.gov",
     project_urls={
         "Bug Reports": "https://github.com/jadchaar/sec-edgar-downloader/issues",
         "Repository": "https://github.com/jadchaar/sec-edgar-downloader",

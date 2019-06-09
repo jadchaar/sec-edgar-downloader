@@ -1,12 +1,10 @@
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
 
 from sec_edgar_downloader import Downloader
-
-sys.path.append(str(Path(__file__).parent.joinpath("helpers")))
+from sec_edgar_downloader._utils import form_query_string
 
 
 @pytest.fixture(scope="function")
@@ -18,11 +16,31 @@ def downloader(tmpdir):
 
 
 @pytest.fixture(scope="session")
+def apple_10k_edgar_search_xml_url():
+    qs = form_query_string("AAPL", "10-K", "20190531")
+    return f"https://www.sec.gov/cgi-bin/browse-edgar?{qs}"
+
+
+@pytest.fixture(scope="session")
 def apple_filing_metadata():
     apple_ticker_data = {
         "symbol": "AAPL",
         "full_cik": "0000320193",
         "company_name": "APPLE INC",
+    }
+    return apple_ticker_data
+
+
+@pytest.fixture(scope="session")
+def apple_filing_metadata_pre_2007():
+    """
+    Prior to 2007, Apple filed with the SEC as
+    APPLE COMPUTER INC rather than APPLE INC
+    """
+    apple_ticker_data = {
+        "symbol": "AAPL",
+        "full_cik": "0000320193",
+        "company_name": "APPLE COMPUTER INC",
     }
     return apple_ticker_data
 

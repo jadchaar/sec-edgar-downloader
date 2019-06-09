@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 
 def parse_filing_document_header(file_path):
@@ -6,6 +7,7 @@ def parse_filing_document_header(file_path):
         "ACCESSION NUMBER": [],
         "CONFORMED SUBMISSION TYPE": [],
         "COMPANY CONFORMED NAME": [],
+        "FILED AS OF DATE": [],
     }
     header = extract_header(file_path)
     for line in header:
@@ -14,6 +16,7 @@ def parse_filing_document_header(file_path):
             components[0] == "ACCESSION NUMBER"
             or components[0] == "CONFORMED SUBMISSION TYPE"
             or components[0] == "COMPANY CONFORMED NAME"
+            or components[0] == "FILED AS OF DATE"
         ):
             parsed[components[0]].append(components[1])
     return parsed
@@ -21,7 +24,7 @@ def parse_filing_document_header(file_path):
 
 def extract_header(file_path):
     header = []
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         for line in f:
             # </SEC-HEADER> indicates the end of the header info
             if line == "</SEC-HEADER>\n":
@@ -31,7 +34,14 @@ def extract_header(file_path):
 
 
 def verify_directory_structure(
-    base_dir, filing_types, num_downloaded, symbol, full_cik, company_name
+    base_dir,
+    filing_types,
+    num_downloaded,
+    symbol,
+    full_cik,
+    company_name,
+    before_date=None,
+    amends_included=False,
 ):
     # no ticker symbol available (only CIK)
     if symbol is None:
@@ -75,10 +85,19 @@ def verify_directory_structure(
         )
         assert header_contents["ACCESSION NUMBER"][0] == accession_number
         header_submission = header_contents["CONFORMED SUBMISSION TYPE"][0]
-        assert header_submission == ft or header_submission == f"{ft}/A"
+        if amends_included:
+            assert header_submission == ft or header_submission == f"{ft}/A"
+        else:
+            assert header_submission == ft
         # lack of standard SEC-HEADER format makes it hard to exact match the company name
         # without more advanced edge-case parsing, so this is a good estimate of the check
         assert company_name in header_contents["COMPANY CONFORMED NAME"]
+
+        if before_date is not None:
+            filing_date = datetime.strptime(
+                header_contents["FILED AS OF DATE"][0], "%Y%m%d"
+            )
+            assert filing_date <= datetime.strptime(before_date, "%Y%m%d")
 
 
 def strip_cik(full_cik):
