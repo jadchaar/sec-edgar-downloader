@@ -24,14 +24,19 @@ setup(
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
+        "Intended Audience :: Information Technology",
+        "Intended Audience :: Financial and Insurance Industry"
         "Natural Language :: English",
         "Topic :: Software Development :: Libraries :: Python Modules",
+        "Topic :: Office/Business :: Financial",
+        "Topic :: Office/Business :: Financial :: Investment"
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3 :: Only",
+        "Operating System :: OS Independent",
     ],
     keywords="sec edgar filing financial finance sec.gov",
     project_urls={
