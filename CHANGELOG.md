@@ -10,6 +10,7 @@
 - Downloads are now written to disk with UTF-8 encoding.
 - Added `__version__` variable to package.
 - Travis CI now uses tox to lint and run tests.
+- Added `verbose` flag to `Downloader` constructor to enable information printing (e.g. how many filings are found and downloaded). `verbose` will default to false, meaning that no download information will be printed by default.
 
 ## 2.0.1 - 5/13/2019
 

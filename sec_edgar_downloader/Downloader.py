@@ -7,15 +7,17 @@ from ._utils import form_query_string, parse_edgar_rss_feed, validate_before_dat
 
 
 class Downloader:
-    def __init__(self, download_folder=None):
-        print("Welcome to the SEC EDGAR Downloader!")
-
+    def __init__(self, download_folder=None, verbose=False):
         if download_folder is None:
             self._download_folder = Path.home().joinpath("Downloads")
         else:
             self._download_folder = Path(download_folder).expanduser().resolve()
 
-        print(f"Company filings will be saved to: {self._download_folder}")
+        self._verbose_print = print if verbose else lambda *a, **k: None
+
+        self._verbose_print(
+            f"Company filings will be saved to: {self._download_folder}"
+        )
 
         self._sec_base_url = "https://www.sec.gov"
         self._sec_edgar_base_url = f"{self._sec_base_url}/cgi-bin/browse-edgar?"
@@ -36,10 +38,10 @@ class Downloader:
         num_filings_to_download = len(filing_document_info)
 
         if num_filings_to_download == 0:
-            print(f"No {filing_type} documents available for {ticker}.")
+            self._verbose_print(f"No {filing_type} documents available for {ticker}.")
             return 0
 
-        print(
+        self._verbose_print(
             f"{num_filings_to_download} {filing_type} documents available for {ticker}.",
             "Beginning download...",
         )
@@ -60,7 +62,9 @@ class Downloader:
             with open(save_path, "w", encoding="utf-8") as f:
                 f.write(resp.text)
 
-        print(f"{filing_type} filings for {ticker} downloaded successfully.")
+        self._verbose_print(
+            f"{filing_type} filings for {ticker} downloaded successfully."
+        )
 
         return num_filings_to_download
 
@@ -85,7 +89,7 @@ class Downloader:
                 "Please enter a number greater than 1 for the number of filings to download."
             )
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
-        print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
+        self._verbose_print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
         qs = form_query_string(ticker_or_cik, filing_type, before_date)
         edgar_search_url = f"{self._sec_edgar_base_url}{qs}"
         return self._download_filings(
