@@ -52,7 +52,7 @@ def test_ticker_argument(downloader):
 
 def test_before_date_argument(downloader, apple_filing_metadata):
     dl, _ = downloader
-    expected_msg = "Please enter a date of the form YYYYMMDD."
+    expected_msg = "Please enter a date string of the form YYYYMMDD."
 
     with pytest.raises(Exception) as excinfo:
         dl.get_8k_filings(apple_filing_metadata["symbol"], 1, "January 30, 2019")
