@@ -1,6 +1,6 @@
 # Changelog
 
-## 2.1.0 - ~/~/2019
+## 2.1.0 - 6/8/2019
 
 - Added `before_date` parameter to each filing download method. If this value is not specified, it will default to the current date.
 - Added `include_amends` parameter to each filing download method. If this value is not specified, it will default to false.

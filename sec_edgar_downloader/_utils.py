@@ -69,5 +69,5 @@ def validate_before_date(before_date):
         datetime.strptime(before_date, "%Y%m%d")
     except ValueError as e:
         raise Exception(
-            "Incorrect before_date format. Please enter a date of the form YYYYMMDD."
+            "Incorrect before_date format. Please enter a date string of the form YYYYMMDD."
         ) from e
