@@ -1,4 +1,4 @@
-.PHONY: test clean publish
+.PHONY: test clean docs publish
 
 build36: PYTHON_VER = python3.6
 build37: PYTHON_VER = python3.7
@@ -20,6 +20,10 @@ clean:
 	rm -rf venv .tox .pytest_cache ./**/__pycache__
 	rm -rf dist build .egg sec_edgar_downloader.egg-info
 	rm -f ./**/*.pyc .coverage
+
+docs:
+	pip3 install -U sphinx
+	cd docs; make html
 
 publish: clean
 	pip3 install -U setuptools twine wheel

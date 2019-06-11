@@ -1,3 +1,5 @@
+"""Provides the :class:`Downloader` class, which is used to download SEC filings."""
+
 from datetime import date
 from pathlib import Path
 
@@ -7,7 +9,22 @@ from ._utils import form_query_string, parse_edgar_rss_feed, validate_before_dat
 
 
 class Downloader:
+    """A :class:`Downloader` object.
+
+    :param download_folder: relative or absolute path to download location,
+        defaults to the user's ``Downloads`` folder.
+    :type download_folder: ``str``, optional
+    :param verbose: display download information, defaults to False
+    :type verbose: ``bool``, optional
+
+    Usage::
+
+        >>> import sec_edgar_downloader
+        >>> dl = sec_edgar_downloader.Downloader()
+    """
+
     def __init__(self, download_folder=None, verbose=False):
+        """Constructor for :class:`Downloader` class."""
         if download_folder is None:
             self._download_folder = Path.home().joinpath("Downloads")
         else:
@@ -100,9 +117,7 @@ class Downloader:
             include_amends,
         )
 
-    """
-    Generic download methods
-    """
+    """Download methods for each supported SEC filing type"""
 
     def get_8k_filings(
         self,
@@ -111,6 +126,19 @@ class Downloader:
         before_date=None,
         include_amends=False,
     ):
+        """Obtains 8-K filings for a specified ticker or CIK.
+
+        :param ticker_or_cik: ticker or CIK to obtain filings for
+        :type ticker_or_cik: ``str``
+        :param num_filings_to_download: [description], defaults to 100
+        :type num_filings_to_download: int, optional
+        :param before_date: [description], defaults to None
+        :type before_date: [type], optional
+        :param include_amends: [description], defaults to False
+        :type include_amends: bool, optional
+        :return: [description]
+        :rtype: [type]
+        """
         filing_type = "8-K"
         return self._get_filing_wrapper(
             filing_type,
