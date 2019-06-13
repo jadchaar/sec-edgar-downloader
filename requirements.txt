@@ -1,4 +1,4 @@
-lxml
+lxml>=4.3.4
 pre-commit
 pytest
 pytest-cov
