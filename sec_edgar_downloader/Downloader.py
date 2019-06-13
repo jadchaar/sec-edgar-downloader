@@ -76,7 +76,7 @@ class Downloader:
             # this would create all the directories leading up to bob.txt.
             save_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(save_path, "w", encoding="utf-8") as f:
+            with open(save_path, "w", encoding="ascii", errors="ignore") as f:
                 f.write(resp.text)
 
         self._verbose_print(
