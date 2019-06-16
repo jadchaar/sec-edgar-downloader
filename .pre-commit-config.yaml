@@ -9,7 +9,9 @@ repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
       rev: v2.2.3
       hooks:
-          - id: trailing-whitespace
+          - id: check-case-conflict
+          - id: check-docstring-first
+          - id: check-merge-conflict
           - id: end-of-file-fixer
           - id: check-yaml
           - id: debug-statements
