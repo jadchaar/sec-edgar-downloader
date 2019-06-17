@@ -1,5 +1,4 @@
 import shutil
-from pathlib import Path
 
 import pytest
 
@@ -8,8 +7,9 @@ from sec_edgar_downloader._utils import form_query_string
 
 
 @pytest.fixture(scope="function")
-def downloader(tmpdir):
-    tmp_dir = Path(tmpdir.mkdir("Downloads"))
+def downloader(tmp_path):
+    tmp_dir = tmp_path.joinpath("Downloads")
+    tmp_dir.mkdir()
     dl = Downloader(tmp_dir)
     yield dl, tmp_dir
     shutil.rmtree(tmp_dir)

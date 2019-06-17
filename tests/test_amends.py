@@ -34,7 +34,7 @@ def test_exclude_amends_from_xml(apple_10k_edgar_search_xml_url):
 
 
 def test_include_amends_filing_retrieval(downloader, apple_filing_metadata):
-    dl, download_location = downloader
+    dl, download_folder_base = downloader
 
     # AAPL has 1 SG-13G filing and 2 SG-13G/A before 19940218
     num_downloaded = dl.get_sc_13g_filings(
@@ -44,7 +44,7 @@ def test_include_amends_filing_retrieval(downloader, apple_filing_metadata):
 
 
 def test_exclude_amends_filing_retrieval(downloader, apple_filing_metadata):
-    dl, download_location = downloader
+    dl, download_folder_base = downloader
 
     # AAPL has 1 SG-13G filing and 2 SG-13G/A before 19940218
     num_downloaded = dl.get_sc_13g_filings(
