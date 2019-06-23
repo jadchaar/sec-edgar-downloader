@@ -1,3 +1,5 @@
+"""Tests downloader behavior in the presence of 4xx and 5xx status codes."""
+
 import pytest
 import requests
 

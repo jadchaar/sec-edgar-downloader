@@ -1,3 +1,7 @@
+"""Tests all types of filing downloads to ensure that the filings
+are properly downloaded and saved in the correct folder hierarchy.
+"""
+
 import filecmp
 import os
 
@@ -163,6 +167,7 @@ def test_large_filing_download(downloader):
     downloaded in a web browser from:
     https://www.sec.gov/Archives/edgar/data/1403161/000140316119000014/0001403161-19-000014.txt
     """
+
     dl, download_folder_base = downloader
 
     dl.get_8k_filings("V", 1, before_date="20190424")

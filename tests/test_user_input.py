@@ -1,3 +1,7 @@
+"""Tests the behavior and error handling of the Downloader
+in the presence of abnormal and malformed user input.
+"""
+
 from datetime import datetime
 
 import pytest

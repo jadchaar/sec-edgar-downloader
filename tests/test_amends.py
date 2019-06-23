@@ -1,3 +1,5 @@
+"""Tests downloads with and without the filing amends included."""
+
 import requests
 
 from sec_edgar_downloader._utils import extract_elements_from_xml

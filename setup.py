@@ -1,6 +1,6 @@
 from setuptools import setup
 
-with open("README.md", "r", encoding="utf-8") as f:
+with open("README.rst", "r", encoding="utf-8") as f:
     readme = f.read()
 
 about = {}
@@ -15,7 +15,7 @@ setup(
     author_email="jad.chaar@gmail.com",
     description="Download company filings from the SEC EDGAR database using Python.",
     long_description=readme,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/jadchaar/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,

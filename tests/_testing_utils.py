@@ -1,3 +1,5 @@
+"""Shared utility functions for testing suite."""
+
 import os
 from datetime import datetime
 
@@ -24,7 +26,7 @@ def parse_filing_document_header(file_path):
 
 def extract_header(file_path):
     header = []
-    with open(file_path, "r", encoding="ascii", errors="ignore") as f:
+    with open(file_path, "r", encoding="ascii") as f:
         for line in f:
             # </SEC-HEADER> indicates the end of the header info
             if line == "</SEC-HEADER>\n":

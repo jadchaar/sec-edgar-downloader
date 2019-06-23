@@ -1,3 +1,7 @@
+"""Tests the initialization of the Downloader object with
+relative and absolute download folder paths.
+"""
+
 from pathlib import Path
 
 from sec_edgar_downloader import Downloader
