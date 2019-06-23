@@ -22,7 +22,6 @@ clean:
 	rm -f ./**/*.pyc .coverage
 
 docs:
-	pip3 install -U sphinx
 	cd docs; make html
 
 publish: clean

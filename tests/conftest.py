@@ -1,3 +1,5 @@
+"""Pytest fixtures for testing suite."""
+
 import shutil
 
 import pytest

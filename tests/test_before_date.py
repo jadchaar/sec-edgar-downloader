@@ -1,3 +1,5 @@
+"""Tests downloads with and without the before_date specified."""
+
 from ._testing_utils import verify_directory_structure
 
 
