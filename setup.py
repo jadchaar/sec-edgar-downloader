@@ -42,5 +42,6 @@ setup(
     project_urls={
         "Bug Reports": "https://github.com/jadchaar/sec-edgar-downloader/issues",
         "Repository": "https://github.com/jadchaar/sec-edgar-downloader",
+        "Documentation": "https://sec-edgar-downloader.readthedocs.io",
     },
 )
