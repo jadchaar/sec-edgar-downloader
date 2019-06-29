@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.2.0 - 6/28/2019
+
+- `sec-edgar-downloader` is now fully documented 🎉. You can view the latest documentation at [sec-edgar-downloader.readthedocs.io](https://sec-edgar-downloader.readthedocs.io).
+- Changed file encoding for filing downloads from `utf-8` to `ascii`. This switch was made because SEC filings should be [submitted in ASCII format](https://www.sec.gov/info/edgar/quick-reference/create-ascii-files.pdf).
+- Locked the `lxml` dependency to `v4.3.4` or greater to fix Python 3.8 install issues.
+
 ## 2.1.0 - 6/8/2019
 
 - Added `before_date` parameter to each filing download method. If this value is not specified, it will default to the current date.
