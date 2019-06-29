@@ -18,7 +18,7 @@ lint:
 
 clean:
 	rm -rf venv .tox .pytest_cache ./**/__pycache__
-	rm -rf dist build .egg sec_edgar_downloader.egg-info
+	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
 	rm -f ./**/*.pyc .coverage
 
 docs:
@@ -28,4 +28,4 @@ publish: clean
 	pip3 install -U setuptools twine wheel
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
-	rm -rf dist build .egg sec_edgar_downloader.egg-info
+	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info

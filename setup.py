@@ -25,11 +25,11 @@ setup(
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Intended Audience :: Information Technology",
-        "Intended Audience :: Financial and Insurance Industry"
+        "Intended Audience :: Financial and Insurance Industry",
         "Natural Language :: English",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Office/Business :: Financial",
-        "Topic :: Office/Business :: Financial :: Investment"
+        "Topic :: Office/Business :: Financial :: Investment",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.6",
