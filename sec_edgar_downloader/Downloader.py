@@ -180,6 +180,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 8-K filings for Apple
+            >>> dl.get_8k_filings("AAPL")
+
+            # Get the past 5 8-K filings for Apple
+            >>> dl.get_8k_filings("AAPL", 5)
+
+            # Get all 8-K filings for Apple, including filing amends (8-K/A)
+            >>> dl.get_8k_filings("AAPL", include_amends=True)
+
+            # Get all 8-K filings for Apple before March 25, 2017
+            >>> dl.get_8k_filings("AAPL", before_date="20170325")
         """
 
         filing_type = "8-K"
@@ -212,6 +229,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 10-K filings for Apple
+            >>> dl.get_10k_filings("AAPL")
+
+            # Get the past 5 10-K filings for Apple
+            >>> dl.get_10k_filings("AAPL", 5)
+
+            # Get all 10-K filings for Apple, including filing amends (10-K/A)
+            >>> dl.get_10k_filings("AAPL", include_amends=True)
+
+            # Get all 10-K filings for Apple before March 25, 2017
+            >>> dl.get_10k_filings("AAPL", before_date="20170325")
         """
 
         filing_type = "10-K"
@@ -244,6 +278,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 10-Q filings for Apple
+            >>> dl.get_10q_filings("AAPL")
+
+            # Get the past 5 10-Q filings for Apple
+            >>> dl.get_10q_filings("AAPL", 5)
+
+            # Get all 10-Q filings for Apple, including filing amends (10-Q/A)
+            >>> dl.get_10q_filings("AAPL", include_amends=True)
+
+            # Get all 10-Q filings for Apple before March 25, 2017
+            >>> dl.get_10q_filings("AAPL", before_date="20170325")
         """
 
         filing_type = "10-Q"
@@ -277,6 +328,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 13F-NT filings for the Vanguard Group
+            >>> dl.get_13f_nt_filings("0000102909")
+
+            # Get the past 5 13F-NT filings for the Vanguard Group
+            >>> dl.get_13f_nt_filings("0000102909", 5)
+
+            # Get all 13F-NT filings for the Vanguard Group, including filing amends (13F-NT/A)
+            >>> dl.get_13f_nt_filings("0000102909", include_amends=True)
+
+            # Get all 13F-NT filings for the Vanguard Group before March 25, 2017
+            >>> dl.get_13f_nt_filings("0000102909", before_date="20170325")
         """
 
         filing_type = "13F-NT"
@@ -309,6 +377,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 13F-HR filings for the Vanguard Group
+            >>> dl.get_13f_hr_filings("0000102909")
+
+            # Get the past 5 13F-HR filings for the Vanguard Group
+            >>> dl.get_13f_hr_filings("0000102909", 5)
+
+            # Get all 13F-HR filings for the Vanguard Group, including filing amends (13F-HR/A)
+            >>> dl.get_13f_hr_filings("0000102909", include_amends=True)
+
+            # Get all 13F-HR filings for the Vanguard Group before March 25, 2017
+            >>> dl.get_13f_hr_filings("0000102909", before_date="20170325")
         """
 
         filing_type = "13F-HR"
@@ -341,6 +426,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all SC 13G filings for Apple
+            >>> dl.get_sc_13g_filings("AAPL")
+
+            # Get the past 5 SC 13G filings for Apple
+            >>> dl.get_sc_13g_filings("AAPL", 5)
+
+            # Get all SC 13G filings for Apple, including filing amends (SC 13G/A)
+            >>> dl.get_sc_13g_filings("AAPL", include_amends=True)
+
+            # Get all SC 13G filings for Apple before March 25, 2017
+            >>> dl.get_sc_13g_filings("AAPL", before_date="20170325")
         """
 
         filing_type = "SC 13G"
@@ -373,6 +475,23 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all SD filings for Apple
+            >>> dl.get_sd_filings("AAPL")
+
+            # Get the past 5 SD filings for Apple
+            >>> dl.get_sd_filings("AAPL", 5)
+
+            # Get all SD filings for Apple, including filing amends (SD/A)
+            >>> dl.get_sd_filings("AAPL", include_amends=True)
+
+            # Get all SD filings for Apple before March 25, 2017
+            >>> dl.get_sd_filings("AAPL", before_date="20170325")
         """
 
         filing_type = "SD"
@@ -409,6 +528,18 @@ class Downloader:
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
         :rtype: ``int``
+
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get the latest filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for Apple
+            >>> dl.get_all_available_filings("AAPL", 1)
+
+            # Get all filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for Apple
+            >>> dl.get_all_available_filings("AAPL")
         """
 
         total_dl = 0
