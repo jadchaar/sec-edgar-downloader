@@ -73,10 +73,10 @@ Example Usage
     # Get all 10-Q filings for Visa (ticker: V)
     dl.get_10q_filings("V")
 
-    # Get all 13F-NT filings for Vanguard Group (CIK: 0000102909)
+    # Get all 13F-NT filings for the Vanguard Group (CIK: 0000102909)
     dl.get_13f_nt_filings("0000102909")
 
-    # Get all 13F-HR filings for Vanguard Group
+    # Get all 13F-HR filings for the Vanguard Group
     dl.get_13f_hr_filings("0000102909")
 
     # Get all SC 13G filings for Apple
