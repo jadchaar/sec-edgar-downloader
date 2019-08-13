@@ -143,7 +143,7 @@ class Downloader:
             )
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
         self._verbose_print(f"\nGetting {filing_type} filings for {ticker_or_cik}.")
-        qs = form_query_string(ticker_or_cik, filing_type, before_date)
+        qs = form_query_string(ticker_or_cik, filing_type, before_date, count=num_filings_to_download)
         edgar_search_url = f"{self._sec_edgar_base_url}{qs}"
         return self._download_filings(
             edgar_search_url,
