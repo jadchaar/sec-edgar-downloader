@@ -8,13 +8,13 @@ from lxml import etree
 FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
 
 
-# TODO: Allow users to pass in start and count parameters
-def form_query_string(ticker, filing_type, before_date):
+# TODO: Allow users to pass in start parameter
+def form_query_string(ticker, filing_type, before_date, count=100):
     query_params = {
         "action": "getcompany",
         "owner": "exclude",
         "start": 0,
-        "count": 100,
+        "count": count,
         "CIK": ticker,
         "type": filing_type,
         "dateb": before_date,
