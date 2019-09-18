@@ -264,7 +264,7 @@ class Downloader:
         before_date=None,
         include_amends=False,
     ):
-        """Downloads 10KSB filings for a specified ticker or CIK.
+        """Downloads 10-KSB filings for a specified ticker or CIK.
 
         :param ticker_or_cik: ticker or CIK to download filings for
         :type ticker_or_cik: ``str``
@@ -273,7 +273,7 @@ class Downloader:
         :param before_date: date of form YYYYMMDD in which to download filings before,
             defaults to today
         :type before_date: ``str`` or ``datetime``, optional
-        :param include_amends: whether or not to include filing amends (e.g. 10KSB/A),
+        :param include_amends: whether or not to include filing amends (e.g. 10-KSB/A),
             defaults to False
         :type include_amends: ``bool``, optional
         :return: number of filings downloaded
@@ -284,16 +284,16 @@ class Downloader:
             >>> import sec_edgar_downloader
             >>> dl = sec_edgar_downloader.Downloader()
 
-            # Get all 10KSB filings for Ubiquitech Software
+            # Get all 10-KSB filings for Ubiquitech Software
             >>> dl.get_10ksb_filings("1411460")
 
-            # Get the past 5 10KSB filings for Ubiquitech Software
+            # Get the past 5 10-KSB filings for Ubiquitech Software
             >>> dl.get_10ksb_filings("1411460", 5)
 
-            # Get all 10KSB filings for Ubiquitech Software, including filing amends (10KSB/A)
+            # Get all 10-KSB filings for Ubiquitech Software, including filing amends (10-KSB/A)
             >>> dl.get_10ksb_filings("1411460", include_amends=True)
 
-            # Get all 10KSB filings for Ubiquitech Software before March 25, 2017
+            # Get all 10-KSB filings for Ubiquitech Software before March 25, 2017
             >>> dl.get_10ksb_filings("1411460", before_date="20170325")
         """
 
