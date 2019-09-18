@@ -44,6 +44,27 @@ def test_10k_filing_retrieval(
     )
 
 
+def test_10ksb_filing_retrieval(downloader, vanguard_filing_metadata):
+    dl, download_folder_base = downloader
+
+    num_downloaded = dl.get_10ksb_filings("1411460", 1)
+    assert num_downloaded == 1
+
+    # Vanguard Group does not file 10KSB
+    vanguard_full_cik = vanguard_filing_metadata["full_cik"]
+    num_downloaded = dl.get_10k_filings(vanguard_full_cik)
+    assert num_downloaded == 0
+
+    verify_directory_structure(
+        download_folder_base,
+        ["10KSB"],
+        1,
+        None,
+        "0001411460",
+        "UBIQUITECH SOFTWARE CORP",
+    )
+
+
 def test_10q_filing_retrieval(
     downloader, apple_filing_metadata, vanguard_filing_metadata
 ):
