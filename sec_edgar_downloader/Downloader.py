@@ -95,7 +95,7 @@ class Downloader:
             # this would create all the directories leading up to bob.txt.
             save_path.parent.mkdir(parents=True, exist_ok=True)
 
-            with open(save_path, "w", encoding="ascii", errors="ignore") as f:
+            with open(save_path, "w", encoding="utf-8") as f:
                 f.write(resp.text)
 
         self._verbose_print(
@@ -249,6 +249,55 @@ class Downloader:
         """
 
         filing_type = "10-K"
+        return self._get_filing_wrapper(
+            filing_type,
+            ticker_or_cik,
+            num_filings_to_download,
+            before_date,
+            include_amends,
+        )
+
+    def get_10ksb_filings(
+        self,
+        ticker_or_cik,
+        num_filings_to_download=100,
+        before_date=None,
+        include_amends=False,
+    ):
+        """Downloads 10KSB filings for a specified ticker or CIK.
+
+        :param ticker_or_cik: ticker or CIK to download filings for
+        :type ticker_or_cik: ``str``
+        :param num_filings_to_download: number of filings to download, defaults to 100
+        :type num_filings_to_download: int, optional
+        :param before_date: date of form YYYYMMDD in which to download filings before,
+            defaults to today
+        :type before_date: ``str`` or ``datetime``, optional
+        :param include_amends: whether or not to include filing amends (e.g. 10KSB/A),
+            defaults to False
+        :type include_amends: ``bool``, optional
+        :return: number of filings downloaded
+        :rtype: ``int``
+
+        Usage::
+
+            >>> import sec_edgar_downloader
+            >>> dl = sec_edgar_downloader.Downloader()
+
+            # Get all 10KSB filings for Ubiquitech Software
+            >>> dl.get_10ksb_filings("1411460")
+
+            # Get the past 5 10KSB filings for Ubiquitech Software
+            >>> dl.get_10ksb_filings("1411460", 5)
+
+            # Get all 10KSB filings for Ubiquitech Software, including filing amends (10KSB/A)
+            >>> dl.get_10ksb_filings("1411460", include_amends=True)
+
+            # Get all 10KSB filings for Ubiquitech Software before March 25, 2017
+            >>> dl.get_10ksb_filings("1411460", before_date="20170325")
+        """
+
+        filing_type = "10KSB"
         return self._get_filing_wrapper(
             filing_type,
             ticker_or_cik,

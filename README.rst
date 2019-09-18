@@ -70,6 +70,9 @@ Example Usage
     # Get the latest 10-K filing for Microsoft
     dl.get_10k_filings("MSFT", 1)
 
+    # Get the latest 10KSB filing for Ubiquitech Software
+    dl.get_10ksb_filings("0001411460", 1)
+
     # Get all 10-Q filings for Visa (ticker: V)
     dl.get_10q_filings("V")
 
@@ -99,6 +102,7 @@ Supported SEC Filings
 
 - 8-K
 - 10-K
+- 10KSB
 - 10-Q
 - 13F-NT and 13F-HR
 - SC 13G
