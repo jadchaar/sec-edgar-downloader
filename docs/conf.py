@@ -33,13 +33,7 @@ master_doc = "index"
 source_suffix = {".rst": "restructuredtext"}
 
 html_sidebars = {
-    "**": [
-        "about.html",
-        "localtoc.html",
-        # "navigation.html",
-        "relations.html",
-        "searchbox.html",
-    ]
+    "**": ["about.html", "localtoc.html", "relations.html", "searchbox.html"]
 }
 
 templates_path = ["_templates"]
@@ -50,13 +44,16 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "alabaster"
 html_theme_options = {
-    "description": "Download SEC filings with ease",
+    "description": "Download SEC filings with ease.",
     "github_user": "jadchaar",
     "github_repo": "sec-edgar-downloader",
-    "github_banner": "true",
-    "github_type": "star",
+    "github_banner": True,
+    "show_related": False,
+    "show_powered_by": False,
 }
 
-html_static_path = ["_static"]
+html_static_path = []
 
 html_show_sourcelink = False
+html_show_copyright = True
+html_show_sphinx = False

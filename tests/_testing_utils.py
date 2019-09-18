@@ -1,6 +1,7 @@
 """Shared utility functions for testing suite."""
 
 import os
+import string
 from datetime import datetime
 
 
@@ -20,6 +21,16 @@ def parse_filing_document_header(file_path):
             or components[0] == "COMPANY CONFORMED NAME"
             or components[0] == "FILED AS OF DATE"
         ):
+            # Strip punctuation from company name and normalize case
+            # Useful for company names that may be inconsistent
+            # such as APPLE INC and Apple Inc.
+            if components[0] == "COMPANY CONFORMED NAME":
+                # https://stackoverflow.com/q/265960
+                components[1] = (
+                    components[1]
+                    .translate(str.maketrans("", "", string.punctuation))
+                    .lower()
+                )
             parsed[components[0]].append(components[1])
     return parsed
 
@@ -93,7 +104,7 @@ def verify_directory_structure(
             assert header_submission == ft
         # lack of standard SEC-HEADER format makes it hard to exact match the company name
         # without more advanced edge-case parsing, so this is a good estimate of the check
-        assert company_name in header_contents["COMPANY CONFORMED NAME"]
+        assert company_name.lower() in header_contents["COMPANY CONFORMED NAME"]
 
         if before_date is not None:
             filing_date = datetime.strptime(
