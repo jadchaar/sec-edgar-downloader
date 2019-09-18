@@ -169,6 +169,7 @@ def test_all_available_filing_retrieval_institutional_investor(
 ):
     dl, download_folder_base = downloader
 
+    # TODO: remove before_date="20190408" when support for >100 filings is added
     num_downloaded = dl.get_all_available_filings(
         vanguard_filing_metadata["full_cik"], 2, "20190408"
     )
