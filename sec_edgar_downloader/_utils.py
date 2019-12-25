@@ -1,3 +1,4 @@
+import re
 from collections import namedtuple
 from datetime import datetime
 from urllib.parse import urlencode
@@ -5,17 +6,27 @@ from urllib.parse import urlencode
 import requests
 from lxml import etree
 
-FilingInfo = namedtuple("FilingInfo", ["filename", "url"])
+from ._constants import SEC_EDGAR_BASE_URL
+
+FilingMetadata = namedtuple("FilingMetadata", ["filename", "url"])
 
 
-# TODO: Allow users to pass in start and count parameters
-def form_query_string(ticker, filing_type, before_date):
+def validate_date_format(date_str):
+    try:
+        datetime.strptime(date_str, "%Y%m%d")
+    except ValueError as e:
+        raise Exception(
+            "Incorrect date format. Please enter a date string of the form YYYYMMDD."
+        ) from e
+
+
+def form_query_string(start, count, ticker_or_cik, filing_type, before_date):
     query_params = {
         "action": "getcompany",
         "owner": "exclude",
-        "start": 0,
-        "count": 100,
-        "CIK": ticker,
+        "start": start,
+        "count": count,
+        "CIK": ticker_or_cik,
         "type": filing_type,
         "dateb": before_date,
         "output": "atom",
@@ -29,45 +40,67 @@ def extract_elements_from_xml(xml_byte_object, xpath_selector):
     return xml_root.xpath(xpath_selector, namespaces=xml_ns_map)
 
 
-def parse_edgar_rss_feed(
-    edgar_search_url, num_filings_to_download, filing_type, include_amends
+def get_filing_urls_to_download(
+    ticker_or_cik,
+    filing_type,
+    num_filings_to_download,
+    before_date,
+    after_date,
+    include_amends,
 ):
-    resp = requests.get(edgar_search_url)
-    resp.raise_for_status()
+    filing_urls = []
+    start = 0
+    count = 100
 
-    # If the Content-Type is text/html, no filings were found
-    # for the entered search query (e.g. No matching Ticker Symbol)
-    if resp.headers["Content-Type"] != "application/atom+xml":
-        return []
+    # loop until:
+    # (1) we get more filings than num_filings_to_download
+    # (2) there are no more filings to fetch
+    while len(filing_urls) < num_filings_to_download:
+        qs = form_query_string(start, count, ticker_or_cik, filing_type, before_date)
+        edgar_search_url = f"{SEC_EDGAR_BASE_URL}{qs}"
 
-    # Need xpath capabilities of lxml because some entries are mislabeled as
-    # 10-K405, for example, which makes an exact match of filing type infeasible
-    if include_amends:
-        xpath_selector = "//w3:filing-href"
-    else:
-        xpath_selector = (
-            "//w3:filing-type[not(contains(text(), '/A'))]/../w3:filing-href"
-        )
-    filing_href_elts = extract_elements_from_xml(resp.content, xpath_selector)[
-        :num_filings_to_download
-    ]
+        print(edgar_search_url)
 
-    filing_info = []
+        resp = requests.get(edgar_search_url)
+        resp.raise_for_status()
+
+        print('resp.headers["Content-Type"]: ', resp.headers["Content-Type"])
+
+        # Need xpath capabilities of lxml because some entries are mislabeled as
+        # 10-K405, for example, which makes an exact match of filing type infeasible
+        if include_amends:
+            xpath_selector = "//w3:filing-href"
+        else:
+            xpath_selector = (
+                "//w3:filing-type[not(contains(text(), '/A'))]/../w3:filing-href"
+            )
+        filing_href_elts = extract_elements_from_xml(resp.content, xpath_selector)
+
+        # no more filings available
+        if not filing_href_elts:
+            break
+
+        filing_urls.extend(filing_href_elts)
+
+        start += count
+
+    # TESTING TODO
+    # (1) num_filings_to_download < number of filings available
+    # (2) num_filings_to_download > number of filings available
+    # (3) num_filings_to_download == number of filings available
+    # (4) num_filings_to_download over two pages (e.g. download 30 entries, but count = 20)
+    #       => it should fetch 40 entries, but truncate to 30
+    # (5) no filings available at all
+
+    # TODO: implement logic for after_date
+    return get_metadata_from_href_elts(filing_urls[:num_filings_to_download])
+
+
+def get_metadata_from_href_elts(filing_href_elts):
+    filings_to_fetch = []
     for elt in filing_href_elts:
         search_result_url = elt.text
-        if search_result_url[-1] != "l":
-            search_result_url += "l"
-        filing_url = search_result_url.replace("-index.html", ".txt")
-        edgar_filename = filing_url.split("/")[-1]
-        filing_info.append(FilingInfo(filename=edgar_filename, url=filing_url))
-
-    return filing_info
-
-
-def validate_before_date(before_date):
-    try:
-        datetime.strptime(before_date, "%Y%m%d")
-    except ValueError as e:
-        raise Exception(
-            "Incorrect before_date format. Please enter a date string of the form YYYYMMDD."
-        ) from e
+        edgar_url = re.sub(r"\-index\.html?", ".txt", search_result_url, 1)
+        edgar_filename = edgar_url.split("/")[-1]
+        filings_to_fetch.append(FilingMetadata(filename=edgar_filename, url=edgar_url))
+    return filings_to_fetch
