@@ -51,7 +51,7 @@ class Downloader:
         # TODO: add ability for user to pass in datetime objects?
         # TODO: add validation that after_date is less than before_date
 
-        get_filing_urls_to_download(
+        filing_to_fetch = get_filing_urls_to_download(
             ticker_or_cik,
             filing_type,
             num_filings_to_download,
@@ -59,3 +59,6 @@ class Downloader:
             after_date,
             include_amends,
         )
+
+        print(filing_to_fetch)
+        print(len(filing_to_fetch))

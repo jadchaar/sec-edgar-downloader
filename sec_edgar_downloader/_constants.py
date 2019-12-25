@@ -9,3 +9,4 @@ SUPPORTED_FILINGS = {
     "SC 13G",
     "SD",
 }
+W3_NAMESPACE = {"w3": "http://www.w3.org/2005/Atom"}
