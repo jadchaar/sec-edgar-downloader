@@ -58,17 +58,16 @@ def get_filing_urls_to_download(
         qs = form_query_string(start, count, ticker_or_cik, filing_type, before_date)
         edgar_search_url = f"{SEC_EDGAR_BASE_URL}{qs}"
 
-        print(edgar_search_url)
-
         resp = requests.get(edgar_search_url)
         resp.raise_for_status()
 
-        print('resp.headers["Content-Type"]: ', resp.headers["Content-Type"])
+        # An HTML page is returned when an invalid ticker is entered
+        # Filter out non-XML responses
+        if resp.headers["Content-Type"] != "application/atom+xml":
+            return []
 
         # Need xpath capabilities of lxml because some entries are mislabeled as
         # 10-K405, for example, which makes an exact match of filing type infeasible
-        # An example XML response can be found here:
-        # https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0000320193&type=10-K&dateb=&owner=exclude&start=0&count=100&output=atom
         if include_amends:
             xpath_selector = "//w3:content"
         else:

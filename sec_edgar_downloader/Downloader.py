@@ -1,10 +1,9 @@
-from datetime import date, datetime
+import sys
+from datetime import date
 from pathlib import Path
 
-from ._constants import SEC_EDGAR_BASE_URL, SUPPORTED_FILINGS
-from ._utils import get_filing_urls_to_download, validate_date_format, download_filings
-
-import sys
+from ._constants import SUPPORTED_FILINGS
+from ._utils import download_filings, get_filing_urls_to_download, validate_date_format
 
 
 class Downloader:
@@ -14,14 +13,7 @@ class Downloader:
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
-    @property
-    def download_folder(self):
-        return self.download_folder
-
-    @download_folder.setter
-    def download_folder(self, download_folder):
-        self.download_folder = Path(download_folder).expanduser().resolve()
-
+    # TODO: add ability to pass in list of filing types
     def get(
         self,
         filing_type,
@@ -32,8 +24,10 @@ class Downloader:
         include_amends=False,
     ):
         if filing_type not in SUPPORTED_FILINGS:
+            filing_options = ", ".join(sorted(SUPPORTED_FILINGS))
             raise ValueError(
-                f"'{filing_type}' filings are not supported. Please choose from the following: {', '.join(sorted(SUPPORTED_FILINGS))}."
+                f"'{filing_type}' filings are not supported. "
+                f"Please choose from the following: {filing_options}."
             )
 
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
@@ -46,7 +40,8 @@ class Downloader:
             num_filings_to_download = int(num_filings_to_download)
             if num_filings_to_download < 1:
                 raise ValueError(
-                    "Please enter a number greater than 1 for the number of filings to download."
+                    "Please enter a number greater than 1 "
+                    "for the number of filings to download."
                 )
 
         if before_date is None:
@@ -62,7 +57,7 @@ class Downloader:
 
         # TODO: add ability for user to pass in datetime objects?
         # TODO: add validation that after_date is less than before_date
-        # TODO: add tests for after_date < before_date, after_date = before_date, and after_date > before_date
+        # TODO: add tests for after_date <, =, and > before_date
 
         filings_to_fetch = get_filing_urls_to_download(
             ticker_or_cik,
