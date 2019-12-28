@@ -73,39 +73,21 @@ def get_filing_urls_to_download(
             xpath_selector = "//w3:content"
         else:
             xpath_selector = "//w3:filing-type[not(contains(text(), '/A'))]/.."
-        filing_entry_elts = extract_elements_from_xml(resp.content, xpath_selector)
 
-        # print(filing_entry_elts[0].find("w3:filing-href", namespaces=W3_NAMESPACE))
-        # print(filing_entry_elts[0].find("w3:filing-href", namespaces=W3_NAMESPACE).text)
-        # print(filing_entry_elts[0].find("w3:filing-date", namespaces=W3_NAMESPACE).text)
+        filing_entry_elts = extract_elements_from_xml(resp.content, xpath_selector)
 
         # no more filings available
         if not filing_entry_elts:
             break
 
-        # if after_date is not None:
-        #     for elt in filing_entry_elts:
-        #         filing_date = elt.find("w3:filing-date", namespaces=W3_NAMESPACE).text
-        #         if filing_date > after_date:
-        #             filing_href = elt.find("w3:filing-href", namespaces=W3_NAMESPACE)
-        #             filings_to_fetch.append(filing_href)
-        #         else:
-        #             return get_metadata_from_href_elts(
-        #                 filings_to_fetch[:num_filings_to_download]
-        #             )
-        # else:
-        #     filings_to_fetch.extend(filing_entry_elts)
-
         for elt in filing_entry_elts:
-            # after date constraint needs to be checked
+            # after date constraint needs to be checked if it is passed in
             if after_date is not None:
-                # filing_date = elt.find("w3:filing-date", namespaces=W3_NAMESPACE).text
                 filing_date = elt.findtext("w3:filing-date", namespaces=W3_NAMESPACE)
                 filing_date = filing_date.replace("-", "", 2)
                 if filing_date < after_date:
                     return filings_to_fetch[:num_filings_to_download]
 
-            # search_result_url = elt.find("w3:filing-href", namespaces=W3_NAMESPACE).text
             search_result_url = elt.findtext("w3:filing-href", namespaces=W3_NAMESPACE)
             edgar_url = re.sub(r"\-index\.html?", ".txt", search_result_url, 1)
             edgar_filename = edgar_url.split("/")[-1]
@@ -124,16 +106,20 @@ def get_filing_urls_to_download(
     # (5) no filings available at all
     # (6) filings across two pages (e.g. two pages of size 20). Ensure that 40 are fetched.
 
-    # TODO: implement logic for after_date
-    # return get_metadata_from_href_elts(filings_to_fetch[:num_filings_to_download])
     return filings_to_fetch[:num_filings_to_download]
 
 
-# def get_metadata_from_href_elts(filing_href_elts):
-#     filings_to_fetch = []
-#     for elt in filing_href_elts:
-#         search_result_url = elt.text
-#         edgar_url = re.sub(r"\-index\.html?", ".txt", search_result_url, 1)
-#         edgar_filename = edgar_url.split("/")[-1]
-#         filings_to_fetch.append(FilingMetadata(filename=edgar_filename, url=edgar_url))
-#     return filings_to_fetch
+def download_filings(download_folder, ticker_or_cik, filing_type, filings_to_fetch):
+    for filing in filings_to_fetch:
+        resp = requests.get(filing.url)
+        resp.raise_for_status()
+
+        save_path = download_folder.joinpath(
+            "sec_edgar_filings", ticker_or_cik, filing_type, filing.filename
+        )
+
+        # Create all parent directories as needed
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+
+        with open(save_path, "w", encoding="utf-8") as f:
+            f.write(resp.text)

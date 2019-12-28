@@ -2,7 +2,9 @@ from datetime import date, datetime
 from pathlib import Path
 
 from ._constants import SEC_EDGAR_BASE_URL, SUPPORTED_FILINGS
-from ._utils import get_filing_urls_to_download, validate_date_format
+from ._utils import get_filing_urls_to_download, validate_date_format, download_filings
+
+import sys
 
 
 class Downloader:
@@ -12,14 +14,19 @@ class Downloader:
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
-    # TODO: add methods for getting and setting download_folder
+    @property
+    def download_folder(self):
+        return self.download_folder
 
-    # TODO: should the default for num_filings_to_download be all?
+    @download_folder.setter
+    def download_folder(self, download_folder):
+        self.download_folder = Path(download_folder).expanduser().resolve()
+
     def get(
         self,
         filing_type,
         ticker_or_cik,
-        num_filings_to_download=100,
+        num_filings_to_download=None,
         before_date=None,
         after_date=None,
         include_amends=False,
@@ -31,11 +38,16 @@ class Downloader:
 
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
 
-        num_filings_to_download = int(num_filings_to_download)
-        if num_filings_to_download < 1:
-            raise ValueError(
-                "Please enter a number greater than 1 for the number of filings to download."
-            )
+        if num_filings_to_download is None:
+            # obtain all available filings, so we simply
+            # need a large number to denote this
+            num_filings_to_download = sys.maxsize
+        else:
+            num_filings_to_download = int(num_filings_to_download)
+            if num_filings_to_download < 1:
+                raise ValueError(
+                    "Please enter a number greater than 1 for the number of filings to download."
+                )
 
         if before_date is None:
             before_date = date.today().strftime("%Y%m%d")
@@ -50,8 +62,9 @@ class Downloader:
 
         # TODO: add ability for user to pass in datetime objects?
         # TODO: add validation that after_date is less than before_date
+        # TODO: add tests for after_date < before_date, after_date = before_date, and after_date > before_date
 
-        filing_to_fetch = get_filing_urls_to_download(
+        filings_to_fetch = get_filing_urls_to_download(
             ticker_or_cik,
             filing_type,
             num_filings_to_download,
@@ -60,5 +73,8 @@ class Downloader:
             include_amends,
         )
 
-        print(filing_to_fetch)
-        print(len(filing_to_fetch))
+        download_filings(
+            self.download_folder, ticker_or_cik, filing_type, filings_to_fetch
+        )
+
+        return len(filings_to_fetch)
