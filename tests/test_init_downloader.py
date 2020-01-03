@@ -3,7 +3,10 @@ Tests the initialization of the Downloader object with
 relative and absolute download folder paths.
 """
 
+import os
 from pathlib import Path
+
+import pytest
 
 from sec_edgar_downloader import Downloader
 
@@ -21,6 +24,9 @@ def test_constructor_blank_path():
     assert dl.download_folder == expected
 
 
+@pytest.mark.skipif(
+    os.name == "nt", reason="Test should only run on non-Windows systems."
+)
 def test_constructor_relative_path():
     dl = Downloader("./Downloads")
     expected = Path.cwd().joinpath("Downloads")
