@@ -9,11 +9,11 @@ matrix:
           python: "3.7"
           env: TOXENV=py37
         - name: "Python 3.8"
-          python: "3.8-dev"
+          python: "3.8"
           env: TOXENV=py38
         - name: "Linting"
           python: "3.7"
-          env: TOXENV=py37
+          env: TOXENV=lint
           cache:
               directories:
                   - $HOME/.cache/pre-commit

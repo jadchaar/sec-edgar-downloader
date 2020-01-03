@@ -1,3 +1,5 @@
+"""Utility functions for the downloader class."""
+
 import re
 from collections import namedtuple
 from datetime import datetime
@@ -14,10 +16,10 @@ FilingMetadata = namedtuple("FilingMetadata", ["filename", "url"])
 def validate_date_format(date_str):
     try:
         datetime.strptime(date_str, "%Y%m%d")
-    except ValueError as e:
-        raise Exception(
+    except ValueError:
+        raise ValueError(
             "Incorrect date format. Please enter a date string of the form YYYYMMDD."
-        ) from e
+        )
 
 
 def form_query_string(start, count, ticker_or_cik, filing_type, before_date):
@@ -40,11 +42,11 @@ def extract_elements_from_xml(xml_byte_object, xpath_selector):
 
 
 def get_filing_urls_to_download(
-    ticker_or_cik,
     filing_type,
+    ticker_or_cik,
     num_filings_to_download,
-    before_date,
     after_date,
+    before_date,
     include_amends,
 ):
     filings_to_fetch = []
@@ -95,15 +97,6 @@ def get_filing_urls_to_download(
             )
 
         start += count
-
-    # TESTING TODO
-    # (1) num_filings_to_download < number of filings available
-    # (2) num_filings_to_download > number of filings available
-    # (3) num_filings_to_download == number of filings available
-    # (4) num_filings_to_download over two pages (e.g. download 30 entries, but count = 20)
-    #       => it should fetch 40 entries, but truncate to 30
-    # (5) no filings available at all
-    # (6) filings across two pages (e.g. two pages of size 20). Ensure that 40 are fetched.
 
     return filings_to_fetch[:num_filings_to_download]
 

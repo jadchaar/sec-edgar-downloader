@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.0 - __/__/2020
+
+- ...
+- ...
+
 ## 2.2.1 - 9/18/2019
 
 - Added support for [form 10-KSB](https://www.vcexperts.com/definition/form-10-ksb).
