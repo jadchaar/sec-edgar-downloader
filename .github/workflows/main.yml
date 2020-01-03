@@ -44,6 +44,8 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: ./codecov.yml
 
   MacOS:
     needs: Linting
@@ -68,6 +70,8 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: ./codecov.yml
 
   Windows:
     needs: Linting
@@ -92,3 +96,5 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.xml
+          yml: ./codecov.yml
