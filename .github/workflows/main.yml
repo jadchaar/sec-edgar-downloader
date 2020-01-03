@@ -29,78 +29,66 @@ jobs:
         python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox tox-gh-actions
-    - name: Test with tox
-      run: tox
+      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Test with tox
+        run: tox
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-  # MacOS:
-  #   needs: Linting
-  #   runs-on: macos-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: [3.6, 3.7, 3.8]
+  MacOS:
+    needs: Linting
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
 
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Set up Python ${{ matrix.python-version }}
-  #     uses: actions/setup-python@v1
-  #     with:
-  #       python-version: ${{ matrix.python-version }}
-  #   - name: Install and set up Poetry
-  #     run: |
-  #       python get-poetry.py --preview -y
-  #       source $HOME/.poetry/env
-  #       poetry config virtualenvs.in-project true
-  #   - name: Set up cache
-  #     uses: actions/cache@v1
-  #     with:
-  #       path: .venv
-  #       key: ${{ runner.os }}-venv-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-  #   - name: Install dependencies
-  #     run: |
-  #       source $HOME/.poetry/env
-  #       poetry install
-  #   - name: Test
-  #     run: |
-  #       source $HOME/.poetry/env
-  #       poetry run pytest -q tests
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Test with tox
+        run: tox
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
 
-  # Windows:
-  #   needs: Linting
-  #   runs-on: windows-latest
-  #   strategy:
-  #     matrix:
-  #       python-version: [3.6, 3.7, 3.8]
+  Windows:
+    needs: Linting
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        python-version: [3.6, 3.7, 3.8]
 
-  #   steps:
-  #   - uses: actions/checkout@v1
-  #   - name: Set up Python ${{ matrix.python-version }}
-  #     uses: actions/setup-python@v1
-  #     with:
-  #       python-version: ${{ matrix.python-version }}
-  #   - name: Install and setup Poetry
-  #     run: |
-  #       python get-poetry.py --preview -y
-  #       $env:Path += ";$env:Userprofile\.poetry\bin"
-  #       poetry config virtualenvs.in-project true
-  #   - name: Set up cache
-  #     uses: actions/cache@v1
-  #     with:
-  #       path: .venv
-  #       key: ${{ runner.os }}-venv-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-  #   - name: Install dependencies
-  #     run: |
-  #       $env:Path += ";$env:Userprofile\.poetry\bin"
-  #       poetry install
-  #   - name: Test
-  #     run: |
-  #       $env:Path += ";$env:Userprofile\.poetry\bin"
-  #       poetry run pytest -q tests
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox tox-gh-actions
+      - name: Test with tox
+        run: tox
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
