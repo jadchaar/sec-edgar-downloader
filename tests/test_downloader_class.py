@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 
 from sec_edgar_downloader import Downloader
+from sec_edgar_downloader._constants import SUPPORTED_FILINGS
 
 
 def test_constructor_no_params():
@@ -43,3 +44,9 @@ def test_constructor_custom_path():
     custom_path = Path.home().joinpath("Downloads/SEC/EDGAR/Downloader")
     dl = Downloader(custom_path)
     assert dl.download_folder == custom_path
+
+
+def test_supported_filings(downloader):
+    dl, _ = downloader
+    expected = sorted(SUPPORTED_FILINGS)
+    assert dl.supported_filings == expected

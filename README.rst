@@ -1,9 +1,9 @@
 sec-edgar-downloader
 ====================
 
-.. image:: https://travis-ci.org/jadchaar/sec-edgar-downloader.svg?branch=master
+.. image:: https://github.com/jadchaar/sec-edgar-downloader/workflows/tests/badge.svg
     :alt: Build Status
-    :target: https://travis-ci.org/jadchaar/sec-edgar-downloader
+    :target: https://github.com/jadchaar/sec-edgar-downloader/actions
 
 .. image:: https://codecov.io/gh/jadchaar/sec-edgar-downloader/branch/master/graph/badge.svg
     :alt: Coverage Status
@@ -52,57 +52,59 @@ Example Usage
     dl = Downloader("/path/to/valid/save/location")
 
     # Get all 8-K filings for Apple (ticker: AAPL)
-    dl.get_8k_filings("AAPL")
+    dl.get("8-K", "AAPL")
 
     # Get all 8-K filings for Apple, including filing amends (8-K/A)
-    dl.get_8k_filings("AAPL", include_amends=True)
+    dl.get("8-K", "AAPL", include_amends=True)
 
-    # Get all 8-K filings for Apple before March 25, 2017
-    # Note: before_date string must be in the form "YYYYMMDD"
-    dl.get_8k_filings("AAPL", before_date="20170325")
+    # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
+    # Note: before_date and after_date strings must be in the form "YYYYMMDD"
+    dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
 
-    # Get the past 5 8-K filings for Apple
-    dl.get_8k_filings("AAPL", 5)
+    # Get the five most recent 8-K filings for Apple
+    dl.get("8-K", "AAPL", 5)
 
     # Get all 10-K filings for Microsoft (ticker: MSFT)
-    dl.get_10k_filings("MSFT")
+    dl.get("10-K", "MSFT")
 
     # Get the latest 10-K filing for Microsoft
-    dl.get_10k_filings("MSFT", 1)
+    dl.get("10-K", "MSFT", 1)
 
-    # Get the latest 10-KSB filing for Ubiquitech Software
-    dl.get_10ksb_filings("0001411460", 1)
+    # Get the latest 10KSB filing for Ubiquitech Software
+    dl.get("10KSB", "0001411460", 1)
 
     # Get all 10-Q filings for Visa (ticker: V)
-    dl.get_10q_filings("V")
+    dl.get("10-Q", "V")
 
     # Get all 13F-NT filings for the Vanguard Group (CIK: 0000102909)
-    dl.get_13f_nt_filings("0000102909")
+    dl.get("13F-NT", "0000102909")
 
     # Get all 13F-HR filings for the Vanguard Group
-    dl.get_13f_hr_filings("0000102909")
+    dl.get("13F-HR", "0000102909")
 
     # Get all SC 13G filings for Apple
-    dl.get_sc_13g_filings("AAPL")
+    dl.get("SC 13G", "AAPL")
 
     # Get all SD filings for Apple
-    dl.get_sd_filings("AAPL")
+    dl.get("SD", "AAPL")
 
-    # Get the latest filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for Apple
-    dl.get_all_available_filings("AAPL", 1)
+    # Get the latest supported filings, if available, for Apple
+    for filing_type in dl.supported_filings:
+        dl.get(filing_type, "AAPL", 1)
 
-    # Get the latest filings (8-K, 10-K, 10-Q, 13F, SC 13G, SD), if available, for a
+    # Get the latest supported filings, if available, for a
     # specified list of tickers and CIKs
     symbols = ["AAPL", "MSFT", "0000102909", "V", "FB"]
     for s in symbols:
-        dl.get_all_available_filings(s, 1)
+        for filing_type in dl.supported_filings:
+            dl.get(filing_type, s, 1)
 
 Supported SEC Filings
 ---------------------
 
 - 8-K
 - 10-K
-- 10-KSB
+- 10KSB
 - 10-Q
 - 13F-NT and 13F-HR
 - SC 13G

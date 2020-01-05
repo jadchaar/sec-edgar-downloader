@@ -7,7 +7,7 @@
 
 ## 2.2.1 - 9/18/2019
 
-- Added support for [form 10-KSB](https://www.vcexperts.com/definition/form-10-ksb).
+- Added support for [form 10KSB](https://www.vcexperts.com/definition/form-10-ksb).
 - Added docs and tests to PyPI distribution package.
 - Locked the `requests` dependency to `v2.22.0` or greater to ensure optimal performance and compatibility.
 
