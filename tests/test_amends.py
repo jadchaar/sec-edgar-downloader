@@ -1,55 +1,34 @@
-"""Tests downloads with and without the filing amends included."""
+"""Tests downloading filings in presence of filing amends (e.g. 8-K/A)."""
 
-import requests
-
-from sec_edgar_downloader._utils import extract_elements_from_xml
+from sec_edgar_downloader._utils import get_filing_urls_to_download
 
 
-def test_include_amends_from_xml(apple_10k_edgar_search_xml_url):
-    resp = requests.get(apple_10k_edgar_search_xml_url)
-    assert resp.ok
+def test_include_amends():
+    ticker = "AAPL"
+    filing_type = "10-K"
+    num_filings_to_download = 100
+    # AAPL has two 10-K/A amends before this date
+    before_date = "20191201"
+    after_date = None
 
-    xpath_selector = "//w3:filing-href"
-    filing_href_elts = extract_elements_from_xml(resp.content, xpath_selector)
-    assert len(filing_href_elts) == 27
-
-    xpath_selector = "//w3:filing-type"
-    filing_types = [
-        elt.text for elt in extract_elements_from_xml(resp.content, xpath_selector)
-    ]
-    assert all("10-K" in ft for ft in filing_types)
-
-
-def test_exclude_amends_from_xml(apple_10k_edgar_search_xml_url):
-    resp = requests.get(apple_10k_edgar_search_xml_url)
-    assert resp.ok
-
-    xpath_selector = "//w3:filing-type[not(contains(text(), '/A'))]/../w3:filing-href"
-    filing_href_elts = extract_elements_from_xml(resp.content, xpath_selector)
-    assert len(filing_href_elts) == 25
-
-    xpath_selector = "//w3:filing-type[not(contains(text(), '/A'))]"
-    filing_types = [
-        elt.text for elt in extract_elements_from_xml(resp.content, xpath_selector)
-    ]
-    assert all(("10-K" in ft and "/A" not in ft) for ft in filing_types)
-
-
-def test_include_amends_filing_retrieval(downloader, apple_filing_metadata):
-    dl, download_folder_base = downloader
-
-    # AAPL has 1 SG-13G filing and 2 SG-13G/A before 19940218
-    num_downloaded = dl.get_sc_13g_filings(
-        apple_filing_metadata["symbol"], 3, "19940218", True
+    filing_urls_without_amends = get_filing_urls_to_download(
+        filing_type, ticker, num_filings_to_download, after_date, before_date, False
     )
-    assert num_downloaded == 3
+    num_filings_without_amends = len(filing_urls_without_amends)
 
-
-def test_exclude_amends_filing_retrieval(downloader, apple_filing_metadata):
-    dl, download_folder_base = downloader
-
-    # AAPL has 1 SG-13G filing and 2 SG-13G/A before 19940218
-    num_downloaded = dl.get_sc_13g_filings(
-        apple_filing_metadata["symbol"], 3, "19940218", False
+    filing_urls_with_amends = get_filing_urls_to_download(
+        filing_type, ticker, num_filings_to_download, after_date, before_date, True
     )
-    assert num_downloaded == 1
+    num_filings_with_amends = len(filing_urls_with_amends)
+
+    assert num_filings_with_amends > num_filings_without_amends
+
+    num_amends = num_filings_with_amends - num_filings_without_amends
+
+    filing_type = "10-K/A"
+    amends_filing_urls = get_filing_urls_to_download(
+        filing_type, ticker, num_filings_to_download, after_date, before_date, True
+    )
+    expected_num_amends = len(amends_filing_urls)
+
+    assert num_amends == expected_num_amends
