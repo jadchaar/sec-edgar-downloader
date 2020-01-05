@@ -1,9 +1,64 @@
 # Changelog
 
-## 3.0.0 - __/__/2020
+## 3.0.0 - 1/5/2020
 
-- ...
-- ...
+### Added
+
+- Added the ability to download more than 100 filings.
+- Added the ability to specify an `after_date` argument to the `get` method. Example usage:
+
+```python
+from sec_edgar_downloader import Downloader
+
+dl = Downloader()
+
+# Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
+dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
+```
+
+- Added a `supported_filings` property to the `Downloader` class, which gets a list of all filings supported by the `sec_edgar_downloader` package. Example usage:
+
+```python
+from sec_edgar_downloader import Downloader
+
+dl = Downloader()
+
+dl.supported_filings
+```
+
+### Changed
+
+- Package has been completely re-written from the ground up.
+- The `Downloader` class now has a single `get` entry point method. This change was made to improve and ease maintainability. Here is the new stub for the `get` method:
+
+
+Example usage of the new method:
+
+```python
+from sec_edgar_downloader import Downloader
+
+dl = Downloader()
+
+# Get all 8-K filings for Apple
+dl.get("8-K", "AAPL")
+```
+
+### Removed
+
+- Replaced retrieval methods for each filing type with a single point of entry. The bulk method `get_all_available_filings` has also been removed, so any bulk actions need to be completed manually as follows:
+
+```python
+# Get the latest supported filings, if available, for Apple
+for filing_type in dl.supported_filings:
+    dl.get(filing_type, "AAPL", 1)
+
+# Get the latest supported filings, if available, for a
+# specified list of tickers and CIKs
+symbols = ["AAPL", "MSFT", "0000102909", "V", "FB"]
+for s in symbols:
+    for filing_type in dl.supported_filings:
+        dl.get(filing_type, s, 1)
+```
 
 ## 2.2.1 - 9/18/2019
 
