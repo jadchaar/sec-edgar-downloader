@@ -9,7 +9,6 @@
 
 ```python
 from sec_edgar_downloader import Downloader
-
 dl = Downloader()
 
 # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
@@ -20,7 +19,6 @@ dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
 
 ```python
 from sec_edgar_downloader import Downloader
-
 dl = Downloader()
 
 dl.supported_filings
@@ -31,12 +29,23 @@ dl.supported_filings
 - Package has been completely re-written from the ground up.
 - The `Downloader` class now has a single `get` entry point method. This change was made to improve and ease maintainability. Here is the new stub for the `get` method:
 
+```python
+class Downloader:
+    def get(
+        self,
+        filing_type,
+        ticker_or_cik,
+        num_filings_to_download=None,
+        after_date=None,
+        before_date=None,
+        include_amends=False
+    )
+```
 
 Example usage of the new method:
 
 ```python
 from sec_edgar_downloader import Downloader
-
 dl = Downloader()
 
 # Get all 8-K filings for Apple
