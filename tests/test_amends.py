@@ -1,3 +1,5 @@
+"""Tests downloading filings in presence of filing amends (e.g. 8-K/A)."""
+
 from sec_edgar_downloader._utils import get_filing_urls_to_download
 
 
