@@ -10,7 +10,7 @@ build36 build37 build38:
 	venv/bin/pre-commit install
 
 test:
-	rm -f .coverage
+	rm -f .coverage coverage.xml
 	. venv/bin/activate && pytest
 
 lint:
@@ -19,12 +19,13 @@ lint:
 clean:
 	rm -rf venv .tox .pytest_cache ./**/__pycache__
 	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
-	rm -f ./**/*.pyc .coverage
+	rm -f ./**/*.pyc .coverage coverage.xml
 
 docs:
 	cd docs; make html
 
-publish: clean
+publish:
+	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
 	pip3 install -U setuptools twine wheel
 	python3 setup.py sdist bdist_wheel
 	twine upload dist/*
