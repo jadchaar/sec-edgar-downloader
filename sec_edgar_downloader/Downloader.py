@@ -12,12 +12,13 @@ class Downloader:
     """A :class:`Downloader` object.
 
     :param download_folder: relative or absolute path to download location,
-        defaulting to the user's ``Downloads`` folder.
+        defaults to the user's ``Downloads`` folder.
     :type download_folder: ``str``, optional
 
     Usage::
-        >>> import sec_edgar_downloader
-        >>> dl = sec_edgar_downloader.Downloader()
+
+        >>> from sec_edgar_downloader import Downloader
+        >>> dl = Downloader()
     """
 
     def __init__(self, download_folder=None):
@@ -33,6 +34,13 @@ class Downloader:
 
         :return: sorted list of all supported filings.
         :rtype: ``list``
+
+        Usage::
+
+            >>> from sec_edgar_downloader import Downloader
+            >>> dl = Downloader()
+            >>> dl.supported_filings
+            ['10-K', '10-Q', '10KSB', '13F-HR', '13F-NT', '8-K', 'SC 13G', 'SD']
         """
         return sorted(SUPPORTED_FILINGS)
 
@@ -69,30 +77,36 @@ class Downloader:
 
         Usage::
 
-            >>> import sec_edgar_downloader
-            >>> dl = sec_edgar_downloader.Downloader()
+            >>> from sec_edgar_downloader import Downloader
+            >>> dl = Downloader()
 
-            # Get all 8-K filings for Apple (ticker: AAPL)
+            # Get all 8-K filings for Apple
             >>> dl.get("8-K", "AAPL")
 
             # Get all 8-K filings for Apple, including filing amends (8-K/A)
             >>> dl.get("8-K", "AAPL", include_amends=True)
 
             # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
-            # Note: before_date and after_date strings must be in the form "YYYYMMDD"
             >>> dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
 
             # Get the five most recent 10-K filings for Apple
             >>> dl.get("10-K", "AAPL", 5)
 
-            # Get all 13F-NT filings for the Vanguard Group (CIK: 0000102909)
+            # Get all 10-Q filings for Visa
+            >>> dl.get("10-Q", "V")
+
+            # Get all 13F-NT filings for the Vanguard Group
             >>> dl.get("13F-NT", "0000102909")
 
             # Get all 13F-HR filings for the Vanguard Group
             >>> dl.get("13F-HR", "0000102909")
+
+            # Get all SC 13G filings for Apple
+            >>> dl.get("SC 13G", "AAPL")
+
+            # Get all SD filings for Apple
+            >>> dl.get("SD", "AAPL")
         """
-        # TODO: add ability to pass in list of filing types
-        # TODO: add ability to pass in datetime objects
         if filing_type not in SUPPORTED_FILINGS:
             filing_options = ", ".join(sorted(SUPPORTED_FILINGS))
             raise ValueError(

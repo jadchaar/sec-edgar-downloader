@@ -44,11 +44,6 @@ repos:
     hooks:
       - id: black
         args: [--safe, --quiet, --target-version=py36]
-  - repo: https://github.com/asottile/blacken-docs
-    rev: v1.4.0
-    hooks:
-      - id: blacken-docs
-        additional_dependencies: [black==19.10b0]
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.7.9
     hooks:
