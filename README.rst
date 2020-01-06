@@ -109,6 +109,7 @@ Supported SEC Filings
 - 13F-NT and 13F-HR
 - SC 13G
 - SD
+- S-1
 
 You can learn more about the different types of SEC filings `here <https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp>`_.
 

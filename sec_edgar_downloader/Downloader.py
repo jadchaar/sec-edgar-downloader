@@ -56,7 +56,6 @@ class Downloader:
         """Downloads filing documents and saves them to disk.
 
         :param filing_type: type of filing to download
-            (supported filings: 8-K, 10-K, 10KSB, 10-Q, 13F-NT, 13F-HR, SC 13G, SD)
         :type filing_type: ``str``
         :param ticker_or_cik: ticker or CIK to download filings for
         :type ticker_or_cik: ``str``
