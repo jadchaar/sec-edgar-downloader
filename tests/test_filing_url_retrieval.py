@@ -62,7 +62,7 @@ def test_filing_url_retrieval():
     assert len(filings_to_download) == 176
 
 
-def test_all_filings_apple():
+def test_common_filings():
     # AAPL files 8-K, 10-K, 10-Q, SC 13G, SD
     ticker = "AAPL"
     filing_types = ["8-K", "10-K", "10-Q", "SC 13G", "SD"]
@@ -83,7 +83,7 @@ def test_all_filings_apple():
         assert len(filings_to_download) == 1
 
 
-def test_all_filings_vanguard():
+def test_13f_filings():
     # Vanguard files 13F-NT, 13F-HR
     ticker = "0000102909"
     filing_types = [
@@ -107,10 +107,30 @@ def test_all_filings_vanguard():
         assert len(filings_to_download) == 1
 
 
-def test_all_filings_ubiquitech():
+def test_10ksb_filings():
     # Ubiquitech files 10KSB
     ticker = "0001411460"
     filing_type = "10KSB"
+    num_filings_to_download = 1
+    after_date = None
+    before_date = None
+    include_amends = False
+
+    filings_to_download = get_filing_urls_to_download(
+        filing_type,
+        ticker,
+        num_filings_to_download,
+        after_date,
+        before_date,
+        include_amends,
+    )
+    assert len(filings_to_download) == 1
+
+
+def test_s1_filings():
+    # Cloudflare filed an S-1 during its IPO
+    ticker = "NET"
+    filing_type = "S-1"
     num_filings_to_download = 1
     after_date = None
     before_date = None
