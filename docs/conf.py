@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 about = {}
-with open("../sec_edgar_downloader/_version.py", "r", encoding="utf-8") as f:
+with open("../sec_edgar_downloader/_version.py", encoding="utf-8") as f:
     exec(f.read(), about)
 
 # -- Project information -----------------------------------------------------

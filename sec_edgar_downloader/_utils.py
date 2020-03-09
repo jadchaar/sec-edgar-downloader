@@ -1,6 +1,7 @@
 """Utility functions for the downloader class."""
 
 import re
+import time
 from collections import namedtuple
 from datetime import datetime
 from urllib.parse import urlencode
@@ -115,3 +116,8 @@ def download_filings(download_folder, ticker_or_cik, filing_type, filings_to_fet
 
         with open(save_path, "w", encoding="utf-8") as f:
             f.write(resp.text)
+
+        # SEC limits users to 10 downloads per second
+        # Sleep >0.10s between each download to prevent rate-limiting
+        # https://github.com/jadchaar/sec-edgar-downloader/issues/24
+        time.sleep(0.15)
