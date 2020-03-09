@@ -10,7 +10,7 @@ build36 build37 build38:
 	venv/bin/pre-commit install
 
 test:
-	rm -f .coverage coverage.xml
+	rm -f .coverage
 	. venv/bin/activate && pytest
 
 lint:
@@ -19,7 +19,7 @@ lint:
 clean:
 	rm -rf venv .tox .pytest_cache ./**/__pycache__
 	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
-	rm -f ./**/*.pyc .coverage coverage.xml
+	rm -f ./**/*.pyc .coverage
 
 docs:
 	cd docs; make html

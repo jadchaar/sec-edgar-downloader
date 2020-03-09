@@ -1,6 +1,14 @@
 name: tests
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+  schedule:
+    - cron: "0 0 1 * *" # run tests monthly
 
 jobs:
   Linting:
@@ -22,7 +30,6 @@ jobs:
         run: tox -e docs
 
   Linux:
-    needs: Linting
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -44,11 +51,9 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          yml: ./codecov.yml
+          file: .coverage
 
   MacOS:
-    needs: Linting
     runs-on: macos-latest
     strategy:
       matrix:
@@ -70,11 +75,9 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          yml: ./codecov.yml
+          file: .coverage
 
   Windows:
-    needs: Linting
     runs-on: windows-latest
     strategy:
       matrix:
@@ -96,5 +99,4 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: ./coverage.xml
-          yml: ./codecov.yml
+          file: .coverage
