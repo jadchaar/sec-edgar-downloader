@@ -40,7 +40,7 @@ repos:
       - id: python-no-eval
       - id: rst-backticks
   - repo: https://github.com/psf/black
-    rev: ''''''
+    rev: 19.10b0
     hooks:
       - id: black
         args: [--safe, --quiet, --target-version=py36]
