@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.2 - 3/9/2020
+
+### Added
+
+- Added a 0.15s delay to download logic in order to prevent rate-limiting by SEC Edgar.
+
 ## 3.0.1 - 1/6/2020
 
 ### Added
