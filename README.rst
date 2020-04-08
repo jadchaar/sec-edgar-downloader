@@ -102,6 +102,7 @@ Example Usage
 Supported SEC Filings
 ---------------------
 
+- 4
 - 8-K
 - 10-K
 - 10KSB

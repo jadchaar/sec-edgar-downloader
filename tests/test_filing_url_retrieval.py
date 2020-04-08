@@ -65,7 +65,7 @@ def test_filing_url_retrieval():
 def test_common_filings():
     # AAPL files 8-K, 10-K, 10-Q, SC 13G, SD
     ticker = "AAPL"
-    filing_types = ["8-K", "10-K", "10-Q", "SC 13G", "SD"]
+    filing_types = ["4", "8-K", "10-K", "10-Q", "SC 13G", "SD"]
     num_filings_to_download = 1
     after_date = None
     before_date = None

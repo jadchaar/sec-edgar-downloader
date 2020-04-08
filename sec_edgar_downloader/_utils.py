@@ -23,10 +23,12 @@ def validate_date_format(date_str):
         )
 
 
-def form_query_string(start, count, ticker_or_cik, filing_type, before_date):
+def form_query_string(
+    start, count, ticker_or_cik, filing_type, before_date, ownership="exclude"
+):
     query_params = {
         "action": "getcompany",
-        "owner": "exclude",
+        "owner": ownership,
         "start": start,
         "count": count,
         "CIK": ticker_or_cik,
@@ -58,7 +60,16 @@ def get_filing_urls_to_download(
     # (1) we get more filings than num_filings_to_download
     # (2) there are no more filings to fetch
     while len(filings_to_fetch) < num_filings_to_download:
-        qs = form_query_string(start, count, ticker_or_cik, filing_type, before_date)
+        # form 4 requires ownership to be set to "only" or
+        # else we will only fetch form 424B5
+        if filing_type == "4":
+            ownership = "only"
+        else:
+            ownership = "exclude"
+
+        qs = form_query_string(
+            start, count, ticker_or_cik, filing_type, before_date, ownership
+        )
         edgar_search_url = f"{SEC_EDGAR_BASE_URL}{qs}"
 
         resp = requests.get(edgar_search_url)

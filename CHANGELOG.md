@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.3 - 4/8/2020
+
+### Added
+
+- Added support for form 4 filings.
+
 ## 3.0.2 - 3/9/2020
 
 ### Added
