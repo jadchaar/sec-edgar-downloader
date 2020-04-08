@@ -2,6 +2,7 @@
 
 SEC_EDGAR_BASE_URL = "https://www.sec.gov/cgi-bin/browse-edgar?"
 SUPPORTED_FILINGS = {
+    "4",
     "8-K",
     "10-K",
     "10KSB",
