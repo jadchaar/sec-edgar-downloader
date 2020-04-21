@@ -108,6 +108,7 @@ Supported SEC Filings
 - 10KSB
 - 10-Q
 - 13F-NT and 13F-HR
+- 20-F
 - SC 13G
 - SD
 - S-1

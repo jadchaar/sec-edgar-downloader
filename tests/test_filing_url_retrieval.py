@@ -145,3 +145,23 @@ def test_s1_filings():
         include_amends,
     )
     assert len(filings_to_download) == 1
+
+
+def test_20f_filings():
+    # Alibaba files 20-F
+    ticker = "BABA"
+    filing_type = "20-F"
+    num_filings_to_download = 1
+    after_date = None
+    before_date = None
+    include_amends = False
+
+    filings_to_download = get_filing_urls_to_download(
+        filing_type,
+        ticker,
+        num_filings_to_download,
+        after_date,
+        before_date,
+        include_amends,
+    )
+    assert len(filings_to_download) == 1

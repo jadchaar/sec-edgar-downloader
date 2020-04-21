@@ -9,6 +9,7 @@ SUPPORTED_FILINGS = {
     "10-Q",
     "13F-NT",
     "13F-HR",
+    "20-F",
     "SC 13G",
     "SD",
     "S-1",
