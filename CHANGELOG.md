@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.0.4 - 4/21/2020
+
+### Added
+
+- Added support for 20-F filings.
+
 ## 3.0.3 - 4/8/2020
 
 ### Added
