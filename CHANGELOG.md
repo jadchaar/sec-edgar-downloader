@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.5 - 5/16/2020
+
+### Added
+
+- Added support for DEF 14A filings (proxy statements).
+- Added `tox.ini` and `Makefile` to distribution package.
+
+### Fixed
+
+- Fixed a failing test in the distributed package due to missing sample filings test data.
+
 ## 3.0.4 - 4/21/2020
 
 ### Added

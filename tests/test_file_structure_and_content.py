@@ -79,4 +79,8 @@ def test_file_contents(downloader):
 
     # https://stackoverflow.com/q/1072569
     expected_data_path = Path(f"tests/sample_filings/apple_8k_{before_date}.txt")
-    assert filecmp.cmp(expected_data_path, downloaded_file_path, shallow=False)
+    if expected_data_path.exists():
+        # Only run this check if the sample filing exists
+        # This check is required since the distributed python package will not
+        # contain the sample filings test data due to size constraints
+        assert filecmp.cmp(expected_data_path, downloaded_file_path, shallow=False)

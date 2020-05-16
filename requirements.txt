@@ -2,4 +2,4 @@ lxml>=4.3.4
 pre-commit
 pytest
 pytest-cov
-requests>=2.22.0
+requests
