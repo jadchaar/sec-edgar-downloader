@@ -51,7 +51,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: .coverage
+          file: ./coverage.xml
 
   MacOS:
     runs-on: macos-latest
@@ -75,7 +75,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: .coverage
+          file: ./coverage.xml
 
   Windows:
     runs-on: windows-latest
@@ -99,4 +99,4 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          file: .coverage
+          file: ./coverage.xml

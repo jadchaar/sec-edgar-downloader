@@ -13,7 +13,7 @@ build36 build37 build38: clean
 	pre-commit install
 
 test:
-	rm -f .coverage
+	rm -f .coverage coverage.xml
 	. venv/bin/activate; pytest
 
 lint:
@@ -25,7 +25,7 @@ docs:
 
 clean: clean-dist
 	rm -rf venv .pytest_cache ./**/__pycache__
-	rm -f .coverage ./**/*.pyc
+	rm -f .coverage coverage.xml ./**/*.pyc
 
 clean-dist:
 	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
