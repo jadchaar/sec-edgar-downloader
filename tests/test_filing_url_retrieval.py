@@ -1,9 +1,11 @@
 """Tests the filing URLs to download for each filing type."""
 
+import pytest
+
 from sec_edgar_downloader._utils import get_filing_urls_to_download
 
 
-def test_filing_url_retrieval():
+def test_filing_url_retrieval_large_number_of_filings():
     filing_type = "8-K"
     ticker = "AAPL"
     after_date = None
@@ -62,52 +64,49 @@ def test_filing_url_retrieval():
     assert len(filings_to_download) == 176
 
 
-def test_common_filings():
-    # AAPL files 4, 8-K, 10-K, 10-Q, SC 13G, SD
+@pytest.mark.parametrize(
+    "filing_type", ["4", "8-K", "10-K", "10-Q", "SC 13G", "SD", "DEF 14A"]
+)
+def test_filing_url_retrieval_common_filings(filing_type):
+    # AAPL files 4, 8-K, 10-K, 10-Q, SC 13G, SD, DEF 14A
     ticker = "AAPL"
-    filing_types = ["4", "8-K", "10-K", "10-Q", "SC 13G", "SD"]
     num_filings_to_download = 1
     after_date = None
     before_date = None
     include_amends = False
 
-    for filing_type in filing_types:
-        filings_to_download = get_filing_urls_to_download(
-            filing_type,
-            ticker,
-            num_filings_to_download,
-            after_date,
-            before_date,
-            include_amends,
-        )
-        assert len(filings_to_download) == 1
+    filings_to_download = get_filing_urls_to_download(
+        filing_type,
+        ticker,
+        num_filings_to_download,
+        after_date,
+        before_date,
+        include_amends,
+    )
+    assert len(filings_to_download) == 1
 
 
-def test_13f_filings():
+@pytest.mark.parametrize("filing_type", ["13F-NT", "13F-HR"])
+def test_filing_url_retrieval_13f_filings(filing_type):
     # Vanguard files 13F-NT, 13F-HR
     ticker = "0000102909"
-    filing_types = [
-        "13F-NT",
-        "13F-HR",
-    ]
     num_filings_to_download = 1
     after_date = None
     before_date = None
     include_amends = False
 
-    for filing_type in filing_types:
-        filings_to_download = get_filing_urls_to_download(
-            filing_type,
-            ticker,
-            num_filings_to_download,
-            after_date,
-            before_date,
-            include_amends,
-        )
-        assert len(filings_to_download) == 1
+    filings_to_download = get_filing_urls_to_download(
+        filing_type,
+        ticker,
+        num_filings_to_download,
+        after_date,
+        before_date,
+        include_amends,
+    )
+    assert len(filings_to_download) == 1
 
 
-def test_10ksb_filings():
+def test_filing_url_retrieval_10ksb_filings():
     # Ubiquitech files 10KSB
     ticker = "0001411460"
     filing_type = "10KSB"
@@ -127,7 +126,7 @@ def test_10ksb_filings():
     assert len(filings_to_download) == 1
 
 
-def test_s1_filings():
+def test_filing_url_retrieval_s1_filings():
     # Cloudflare filed an S-1 during its IPO
     ticker = "NET"
     filing_type = "S-1"
@@ -147,7 +146,7 @@ def test_s1_filings():
     assert len(filings_to_download) == 1
 
 
-def test_20f_filings():
+def test_filing_url_retrieval_20f_filings():
     # Alibaba files 20-F
     ticker = "BABA"
     filing_type = "20-F"

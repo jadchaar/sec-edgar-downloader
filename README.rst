@@ -112,6 +112,7 @@ Supported SEC Filings
 - SC 13G
 - SD
 - S-1
+- DEF 14A
 
 You can learn more about the different types of SEC filings `here <https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp>`_.
 
