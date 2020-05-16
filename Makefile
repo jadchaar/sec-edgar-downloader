@@ -7,8 +7,9 @@ build37: PYTHON_VER = python3.7
 build38: PYTHON_VER = python3.8
 
 build36 build37 build38: clean
-	virtualenv venv --python=$(PYTHON_VER)
+	$(PYTHON_VER) -m venv venv
 	. venv/bin/activate; \
+	pip install -U pip setuptools wheel; \
 	pip install -r requirements.txt; \
 	pre-commit install
 
