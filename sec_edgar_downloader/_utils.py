@@ -4,6 +4,8 @@ import re
 import time
 from collections import namedtuple
 from datetime import datetime
+from pathlib import Path
+from typing import List
 from urllib.parse import urlencode
 
 import requests
@@ -14,9 +16,9 @@ from ._constants import SEC_EDGAR_BASE_URL, W3_NAMESPACE
 FilingMetadata = namedtuple("FilingMetadata", ["filename", "url"])
 
 
-def validate_date_format(date_str):
+def validate_date_format(date_format: str) -> None:
     try:
-        datetime.strptime(date_str, "%Y%m%d")
+        datetime.strptime(date_format, "%Y%m%d")
     except ValueError:
         raise ValueError(
             "Incorrect date format. Please enter a date string of the form YYYYMMDD."
@@ -24,8 +26,13 @@ def validate_date_format(date_str):
 
 
 def form_query_string(
-    start, count, ticker_or_cik, filing_type, before_date, ownership="exclude"
-):
+    start: int,
+    count: int,
+    ticker_or_cik: str,
+    filing_type: str,
+    before_date: str,
+    ownership="exclude",
+) -> str:
     query_params = {
         "action": "getcompany",
         "owner": ownership,
@@ -45,13 +52,13 @@ def extract_elements_from_xml(xml_byte_object, xpath_selector):
 
 
 def get_filing_urls_to_download(
-    filing_type,
-    ticker_or_cik,
-    num_filings_to_download,
-    after_date,
-    before_date,
-    include_amends,
-):
+    filing_type: str,
+    ticker_or_cik: str,
+    num_filings_to_download: int,
+    after_date: str,
+    before_date: str,
+    include_amends: bool,
+) -> List[FilingMetadata]:
     filings_to_fetch = []
     start = 0
     count = 100
@@ -113,7 +120,12 @@ def get_filing_urls_to_download(
     return filings_to_fetch[:num_filings_to_download]
 
 
-def download_filings(download_folder, ticker_or_cik, filing_type, filings_to_fetch):
+def download_filings(
+    download_folder: Path,
+    ticker_or_cik: str,
+    filing_type: str,
+    filings_to_fetch: List[FilingMetadata],
+) -> None:
     for filing in filings_to_fetch:
         resp = requests.get(filing.url)
         resp.raise_for_status()

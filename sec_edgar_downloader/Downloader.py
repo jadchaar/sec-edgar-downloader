@@ -3,6 +3,7 @@
 import sys
 from datetime import date
 from pathlib import Path
+from typing import List, Optional
 
 from ._constants import SUPPORTED_FILINGS
 from ._utils import download_filings, get_filing_urls_to_download, validate_date_format
@@ -21,7 +22,7 @@ class Downloader:
         >>> dl = Downloader()
     """
 
-    def __init__(self, download_folder=None):
+    def __init__(self, download_folder: Optional[str] = None) -> None:
         """Constructor for the :class:`Downloader` class."""
         if download_folder is None:
             self.download_folder = Path.home().joinpath("Downloads")
@@ -29,7 +30,7 @@ class Downloader:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
     @property
-    def supported_filings(self):
+    def supported_filings(self) -> List[str]:
         """Get a sorted list of all supported filings.
 
         :return: sorted list of all supported filings.
@@ -46,13 +47,13 @@ class Downloader:
 
     def get(
         self,
-        filing_type,
-        ticker_or_cik,
-        num_filings_to_download=None,
-        after_date=None,
-        before_date=None,
-        include_amends=False,
-    ):
+        filing_type: str,
+        ticker_or_cik: str,
+        num_filings_to_download: Optional[int] = None,
+        after_date: Optional[str] = None,
+        before_date: Optional[str] = None,
+        include_amends: bool = False,
+    ) -> int:
         """Downloads filing documents and saves them to disk.
 
         :param filing_type: type of filing to download
