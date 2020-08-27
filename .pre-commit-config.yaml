@@ -7,7 +7,7 @@ repos:
       - id: bandit
         args: [-lll, --quiet, --exclude=tests/**]
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.0.0
+    rev: v3.2.0
     hooks:
       - id: check-case-conflict
       - id: check-docstring-first
@@ -20,30 +20,25 @@ repos:
         args: [--remove]
       - id: trailing-whitespace
         exclude: ^tests/sample_filings/
-  - repo: https://github.com/asottile/seed-isort-config
-    rev: v2.1.1
-    hooks:
-      - id: seed-isort-config
-  - repo: https://github.com/pre-commit/mirrors-isort
-    rev: v4.3.21
+  - repo: https://github.com/timothycrosley/isort
+    rev: 5.4.2
     hooks:
       - id: isort
-        args: [--quiet]
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.4.1
+    rev: v2.7.2
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
   - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.5.1
+    rev: v1.6.0
     hooks:
       - id: python-no-eval
       - id: rst-backticks
   - repo: https://github.com/psf/black
-    rev: 19.10b0
+    rev: 20.8b1
     hooks:
       - id: black
-        args: [--safe, --quiet, --target-version=py36]
+        args: [--safe, --quiet]
   - repo: https://gitlab.com/pycqa/flake8
     rev: 3.8.1
     hooks:
