@@ -1,7 +1,9 @@
 """Tests the filing URLs to download for each filing type."""
+from datetime import date
 
 import pytest
 
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
 from sec_edgar_downloader._utils import get_filing_urls_to_download
 
 
@@ -9,7 +11,7 @@ def test_large_number_of_filings():
     filing_type = "8-K"
     ticker = "AAPL"
     after_date = None
-    before_date = "20191115"
+    before_date = date(2019, 11, 15).strftime(DATE_FORMAT_TOKENS)
     include_amends = False
 
     # num_filings_to_download < number of filings available
@@ -37,6 +39,9 @@ def test_large_number_of_filings():
     )
     assert len(filings_to_download) == 150
 
+    # SEC Edgar Search fails to retrieve Apple 8-Ks after 2000 and before 2002
+    after_date = date(2002, 1, 1).strftime(DATE_FORMAT_TOKENS)
+
     # num_filings_to_download > number of filings available
     num_filings_to_download = 200
     filings_to_download = get_filing_urls_to_download(
@@ -47,11 +52,11 @@ def test_large_number_of_filings():
         before_date,
         include_amends,
     )
-    # there are 176 AAPL 8-K filings before 20191115
-    assert len(filings_to_download) == 176
+    # there are 158 AAPL 8-K filings before 2019-11-15 and after 2002-01-01
+    assert len(filings_to_download) == 158
 
     # num_filings_to_download == number of filings available
-    num_filings_to_download = 176
+    num_filings_to_download = 158
     filings_to_download = get_filing_urls_to_download(
         filing_type,
         ticker,
@@ -60,8 +65,8 @@ def test_large_number_of_filings():
         before_date,
         include_amends,
     )
-    # there are 176 AAPL 8-K filings before 20191115
-    assert len(filings_to_download) == 176
+    # there are 158 AAPL 8-K filings before 2019-11-15
+    assert len(filings_to_download) == 158
 
 
 @pytest.mark.parametrize(

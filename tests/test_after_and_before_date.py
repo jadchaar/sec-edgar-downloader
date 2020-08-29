@@ -3,6 +3,7 @@
 import sys
 from datetime import datetime, timedelta
 
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
 from sec_edgar_downloader._utils import get_filing_urls_to_download
 
 
@@ -20,30 +21,30 @@ def test_date_bounds():
         filing_type,
         ticker,
         num_filings_to_download,
-        after_date.strftime("%Y%m%d"),
-        before_date.strftime("%Y%m%d"),
+        after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date.strftime(DATE_FORMAT_TOKENS),
         include_amends,
     )
     assert len(filings_to_download) == 20
 
-    after_date += timedelta(1)
+    after_date += timedelta(days=1)
     filings_to_download = get_filing_urls_to_download(
         filing_type,
         ticker,
         num_filings_to_download,
-        after_date.strftime("%Y%m%d"),
-        before_date.strftime("%Y%m%d"),
+        after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date.strftime(DATE_FORMAT_TOKENS),
         include_amends,
     )
     assert len(filings_to_download) == 19
 
-    before_date -= timedelta(1)
+    before_date -= timedelta(days=1)
     filings_to_download = get_filing_urls_to_download(
         filing_type,
         ticker,
         num_filings_to_download,
-        after_date.strftime("%Y%m%d"),
-        before_date.strftime("%Y%m%d"),
+        after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date.strftime(DATE_FORMAT_TOKENS),
         include_amends,
     )
     assert len(filings_to_download) == 18
@@ -54,8 +55,8 @@ def test_date_bounds():
         filing_type,
         ticker,
         num_filings_to_download,
-        after_date.strftime("%Y%m%d"),
-        before_date.strftime("%Y%m%d"),
+        after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date.strftime(DATE_FORMAT_TOKENS),
         include_amends,
     )
     assert len(filings_to_download) == 5

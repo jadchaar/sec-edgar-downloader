@@ -1,18 +1,21 @@
 """Tests the file structure and contents of downloaded files."""
 
 import filecmp
+from datetime import date
 from pathlib import Path
+
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
 
 
 def test_file_structure(downloader):
     """
-    Ensures that the file directory looks as follows,
+    Ensure that the file directory looks as follows,
     with 4 directories and 2 files:
 
     └── sec_edgar_filings
         └── AAPL
             ├── 10-K
-            │   └── 0000320193-19-000119.txt
+            │   └── 0000320193-19-000119.txt
             └── 8-K
                 └── 0001193125-19-292676.txt
     """
@@ -67,7 +70,7 @@ def test_file_contents(downloader):
 
     filing_type = "8-K"
     ticker = "AAPL"
-    before_date = "20191115"
+    before_date = date(2019, 11, 15).strftime(DATE_FORMAT_TOKENS)
 
     num_downloaded = dl.get(filing_type, ticker, 1, before_date=before_date)
     assert num_downloaded == 1

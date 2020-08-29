@@ -7,6 +7,8 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
+
 
 def test_invalid_filing_type(downloader):
     dl, _ = downloader
@@ -62,7 +64,7 @@ def test_invalid_num_filings_to_download(downloader):
 def test_invalid_before_and_after_dates(downloader):
     dl, _ = downloader
     expected_msg = (
-        "Incorrect date format. Please enter a date string of the form YYYYMMDD."
+        "Incorrect date format. Please enter a date string of the form YYYY-MM-DD."
     )
 
     filing_type = "8-K"
@@ -71,21 +73,37 @@ def test_invalid_before_and_after_dates(downloader):
     # AAPL filed a 8-K on 2019-11-15
     after_date = datetime(2019, 11, 15)
     before_date = datetime(2019, 11, 15)
+    incorrect_date_format = "%Y%m%d"
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, after_date=after_date.strftime("%Y-%m-%d"))
+        dl.get(
+            filing_type, ticker, after_date=after_date.strftime(incorrect_date_format)
+        )
     assert expected_msg in str(excinfo.value)
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, before_date=before_date.strftime("%Y-%m-%d"))
+        dl.get(
+            filing_type, ticker, before_date=before_date.strftime(incorrect_date_format)
+        )
     assert expected_msg in str(excinfo.value)
+
+
+def test_valid_before_and_after_date_combos(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    # AAPL filed a 8-K on 2019-11-15
+    after_date = datetime(2019, 11, 15)
+    before_date = datetime(2019, 11, 15)
 
     # after_date == before_date
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime("%Y%m%d"),
-        before_date=before_date.strftime("%Y%m%d"),
+        after_date=after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
@@ -95,8 +113,8 @@ def test_invalid_before_and_after_dates(downloader):
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime("%Y%m%d"),
-        before_date=before_date.strftime("%Y%m%d"),
+        after_date=after_date.strftime(DATE_FORMAT_TOKENS),
+        before_date=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
@@ -107,7 +125,7 @@ def test_invalid_before_and_after_dates(downloader):
         dl.get(
             filing_type,
             ticker,
-            after_date=after_date.strftime("%Y%m%d"),
-            before_date=before_date.strftime("%Y%m%d"),
+            after_date=after_date.strftime(DATE_FORMAT_TOKENS),
+            before_date=before_date.strftime(DATE_FORMAT_TOKENS),
         )
     assert expected_msg in str(excinfo.value)
