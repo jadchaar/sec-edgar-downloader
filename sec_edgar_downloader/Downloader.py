@@ -1,4 +1,4 @@
-"""Provides the :class:`Downloader` class, which is used to download SEC filings."""
+"""Provides a :class:`Downloader` class for downloading SEC EDGAR filings."""
 
 import sys
 from pathlib import Path
@@ -11,9 +11,8 @@ from ._utils import download_filings, get_filing_urls_to_download, validate_date
 class Downloader:
     """A :class:`Downloader` object.
 
-    :param download_folder: relative or absolute path to download location,
-        defaults to the user's ``Downloads`` folder.
-    :type download_folder: ``str``, optional
+    :param download_folder: relative or absolute path to download location.
+        Defaults to the user's ``Downloads`` folder.
 
     Usage::
 
@@ -33,7 +32,6 @@ class Downloader:
         """Get a sorted list of all supported filings.
 
         :return: sorted list of all supported filings.
-        :rtype: ``list``
 
         Usage::
 
@@ -44,6 +42,7 @@ class Downloader:
         """
         return sorted(SUPPORTED_FILINGS)
 
+    # TODO: add new arguments to docstring
     def get(
         self,
         filing_type: str,
@@ -52,28 +51,23 @@ class Downloader:
         after_date: Optional[str] = None,
         before_date: Optional[str] = None,
         include_amends: bool = False,
-        # download_filing_details: bool = False
+        include_filing_details: bool = True,
     ) -> int:
-        """Downloads filing documents and saves them to disk.
+        """Download filings and save them to disk.
 
-        :param filing_type: type of filing to download
-        :type filing_type: ``str``
-        :param ticker_or_cik: ticker or CIK to download filings for
-        :type ticker_or_cik: ``str``
-        :param num_filings_to_download: number of filings to download,
-            defaults to all available filings
-        :type num_filings_to_download: ``int``, optional
-        :param after_date: date of form YYYY-MM-DD in which to download filings after,
-            defaults to None
-        :type after_date: ``str``, optional
-        :param before_date: date of form YYYY-MM-DD in which to download filings before,
-            defaults to today
-        :type before_date: ``str``, optional
-        :param include_amends: denotes whether or not to include filing amends (e.g. 8-K/A),
-            defaults to False
-        :type include_amends: ``bool``, optional
-        :return: number of filings downloaded
-        :rtype: ``int``
+        :param filing_type: type of filing to download.
+        :param ticker_or_cik: ticker or CIK to download filings for.
+        :param num_filings_to_download: number of filings to download.
+            Defaults to all available filings.
+        :param after_date: date of form YYYY-MM-DD in which to download filings after.
+            Defaults to 2000-01-01, the earliest date supported by EDGAR full text search.
+        :param before_date: date of form YYYY-MM-DD in which to download filings before.
+            Defaults to today.
+        :param include_amends: denotes whether or not to include filing amends (e.g. 8-K/A).
+            Defaults to False.
+        :param include_filing_details: denotes whether or not to include filing details
+            (e.g. form 4 XML, 8-K HTML). Defaults to True.
+        :return: number of filings downloaded.
 
         Usage::
 
@@ -167,7 +161,11 @@ class Downloader:
         )
 
         download_filings(
-            self.download_folder, ticker_or_cik, filing_type, filings_to_fetch
+            self.download_folder,
+            ticker_or_cik,
+            filing_type,
+            filings_to_fetch,
+            include_filing_details,
         )
 
         return len(filings_to_fetch)
