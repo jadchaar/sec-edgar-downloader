@@ -76,15 +76,11 @@ def test_invalid_before_and_after_dates(downloader):
     incorrect_date_format = "%Y%m%d"
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(
-            filing_type, ticker, after_date=after_date.strftime(incorrect_date_format)
-        )
+        dl.get(filing_type, ticker, after=after_date.strftime(incorrect_date_format))
     assert expected_msg in str(excinfo.value)
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(
-            filing_type, ticker, before_date=before_date.strftime(incorrect_date_format)
-        )
+        dl.get(filing_type, ticker, before=before_date.strftime(incorrect_date_format))
     assert expected_msg in str(excinfo.value)
 
 
@@ -102,8 +98,8 @@ def test_valid_before_and_after_date_combos(downloader):
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime(DATE_FORMAT_TOKENS),
-        before_date=before_date.strftime(DATE_FORMAT_TOKENS),
+        after=after_date.strftime(DATE_FORMAT_TOKENS),
+        before=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
@@ -113,8 +109,8 @@ def test_valid_before_and_after_date_combos(downloader):
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime(DATE_FORMAT_TOKENS),
-        before_date=before_date.strftime(DATE_FORMAT_TOKENS),
+        after=after_date.strftime(DATE_FORMAT_TOKENS),
+        before=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
@@ -125,7 +121,7 @@ def test_valid_before_and_after_date_combos(downloader):
         dl.get(
             filing_type,
             ticker,
-            after_date=after_date.strftime(DATE_FORMAT_TOKENS),
-            before_date=before_date.strftime(DATE_FORMAT_TOKENS),
+            after=after_date.strftime(DATE_FORMAT_TOKENS),
+            before=before_date.strftime(DATE_FORMAT_TOKENS),
         )
     assert expected_msg in str(excinfo.value)

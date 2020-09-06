@@ -14,7 +14,7 @@ from sec_edgar_downloader._constants import SUPPORTED_FILINGS
 
 def test_constructor_no_params():
     dl = Downloader()
-    expected = Path.home().joinpath("Downloads")
+    expected = Path.cwd()
     assert dl.download_folder == expected
 
 

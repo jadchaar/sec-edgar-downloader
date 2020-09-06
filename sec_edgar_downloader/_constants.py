@@ -10,6 +10,9 @@ DEFAULT_BEFORE_DATE = date.today().strftime(DATE_FORMAT_TOKENS)
 DEFAULT_AFTER_DATE = date(2000, 1, 1).strftime(DATE_FORMAT_TOKENS)
 
 ROOT_SAVE_FOLDER_NAME = "sec_edgar_filings"
+FILING_FULL_SUBMISSION_FILENAME = "full_submission.txt"
+# Extension will vary based on form (e.g. form 4 is xml, 8-K is HTML)
+FILING_DETAILS_FILENAME_STEM = "filing_details"
 
 # Supported filings set to allow for fast validation checks
 SUPPORTED_FILINGS = {

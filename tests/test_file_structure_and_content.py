@@ -4,7 +4,11 @@ import filecmp
 from datetime import date
 from pathlib import Path
 
-from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
+from sec_edgar_downloader._constants import (
+    DATE_FORMAT_TOKENS,
+    FILING_DETAILS_FILENAME_STEM,
+    FILING_FULL_SUBMISSION_FILENAME,
+)
 
 
 def test_file_structure(downloader):
@@ -27,7 +31,7 @@ def test_file_structure(downloader):
     ticker = "AAPL"
 
     # get the latest 8-K for AAPL
-    num_downloaded = dl.get(filing_type, ticker, 1)
+    num_downloaded = dl.get(filing_type, ticker, 1, download_details=False)
     assert num_downloaded == 1
 
     filings_save_path = dl_path / "sec_edgar_filings"
@@ -48,9 +52,9 @@ def test_file_structure(downloader):
     assert len(downloaded_filings) == 1
     assert downloaded_filings[0].is_file()
 
-    # get the latest 10-K for AAPL
+    # get the latest 10-K for AAPL, including the detail HTML file
     filing_type = "10-K"
-    num_downloaded = dl.get(filing_type, ticker, 1)
+    num_downloaded = dl.get(filing_type, ticker, 1, download_details=True)
     assert num_downloaded == 1
 
     # ensure that the 10-K was added to the existing AAPL dir
@@ -61,10 +65,17 @@ def test_file_structure(downloader):
     assert filing_type_save_path.is_dir()
 
     downloaded_filings = list(filing_type_save_path.glob("*"))
-    assert len(downloaded_filings) == 1
+    assert len(downloaded_filings) == 2
     assert downloaded_filings[0].is_file()
+    assert downloaded_filings[1].is_file()
+    assert len(list(filing_type_save_path.glob(FILING_FULL_SUBMISSION_FILENAME))) == 1
+    assert (
+        len(list(filing_type_save_path.glob(f"{FILING_DETAILS_FILENAME_STEM}.html")))
+        == 1
+    )
 
 
+# TODO: test file contents of detail file (e.g. xml)
 def test_file_contents(downloader):
     dl, dl_path = downloader
 
@@ -72,7 +83,9 @@ def test_file_contents(downloader):
     ticker = "AAPL"
     before_date = date(2019, 11, 15).strftime(DATE_FORMAT_TOKENS)
 
-    num_downloaded = dl.get(filing_type, ticker, 1, before_date=before_date)
+    num_downloaded = dl.get(
+        filing_type, ticker, 1, before=before_date, download_details=False
+    )
     assert num_downloaded == 1
 
     downloaded_file_path = dl_path / "sec_edgar_filings" / ticker / filing_type

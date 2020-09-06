@@ -12,6 +12,8 @@ from bs4 import BeautifulSoup
 
 from ._constants import (
     DATE_FORMAT_TOKENS,
+    FILING_DETAILS_FILENAME_STEM,
+    FILING_FULL_SUBMISSION_FILENAME,
     ROOT_SAVE_FOLDER_NAME,
     SEC_EDGAR_ARCHIVES_BASE_URL,
     SEC_EDGAR_SEARCH_API_ENDPOINT,
@@ -27,7 +29,6 @@ FilingMetadata = namedtuple(
     "FilingMetaData",
     [
         "accession_number",
-        "full_submission_filename",
         "full_submission_url",
         "filing_details_url",
         "filing_details_filename",
@@ -78,8 +79,7 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
         f"{SEC_EDGAR_ARCHIVES_BASE_URL}/{cik}/{accession_number_no_dashes}"
     )
 
-    full_submission_filename = f"{accession_number}.txt"
-    full_submission_url = f"{submission_base_url}/{full_submission_filename}"
+    full_submission_url = f"{submission_base_url}/{accession_number}.txt"
 
     # Get XSL if human readable is wanted
     # XSL is required to download the human-readable
@@ -96,12 +96,16 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
 
     filing_details_url = f"{submission_base_url}/{filing_details_filename}"
 
+    filing_details_filename_extension = Path(filing_details_filename).suffix
+    filing_details_filename = (
+        f"{FILING_DETAILS_FILENAME_STEM}{filing_details_filename_extension}"
+    )
+
     return FilingMetadata(
         accession_number=accession_number,
         full_submission_url=full_submission_url,
-        full_submission_filename=full_submission_filename,
         filing_details_url=filing_details_url,
-        filing_details_filename=filing_details_filename,
+        filing_details_filename=filing_details_filename.replace("htm", "html"),
     )
 
 
@@ -195,7 +199,7 @@ def download_and_save_filing(
     filing_text = resp.text
 
     # Only resolve URLs in HTML files
-    if resolve_urls and Path(save_filename).suffix in [".htm", ".html"]:
+    if resolve_urls and Path(save_filename).suffix == ".html":
         base_url = f"{download_url.rsplit('/', 1)[0]}/"
         filing_text = resolve_relative_urls_in_filing(filing_text, base_url)
 
@@ -209,9 +213,10 @@ def download_and_save_filing(
 
 def download_filings(
     download_folder: Path,
-    ticker_or_cik: str,
     filing_type: str,
+    ticker_or_cik: str,
     filings_to_fetch: List[FilingMetadata],
+    include_filing_details: bool,
 ) -> None:
     for filing in filings_to_fetch:
         download_and_save_filing(
@@ -219,7 +224,7 @@ def download_filings(
             ticker_or_cik,
             filing_type,
             filing.full_submission_url,
-            filing.full_submission_filename,
+            FILING_FULL_SUBMISSION_FILENAME,
         )
 
         # SEC limits users to no more than 10 downloads per second
@@ -227,9 +232,13 @@ def download_filings(
         # Source: https://www.sec.gov/developer
         time.sleep(0.12)
 
-        # download_and_save_filing(
-        #     filing.filing_details_url,
-        #     filing.filing_details_filename,
-        #     resolve_urls=True
-        # )
-        # time.sleep(0.12)
+        if include_filing_details:
+            download_and_save_filing(
+                download_folder,
+                ticker_or_cik,
+                filing_type,
+                filing.filing_details_url,
+                filing.filing_details_filename,
+                resolve_urls=True,
+            )
+            time.sleep(0.12)
