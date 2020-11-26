@@ -16,6 +16,7 @@ from ._constants import (
     FILING_FULL_SUBMISSION_FILENAME,
     ROOT_SAVE_FOLDER_NAME,
     SEC_EDGAR_ARCHIVES_BASE_URL,
+    SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
     SEC_EDGAR_SEARCH_API_ENDPOINT,
 )
 
@@ -37,12 +38,18 @@ FilingMetadata = namedtuple(
 
 
 def validate_date_format(date_format: str) -> None:
+    error_msg = (
+        "Incorrect date format. Please enter a date string of the form YYYY-MM-DD."
+    )
+
+    if not isinstance(date_format, str):
+        raise ValueError(error_msg)
+
     try:
         datetime.strptime(date_format, DATE_FORMAT_TOKENS)
     except ValueError:
-        raise ValueError(
-            "Incorrect date format. Please enter a date string of the form YYYY-MM-DD."
-        )
+        # Re-raise with custom error message
+        raise ValueError(error_msg)
 
 
 def form_request_payload(
@@ -109,7 +116,7 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
     )
 
 
-# TODO: add support for filing type lists
+# TODO: add support for filing type lists (in payload)
 def get_filing_urls_to_download(
     filing_type: str,
     ticker_or_cik: str,
@@ -118,7 +125,7 @@ def get_filing_urls_to_download(
     before_date: str,
     include_amends: bool,
 ) -> List[FilingMetadata]:
-    filings_to_fetch = []
+    filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
 
     while len(filings_to_fetch) < num_filings_to_download:
@@ -131,12 +138,16 @@ def get_filing_urls_to_download(
 
         if "error" in search_query_results:
             try:
-                error_reason = search_query_results["error"]["root_cause"]["reason"]
+                root_cause = search_query_results["error"]["root_cause"]
+                if not root_cause:  # pragma: no cover
+                    raise ValueError
+
+                error_reason = root_cause[0]["reason"]
                 raise EdgarSearchApiError(
                     f"Edgar Search API encountered an error: {error_reason}. "
                     f"Request payload: {payload}"
                 )
-            except KeyError:
+            except (ValueError, KeyError):  # pragma: no cover
                 raise EdgarSearchApiError(
                     "Edgar Search API encountered an unknown error."
                     f"Request payload: {payload}"
@@ -227,10 +238,7 @@ def download_filings(
             FILING_FULL_SUBMISSION_FILENAME,
         )
 
-        # SEC limits users to no more than 10 downloads per second
-        # Sleep >0.10s between each download to prevent rate-limiting
-        # Source: https://www.sec.gov/developer
-        time.sleep(0.12)
+        time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
         if include_filing_details:
             download_and_save_filing(
@@ -241,4 +249,4 @@ def download_filings(
                 filing.filing_details_filename,
                 resolve_urls=True,
             )
-            time.sleep(0.12)
+            time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)

@@ -4,7 +4,8 @@ import sys
 from pathlib import Path
 from typing import List, Optional, Union
 
-from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, SUPPORTED_FILINGS
+from ._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
+from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
 from ._utils import download_filings, get_filing_urls_to_download, validate_date_format
 
 
@@ -20,6 +21,8 @@ class Downloader:
         >>> dl = Downloader()
     """
 
+    supported_filings: List[str] = sorted(_SUPPORTED_FILINGS)
+
     def __init__(self, download_folder: Union[str, Path, None] = None) -> None:
         """Constructor for the :class:`Downloader` class."""
         if download_folder is None:
@@ -29,25 +32,15 @@ class Downloader:
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
-    @property
-    def supported_filings(self) -> List[str]:
-        """Get a sorted list of all supported filings.
-
-        :return: sorted list of all supported filings.
-
-        Usage::
-
-            >>> from sec_edgar_downloader import Downloader
-            >>> dl = Downloader()
-            >>> dl.supported_filings
-            ['1', ..., '10-K', '10-KT', '10-Q', ..., '13F-HR', '13F-NT', ..., 'X-17A-5'']
-        """
-        return sorted(SUPPORTED_FILINGS)
-
     # TODO: add new arguments to docstring
+    # TODO: clarify amount
+    #       -> is it amount of each filing type (e.g. 100 8-K, 100 10-K)
+    #       -> or total amount (e.g. 100 total)
+    # Ideas: either clarify in comments or give example in docs and just accept single string
+    # (force use of custom loop through all types to retrieve in client program)
     def get(
         self,
-        filings: Union[str, List[str]],
+        filing: str,
         ticker_or_cik: str,
         amount: Optional[int] = None,
         *,
@@ -58,8 +51,7 @@ class Downloader:
     ) -> int:
         """Download filings and save them to disk.
 
-        :param filings: filing types to download. Can either be a single filing type or
-            a list of filing types (e.g. "8-K" or ["8-K", "10-K"]).
+        :param filing: filing type to download (e.g. 8-K).
         :param ticker_or_cik: ticker or CIK to download filings for.
         :param amount: number of filings to download.
             Defaults to all available filings.
@@ -105,12 +97,9 @@ class Downloader:
             # Get all SD filings for Apple
             >>> dl.get("SD", "AAPL")
         """
-        if isinstance(filings, str):
-            filings = [filings]
-
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
 
-        # TODO: all filings should rely on after_date being 2000-01-01
+        # TODO: all filings should rely on after_date being 2001-01-01
         #  maxsize makes me uncomfortable
         if amount is None:
             # obtain all available filings, so we simply
@@ -120,64 +109,58 @@ class Downloader:
             amount = int(amount)
             if amount < 1:
                 raise ValueError(
-                    "Please enter a number greater than 1 "
-                    "for the number of filings to download."
+                    "Invalid amount. Please enter a number greater than 1."
                 )
 
-        # SEC allows for filing searches from 2000 onwards
+        # SEC allows for filing searches from 2001 onwards
         if after is None:
-            after = DEFAULT_AFTER_DATE
+            after = DEFAULT_AFTER_DATE.strftime(DATE_FORMAT_TOKENS)
         else:
-            after = str(after)
             validate_date_format(after)
 
-            # TODO: test this!
-            if after < DEFAULT_AFTER_DATE:
+            if after < DEFAULT_AFTER_DATE.strftime(DATE_FORMAT_TOKENS):
                 raise ValueError(
-                    "Filings cannot be downloaded prior to 2000. "
+                    f"Filings cannot be downloaded prior to {DEFAULT_AFTER_DATE.year}. "
                     f"Please enter a date on or after {DEFAULT_AFTER_DATE}."
                 )
 
         if before is None:
-            before = DEFAULT_BEFORE_DATE
+            before = DEFAULT_BEFORE_DATE.strftime(DATE_FORMAT_TOKENS)
         else:
-            before = str(before)
             validate_date_format(before)
 
-        if after is not None and after > before:
+        if after > before:
             raise ValueError(
-                "Invalid after_date and before_date. "
-                "Please enter an after_date that is less than the before_date."
+                "Invalid after and before date combination. "
+                "Please enter an after date that is less than the before date."
             )
 
-        num_downloaded = 0
-        for filing in filings:
-            if filing not in SUPPORTED_FILINGS:
-                filing_options = ", ".join(sorted(SUPPORTED_FILINGS))
-                raise ValueError(
-                    f"'{filing}' filings are not supported. "
-                    f"Please choose from the following: {filing_options}."
-                )
-
-            # TODO: add try/except for keyerror with link
-            # to issue reporting (SEC API may change)
-            filings_to_fetch = get_filing_urls_to_download(
-                filing,
-                ticker_or_cik,
-                amount,
-                after,
-                before,
-                include_amends,
+        if filing not in _SUPPORTED_FILINGS:
+            filing_options = ", ".join(self.supported_filings)
+            raise ValueError(
+                f"'{filing}' filings are not supported. "
+                f"Please choose from the following: {filing_options}."
             )
 
-            download_filings(
-                self.download_folder,
-                filing,
-                ticker_or_cik,
-                filings_to_fetch,
-                download_details,
-            )
+        # TODO: add support for search query kwarg
+        # Should be a separate function bc you can search
+        # without passing in a ticker/cik
 
-            num_downloaded += len(filings_to_fetch)
+        filings_to_fetch = get_filing_urls_to_download(
+            filing,
+            ticker_or_cik,
+            amount,
+            after,
+            before,
+            include_amends,
+        )
 
-        return num_downloaded
+        download_filings(
+            self.download_folder,
+            filing,
+            ticker_or_cik,
+            filings_to_fetch,
+            download_details,
+        )
+
+        return len(filings_to_fetch)

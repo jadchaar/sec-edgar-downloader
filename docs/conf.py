@@ -25,7 +25,7 @@ release = about["__version__"]
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = ["sphinx.ext.autodoc", "sphinx_autodoc_typehints"]
 
 autodoc_member_order = "bysource"
 

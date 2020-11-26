@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE
 
 
 def test_invalid_filing_type(downloader):
@@ -45,9 +45,7 @@ def test_invalid_ticker(downloader):
 
 def test_invalid_num_filings_to_download(downloader):
     dl, _ = downloader
-    expected_msg = (
-        "Please enter a number greater than 1 for the number of filings to download."
-    )
+    expected_msg = "Invalid amount. Please enter a number greater than 1."
 
     filing_type = "10-K"
     ticker = "AAPL"
@@ -104,8 +102,8 @@ def test_valid_before_and_after_date_combos(downloader):
     assert num_filings_downloaded == 1
 
     # after_date < before_date
-    after_date -= timedelta(1)
-    before_date += timedelta(1)
+    after_date -= timedelta(days=1)
+    before_date += timedelta(days=1)
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
@@ -114,9 +112,20 @@ def test_valid_before_and_after_date_combos(downloader):
     )
     assert num_filings_downloaded == 1
 
+
+def test_invalid_before_and_after_date_combos(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    # AAPL filed a 8-K on 2019-11-15
+    after_date = datetime(2019, 11, 15)
+    before_date = datetime(2019, 11, 15)
+
     # after_date > before_date
-    after_date += timedelta(3)
-    expected_msg = "Invalid after_date and before_date."
+    after_date += timedelta(days=3)
+    expected_msg = "Invalid after and before date combination."
     with pytest.raises(ValueError) as excinfo:
         dl.get(
             filing_type,
@@ -125,3 +134,26 @@ def test_valid_before_and_after_date_combos(downloader):
             before=before_date.strftime(DATE_FORMAT_TOKENS),
         )
     assert expected_msg in str(excinfo.value)
+
+
+def test_pre_default_after_date(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    invalid_date = DEFAULT_AFTER_DATE - timedelta(days=1)
+    expected_msg = f"Filings cannot be downloaded prior to {DEFAULT_AFTER_DATE.year}."
+    with pytest.raises(ValueError) as excinfo:
+        dl.get(filing_type, ticker, after=invalid_date.strftime(DATE_FORMAT_TOKENS))
+    assert expected_msg in str(excinfo.value)
+
+
+def test_non_string_date(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    with pytest.raises(ValueError):
+        dl.get(filing_type, ticker, after=DEFAULT_AFTER_DATE)
