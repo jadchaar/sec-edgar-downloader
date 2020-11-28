@@ -116,7 +116,6 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
     )
 
 
-# TODO: add support for filing type lists (in payload)
 def get_filing_urls_to_download(
     filing_type: str,
     ticker_or_cik: str,
@@ -194,12 +193,13 @@ def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
     for image in soup.find_all("img", src=True):
         image["src"] = urljoin(base_url, image["src"])
 
-    return str(soup)
+    return soup.encode(soup.original_encoding)
 
 
 def download_and_save_filing(
     download_folder: Path,
     ticker_or_cik: str,
+    accession_number: str,
     filing_type: str,
     download_url: str,
     save_filename: str,
@@ -207,7 +207,7 @@ def download_and_save_filing(
 ) -> None:
     resp = requests.get(download_url)
     resp.raise_for_status()
-    filing_text = resp.text
+    filing_text = resp.content
 
     # Only resolve URLs in HTML files
     if resolve_urls and Path(save_filename).suffix == ".html":
@@ -215,17 +215,22 @@ def download_and_save_filing(
         filing_text = resolve_relative_urls_in_filing(filing_text, base_url)
 
     # Create all parent directories as needed and write content to file
-    save_path = download_folder.joinpath(
-        ROOT_SAVE_FOLDER_NAME, ticker_or_cik, filing_type, save_filename
+    save_path = (
+        download_folder
+        / ROOT_SAVE_FOLDER_NAME
+        / ticker_or_cik
+        / filing_type
+        / accession_number
+        / save_filename
     )
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    save_path.write_text(filing_text, encoding="utf-8")
+    save_path.write_bytes(filing_text)
 
 
 def download_filings(
     download_folder: Path,
-    filing_type: str,
     ticker_or_cik: str,
+    filing_type: str,
     filings_to_fetch: List[FilingMetadata],
     include_filing_details: bool,
 ) -> None:
@@ -233,6 +238,7 @@ def download_filings(
         download_and_save_filing(
             download_folder,
             ticker_or_cik,
+            filing.accession_number,
             filing_type,
             filing.full_submission_url,
             FILING_FULL_SUBMISSION_FILENAME,
@@ -244,6 +250,7 @@ def download_filings(
             download_and_save_filing(
                 download_folder,
                 ticker_or_cik,
+                filing.accession_number,
                 filing_type,
                 filing.filing_details_url,
                 filing.filing_details_filename,

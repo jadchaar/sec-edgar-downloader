@@ -32,12 +32,6 @@ class Downloader:
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
-    # TODO: add new arguments to docstring
-    # TODO: clarify amount
-    #       -> is it amount of each filing type (e.g. 100 8-K, 100 10-K)
-    #       -> or total amount (e.g. 100 total)
-    # Ideas: either clarify in comments or give example in docs and just accept single string
-    # (force use of custom loop through all types to retrieve in client program)
     def get(
         self,
         filing: str,
@@ -77,7 +71,7 @@ class Downloader:
             >>> dl.get("8-K", "AAPL", include_amends=True)
 
             # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
-            >>> dl.get("8-K", "AAPL", after_date="2017-01-01", before_date="2017-03-25")
+            >>> dl.get("8-K", "AAPL", after="2017-01-01", before="2017-03-25")
 
             # Get the five most recent 10-K filings for Apple
             >>> dl.get("10-K", "AAPL", 5)
@@ -157,8 +151,8 @@ class Downloader:
 
         download_filings(
             self.download_folder,
-            filing,
             ticker_or_cik,
+            filing,
             filings_to_fetch,
             download_details,
         )
