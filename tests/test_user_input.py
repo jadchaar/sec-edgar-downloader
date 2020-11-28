@@ -7,7 +7,11 @@ from datetime import datetime, timedelta
 
 import pytest
 
-from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE
+from sec_edgar_downloader._constants import (
+    DATE_FORMAT_TOKENS,
+    DEFAULT_AFTER_DATE,
+    ROOT_SAVE_FOLDER_NAME,
+)
 
 
 def test_invalid_filing_type(downloader):
@@ -33,7 +37,7 @@ def test_invalid_ticker(downloader):
     assert num_filings_downloaded == 0
     assert len(list(dl_path.glob("*"))) == 0
 
-    filings_save_path = dl_path / "sec_edgar_filings"
+    filings_save_path = dl_path / ROOT_SAVE_FOLDER_NAME
     assert not filings_save_path.exists()
 
     ticker_save_path = filings_save_path / ticker

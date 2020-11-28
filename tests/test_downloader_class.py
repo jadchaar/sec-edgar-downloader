@@ -30,18 +30,18 @@ def test_constructor_blank_path():
 )
 def test_constructor_relative_path():
     dl = Downloader("./Downloads")
-    expected = Path.cwd().joinpath("Downloads")
+    expected = Path.cwd() / "Downloads"
     assert dl.download_folder == expected
 
 
 def test_constructor_user_path():
     dl = Downloader("~/Downloads")
-    expected = Path.home().joinpath("Downloads")
+    expected = Path.home() / "Downloads"
     assert dl.download_folder == expected
 
 
 def test_constructor_custom_path():
-    custom_path = Path.home().joinpath("Downloads/SEC/EDGAR/Downloader")
+    custom_path = Path.home() / "Downloads/SEC/EDGAR/Downloader"
     dl = Downloader(custom_path)
     assert dl.download_folder == custom_path
 
