@@ -11,6 +11,10 @@ from lxml import etree
 
 from ._constants import SEC_EDGAR_BASE_URL, W3_NAMESPACE
 
+from datetime import timedelta
+
+from sec_edgar_downloader.rate_limiter import RateLimiter
+
 FilingMetadata = namedtuple("FilingMetadata", ["filename", "url"])
 
 
@@ -72,7 +76,12 @@ def get_filing_urls_to_download(
         )
         edgar_search_url = f"{SEC_EDGAR_BASE_URL}{qs}"
 
-        resp = requests.get(edgar_search_url)
+        with RateLimiter('sec-state') as limiter:
+            while limiter.ready() is False:
+                time.sleep(.1)
+
+            resp = requests.get(edgar_search_url)
+
         resp.raise_for_status()
 
         # An HTML page is returned when an invalid ticker is entered
