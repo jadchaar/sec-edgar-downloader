@@ -206,3 +206,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# python -m venv files
+bin
+lib
+lib64
+pyvenv.cfg
