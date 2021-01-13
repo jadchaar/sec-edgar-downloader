@@ -37,7 +37,7 @@ def test_file_structure(downloader):
     # Verify AAPL 8-K download
     ticker = "AAPL"
     filing_type = "8-K"
-    dl.get(filing_type, ticker, 2, download_details=True)
+    dl.get(filing_type, ticker, amount=2, download_details=True)
     assert len(list((filings_save_path / ticker).glob("*"))) == 1
 
     filings_downloaded = (filings_save_path / ticker / filing_type).glob("*")
@@ -55,7 +55,7 @@ def test_file_structure(downloader):
 
     # Verify AAPL 10-K download
     filing_type = "10-K"
-    dl.get(filing_type, ticker, 1, download_details=False)
+    dl.get(filing_type, ticker, amount=1, download_details=False)
     assert len(list((filings_save_path / ticker).glob("*"))) == 2
 
     filings_downloaded = list((filings_save_path / ticker / filing_type).glob("*"))
@@ -73,7 +73,7 @@ def test_file_structure(downloader):
     # Verify IBM Form 4 download
     ticker = "IBM"
     filing_type = "4"
-    dl.get(filing_type, ticker, 1, download_details=True)
+    dl.get(filing_type, ticker, amount=1, download_details=True)
     assert len(list((filings_save_path / ticker).glob("*"))) == 1
 
     filings_downloaded = list((filings_save_path / ticker / filing_type).glob("*"))

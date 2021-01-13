@@ -26,7 +26,7 @@ def test_constructor_blank_path():
 
 
 @pytest.mark.skipif(
-    os.name == "nt", reason="Test should only run on non-Windows systems."
+    os.name == "nt", reason="test should only run on Unix-based systems"
 )
 def test_constructor_relative_path():
     dl = Downloader("./Downloads")

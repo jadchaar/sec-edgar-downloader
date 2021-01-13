@@ -47,7 +47,7 @@ def test_file_contents(
     extension = downloaded_filename.suffix
 
     num_downloaded = dl.get(
-        filing_type, ticker, 1, before=before_date, download_details=True
+        filing_type, ticker, amount=1, before=before_date, download_details=True
     )
     assert num_downloaded == 1
 

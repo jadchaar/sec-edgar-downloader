@@ -55,11 +55,11 @@ def test_invalid_num_filings_to_download(downloader):
     ticker = "AAPL"
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, -1)
+        dl.get(filing_type, ticker, amount=-1)
     assert expected_msg in str(excinfo.value)
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, 0)
+        dl.get(filing_type, ticker, amount=0)
     assert expected_msg in str(excinfo.value)
 
 
@@ -161,3 +161,14 @@ def test_non_string_date(downloader):
 
     with pytest.raises(ValueError):
         dl.get(filing_type, ticker, after=DEFAULT_AFTER_DATE)
+
+
+def test_invalid_query_type(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+    query = 25
+
+    with pytest.raises(TypeError):
+        dl.get(filing_type, ticker, query=query)

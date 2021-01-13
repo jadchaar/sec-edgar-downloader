@@ -6,7 +6,12 @@ from typing import List, Optional, Union
 
 from ._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
-from ._utils import download_filings, get_filing_urls_to_download, validate_date_format
+from ._utils import (
+    download_filings,
+    get_filing_urls_to_download,
+    get_number_of_unique_filings,
+    validate_date_format,
+)
 
 
 class Downloader:
@@ -36,12 +41,13 @@ class Downloader:
         self,
         filing: str,
         ticker_or_cik: str,
-        amount: Optional[int] = None,
         *,
+        amount: Optional[int] = None,
         after: Optional[str] = None,
         before: Optional[str] = None,
         include_amends: bool = False,
         download_details: bool = True,
+        query: str = "",
     ) -> int:
         """Download filings and save them to disk.
 
@@ -57,6 +63,7 @@ class Downloader:
             Defaults to False.
         :param download_details: denotes whether or not to download filing detail documents
             (e.g. form 4 XML, 8-K HTML). Defaults to True.
+        :param query: keyword to search for in filing documents.
         :return: number of filings downloaded.
 
         Usage::
@@ -74,7 +81,7 @@ class Downloader:
             >>> dl.get("8-K", "AAPL", after="2017-01-01", before="2017-03-25")
 
             # Get the five most recent 10-K filings for Apple
-            >>> dl.get("10-K", "AAPL", 5)
+            >>> dl.get("10-K", "AAPL", amount=5)
 
             # Get all 10-Q filings for Visa
             >>> dl.get("10-Q", "V")
@@ -93,11 +100,10 @@ class Downloader:
         """
         ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
 
-        # TODO: all filings should rely on after_date being 2001-01-01
-        #  maxsize makes me uncomfortable
         if amount is None:
-            # obtain all available filings, so we simply
-            # need a large number to denote this
+            # If amount is not specified, obtain all available filings.
+            # We simply need a large number to denote this and the loop
+            # responsible for fetching the URLs will break appropriately.
             amount = sys.maxsize
         else:
             amount = int(amount)
@@ -106,7 +112,7 @@ class Downloader:
                     "Invalid amount. Please enter a number greater than 1."
                 )
 
-        # SEC allows for filing searches from 2001 onwards
+        # SEC allows for filing searches from 2000 onwards
         if after is None:
             after = DEFAULT_AFTER_DATE.strftime(DATE_FORMAT_TOKENS)
         else:
@@ -136,9 +142,8 @@ class Downloader:
                 f"Please choose from the following: {filing_options}."
             )
 
-        # TODO: add support for search query kwarg
-        # Should be a separate function bc you can search
-        # without passing in a ticker/cik
+        if not isinstance(query, str):
+            raise TypeError("Query must be of type string.")
 
         filings_to_fetch = get_filing_urls_to_download(
             filing,
@@ -147,6 +152,7 @@ class Downloader:
             after,
             before,
             include_amends,
+            query,
         )
 
         download_filings(
@@ -157,4 +163,5 @@ class Downloader:
             download_details,
         )
 
-        return len(filings_to_fetch)
+        # Get number of unique accession numbers downloaded
+        return get_number_of_unique_filings(filings_to_fetch)

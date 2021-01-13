@@ -27,7 +27,7 @@ class EdgarSearchApiError(Exception):
 
 # Object for storing metadata about filings that will be downloaded."""
 FilingMetadata = namedtuple(
-    "FilingMetaData",
+    "FilingMetadata",
     [
         "accession_number",
         "full_submission_url",
@@ -58,17 +58,16 @@ def form_request_payload(
     start_date: str,
     end_date: str,
     start_index: int,
+    query: str,
 ) -> dict:
     payload = {
         "dateRange": "custom",
         "startdt": start_date,
         "enddt": end_date,
-        "category": "all",
-        "locationType": "located",
-        "locationCode": "all",
         "entityName": ticker_or_cik,
         "forms": filing_types,
         "from": start_index,
+        "q": query,
     }
     return payload
 
@@ -80,8 +79,6 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
     cik = hit["_source"]["ciks"][-1]
     accession_number_no_dashes = accession_number.replace("-", "", 2)
 
-    # TODO: add support for downloading original XML
-    #  and HTML files using filing_details_filename
     submission_base_url = (
         f"{SEC_EDGAR_ARCHIVES_BASE_URL}/{cik}/{accession_number_no_dashes}"
     )
@@ -123,13 +120,14 @@ def get_filing_urls_to_download(
     after_date: str,
     before_date: str,
     include_amends: bool,
+    query: str = "",
 ) -> List[FilingMetadata]:
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
 
     while len(filings_to_fetch) < num_filings_to_download:
         payload = form_request_payload(
-            ticker_or_cik, [filing_type], after_date, before_date, start_index
+            ticker_or_cik, [filing_type], after_date, before_date, start_index, query
         )
         resp = requests.post(SEC_EDGAR_SEARCH_API_ENDPOINT, json=payload)
         resp.raise_for_status()
@@ -243,7 +241,6 @@ def download_filings(
             filing.full_submission_url,
             FILING_FULL_SUBMISSION_FILENAME,
         )
-
         time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
         if include_filing_details:
@@ -257,3 +254,7 @@ def download_filings(
                 resolve_urls=True,
             )
             time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+
+
+def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
+    return len({metadata.accession_number for metadata in filings})
