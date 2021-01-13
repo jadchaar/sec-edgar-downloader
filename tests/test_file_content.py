@@ -1,6 +1,5 @@
 """Tests the contents of downloaded files."""
 
-import filecmp
 from datetime import date
 from pathlib import Path
 
@@ -47,7 +46,7 @@ def test_file_contents(
     extension = downloaded_filename.suffix
 
     num_downloaded = dl.get(
-        filing_type, ticker, 1, before=before_date, download_details=True
+        filing_type, ticker, amount=1, before=before_date, download_details=True
     )
     assert num_downloaded == 1
 
@@ -64,7 +63,11 @@ def test_file_contents(
         filing_type.replace("-", ""),
         f"{before_date.replace('-', '')}{extension}",
     ]
+
     filename = "-".join(filename_parts).lower()
-    expected_filing = sample_filings / filename
-    downloaded_filing = downloaded_file_path / downloaded_filename
-    assert filecmp.cmp(expected_filing, downloaded_filing, shallow=False)
+    expected = sample_filings / filename
+    downloaded = downloaded_file_path / downloaded_filename
+
+    with expected.open() as expected_file:
+        with downloaded.open() as downloaded_file:
+            assert expected_file.readlines() == downloaded_file.readlines()

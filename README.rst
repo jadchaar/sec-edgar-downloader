@@ -62,16 +62,16 @@ Example Usage
     dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
 
     # Get the five most recent 8-K filings for Apple
-    dl.get("8-K", "AAPL", 5)
+    dl.get("8-K", "AAPL", amount=5)
 
     # Get all 10-K filings for Microsoft (ticker: MSFT)
     dl.get("10-K", "MSFT")
 
     # Get the latest 10-K filing for Microsoft
-    dl.get("10-K", "MSFT", 1)
+    dl.get("10-K", "MSFT", amount=1)
 
     # Get the latest 10KSB filing for Ubiquitech Software
-    dl.get("10KSB", "0001411460", 1)
+    dl.get("10KSB", "0001411460", amount=1)
 
     # Get all 10-Q filings for Visa (ticker: V)
     dl.get("10-Q", "V")
@@ -90,14 +90,14 @@ Example Usage
 
     # Get the latest supported filings, if available, for Apple
     for filing_type in dl.supported_filings:
-        dl.get(filing_type, "AAPL", 1)
+        dl.get(filing_type, "AAPL", amount=1)
 
     # Get the latest supported filings, if available, for a
     # specified list of tickers and CIKs
     symbols = ["AAPL", "MSFT", "0000102909", "V", "FB"]
     for s in symbols:
         for filing_type in dl.supported_filings:
-            dl.get(filing_type, s, 1)
+            dl.get(filing_type, s, amount=1)
 
 Supported SEC Filings
 ---------------------

@@ -18,7 +18,7 @@ with open("../sec_edgar_downloader/_version.py", encoding="utf-8") as f:
 # -- Project information -----------------------------------------------------
 
 project = "sec-edgar-downloader"
-copyright = "2019, Jad Chaar"
+copyright = "2020, Jad Chaar"
 author = "Jad Chaar"
 
 release = about["__version__"]
