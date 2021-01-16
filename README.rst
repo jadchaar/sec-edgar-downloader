@@ -60,8 +60,8 @@ Example Usage
     dl.get("8-K", "AAPL", include_amends=True)
 
     # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
-    # Note: before_date and after_date strings must be in the form "YYYYMMDD"
-    dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
+    # Note: before_date and after_date strings must be in the form "YYYY-MM-DD"
+    dl.get("8-K", "AAPL", after_date="2017-01-01", before_date="2017-03-25")
 
     # Get the five most recent 8-K filings for Apple
     dl.get("8-K", "AAPL", amount=5)

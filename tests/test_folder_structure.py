@@ -15,19 +15,19 @@ def test_file_structure(downloader):
     ├── AAPL
     │   ├── 10-K
     │   │   └── 0000320193-20-000096
-    │   │       └── full_submission.txt
+    │   │       └── full-submission.txt
     │   └── 8-K
     │       ├── 0000320193-20-000094
-    │       │   ├── filing_details.html
-    │       │   └── full_submission.txt
+    │       │   ├── filing-details.html
+    │       │   └── full-submission.txt
     │       └── 0001193125-20-225672
-    │           ├── filing_details.html
-    │           └── full_submission.txt
+    │           ├── filing-details.html
+    │           └── full-submission.txt
     └── IBM
         └── 4
             └── 0001562180-20-006712
-                ├── filing_details.xml
-                └── full_submission.txt
+                ├── filing-details.xml
+                └── full-submission.txt
     """
     dl, dl_path = downloader
     filings_save_path = dl_path / ROOT_SAVE_FOLDER_NAME

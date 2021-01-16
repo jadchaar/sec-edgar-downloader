@@ -2,7 +2,7 @@
 
 import sys
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import ClassVar, List, Optional, Union
 
 from ._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
@@ -23,10 +23,13 @@ class Downloader:
     Usage::
 
         >>> from sec_edgar_downloader import Downloader
+        # Download to current working directory
         >>> dl = Downloader()
+        # Download to relative or absolute path
+        >>> dl = Downloader("/path/to/valid/save/location")
     """
 
-    supported_filings: List[str] = sorted(_SUPPORTED_FILINGS)
+    supported_filings: ClassVar[List[str]] = sorted(_SUPPORTED_FILINGS)
 
     def __init__(self, download_folder: Union[str, Path, None] = None) -> None:
         """Constructor for the :class:`Downloader` class."""

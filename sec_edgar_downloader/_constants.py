@@ -5,10 +5,10 @@ from datetime import date
 SEC_EDGAR_SEARCH_API_ENDPOINT = "https://efts.sec.gov/LATEST/search-index"
 SEC_EDGAR_ARCHIVES_BASE_URL = "https://www.sec.gov/Archives/edgar/data"
 
-# SEC limits users to no more than 10 downloads per second
-# Sleep >0.10s between each download to prevent rate-limiting
+# SEC limits users to no more than 10 requests per second
+# Sleep 0.1s between each request to prevent rate-limiting
 # Source: https://www.sec.gov/developer
-SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.12
+SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.1
 
 DATE_FORMAT_TOKENS = "%Y-%m-%d"
 DEFAULT_BEFORE_DATE = date.today()

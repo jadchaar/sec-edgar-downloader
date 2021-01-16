@@ -179,6 +179,9 @@ def get_filing_urls_to_download(
         query_size = search_query_results["query"]["size"]
         start_index += query_size
 
+        # Limit the number of API requests per minute
+        time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+
     return filings_to_fetch
 
 

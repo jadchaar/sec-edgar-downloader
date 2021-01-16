@@ -1,11 +1,11 @@
+from pathlib import Path
+
 from setuptools import setup
 
-with open("README.rst", encoding="utf-8") as f:
-    readme = f.read()
-
+readme = Path("README.rst").read_text(encoding="utf-8")
+version = Path("sec_edgar_downloader/_version.py").read_text(encoding="utf-8")
 about = {}
-with open("sec_edgar_downloader/_version.py", encoding="utf-8") as f:
-    exec(f.read(), about)
+exec(version, about)
 
 setup(
     name="sec-edgar-downloader",

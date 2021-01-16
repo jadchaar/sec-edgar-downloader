@@ -1,5 +1,43 @@
 # Changelog
 
+## 4.0.0 - 1/16/2021
+
+This is a major breaking release. Please see the [v4 migration guide](https://github.com/jadchaar/sec-edgar-downloader/blob/master/docs/v4_migration_guide.md) for information on how to upgrade and adapt your existing codebase to the new package version.
+
+### Added
+
+- The [SEC Edgar Full-Text Search API](https://www.sec.gov/edgar/search/) is now used to fetch filing download URLs. This approach replaces the existing fragile scraping and ATOM RSS implementation used in existing versions of this package.
+  - Note: this API only allows for fetching filings after December 1, 2000.
+- Added support for searching and downloading filings via a `query` kwarg:
+```python
+dl = Downloader()
+# Download all Apple proxy statements that contain the word "antitrust"
+dl.get("DEF 14A", "AAPL", query="antitrust")
+```
+- Filing details, whose extensions vary based on filing type, are now downloaded in addition to the full submission `txt` file. See the migration guide for information on the revamped folder structure.
+- Added the ability to download all available SEC filings. Please see the [README](https://github.com/jadchaar/sec-edgar-downloader/blob/master/README.rst) for a full list of all supported filings.
+- `Path` objects can now be used to specify a `download_folder` when constructing a `Downloader` object.
+- Added type annotations throughout the codebase.
+
+### Changed
+
+- The current working directory is now used as the default download location. Custom paths can be specified when constructing `Downloader` objects.
+- All arguments passed to `dl.get()` other than `filing` and `ticker_or_cik` must be used with a keyword:
+```python
+dl = Downloader()
+dl.get(
+    "10-K",
+    "AAPL",
+    # All other arguments must be used with a keyword
+    amount=1,
+    after="2019-01-01",
+    before="2021-01-01",
+    include_amends=True,
+    download_details=True,
+    query="sample query"
+)
+```
+
 ## 3.0.5 - 5/16/2020
 
 ### Added
