@@ -41,16 +41,16 @@ Install and update this package using `pip <https://pip.pypa.io/en/stable/quicks
 
     $ pip install -U sec-edgar-downloader
 
-Example Usage
-^^^^^^^^^^^^^
+Basic Usage
+^^^^^^^^^^^
 
 .. code-block:: python
 
     from sec_edgar_downloader import Downloader
 
-    # Initialize a downloader instance.
-    # If no argument is passed to the constructor, the package
-    # will attempt to locate the user's downloads folder.
+    # Initialize a downloader instance. If no argument is passed
+    # to the constructor, the package will download filings to
+    # the current working directory.
     dl = Downloader("/path/to/valid/save/location")
 
     # Get all 8-K filings for Apple (ticker: AAPL)
@@ -60,25 +60,22 @@ Example Usage
     dl.get("8-K", "AAPL", include_amends=True)
 
     # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
-    # Note: before_date and after_date strings must be in the form "YYYY-MM-DD"
+    # Note: after_date and before_date strings must be in the form "YYYY-MM-DD"
     dl.get("8-K", "AAPL", after_date="2017-01-01", before_date="2017-03-25")
 
     # Get the five most recent 8-K filings for Apple
     dl.get("8-K", "AAPL", amount=5)
 
-    # Get all 10-K filings for Microsoft (ticker: MSFT)
+    # Get all 10-K filings for Microsoft
     dl.get("10-K", "MSFT")
 
     # Get the latest 10-K filing for Microsoft
     dl.get("10-K", "MSFT", amount=1)
 
-    # Get the latest 10KSB filing for Ubiquitech Software
-    dl.get("10KSB", "0001411460", amount=1)
-
-    # Get all 10-Q filings for Visa (ticker: V)
+    # Get all 10-Q filings for Visa
     dl.get("10-Q", "V")
 
-    # Get all 13F-NT filings for the Vanguard Group (CIK: 0000102909)
+    # Get all 13F-NT filings for the Vanguard Group
     dl.get("13F-NT", "0000102909")
 
     # Get all 13F-HR filings for the Vanguard Group
@@ -90,22 +87,39 @@ Example Usage
     # Get all SD filings for Apple
     dl.get("SD", "AAPL")
 
+Advanced Usage
+^^^^^^^^^^^^^^
+
+.. code-block:: python
+
+    from sec_edgar_downloader import Downloader
+
+    # Download filings to the current working directory
+    dl = Downloader()
+
+    # Get all Apple proxy statements that contain the term "antitrust"
+    dl.get("DEF 14A", "AAPL", query="antitrust")
+
+    # Get all 10-K filings for Microsoft without the filing details
+    dl.get("10-K", "MSFT", download_details=False)
+
     # Get the latest supported filings, if available, for Apple
     for filing_type in dl.supported_filings:
         dl.get(filing_type, "AAPL", amount=1)
 
     # Get the latest supported filings, if available, for a
     # specified list of tickers and CIKs
-    symbols = ["AAPL", "MSFT", "0000102909", "V", "FB"]
-    for s in symbols:
+    equity_ids = ["AAPL", "MSFT", "0000102909", "V", "FB"]
+    for equity_id in equity_ids:
         for filing_type in dl.supported_filings:
-            dl.get(filing_type, s, amount=1)
+            dl.get(filing_type, equity_id, amount=1)
 
-Supported SEC Filings
----------------------
+Supported SEC Filing Types
+--------------------------
 
-This package supports downloading all SEC filing types
-(learn more about the different SEC filing types `here <https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp>`_):
+This package supports downloading all SEC filing types (6-K, 8-K, 10-K, DEF 14A, S-1, and many others).
+You can learn more about the different SEC filing types `here <https://www.investopedia.com/articles/fundamental-analysis/08/sec-forms.asp>`_).
+Below is an exhaustive list of all filings types that can be downloaded by this package:
 
 - 1
 - 1-A

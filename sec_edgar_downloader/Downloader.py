@@ -23,8 +23,10 @@ class Downloader:
     Usage::
 
         >>> from sec_edgar_downloader import Downloader
+
         # Download to current working directory
         >>> dl = Downloader()
+
         # Download to relative or absolute path
         >>> dl = Downloader("/path/to/valid/save/location")
     """
@@ -85,6 +87,12 @@ class Downloader:
 
             # Get the five most recent 10-K filings for Apple
             >>> dl.get("10-K", "AAPL", amount=5)
+
+            # Get all 10-K filings for Apple, excluding the human-readable details
+            >>> dl.get("10-K", "AAPL", amount=1, download_details=False)
+
+            # Get all Apple proxy statements that contain the term "antitrust"
+            >>> dl.get("DEF 14A", "AAPL", query="antitrust")
 
             # Get all 10-Q filings for Visa
             >>> dl.get("10-Q", "V")
