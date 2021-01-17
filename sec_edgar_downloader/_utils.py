@@ -25,7 +25,7 @@ class EdgarSearchApiError(Exception):
     """Error raised when Edgar Search API encounters a problem."""
 
 
-# Object for storing metadata about filings that will be downloaded."""
+# Object for storing metadata about filings that will be downloaded.
 FilingMetadata = namedtuple(
     "FilingMetadata",
     [
@@ -38,18 +38,16 @@ FilingMetadata = namedtuple(
 
 
 def validate_date_format(date_format: str) -> None:
-    error_msg = (
-        "Incorrect date format. Please enter a date string of the form YYYY-MM-DD."
-    )
+    error_msg_base = "Please enter a date string of the form YYYY-MM-DD."
 
     if not isinstance(date_format, str):
-        raise ValueError(error_msg)
+        raise TypeError(error_msg_base)
 
     try:
         datetime.strptime(date_format, DATE_FORMAT_TOKENS)
     except ValueError:
         # Re-raise with custom error message
-        raise ValueError(error_msg)
+        raise ValueError(f"Incorrect date format. {error_msg_base}")
 
 
 def form_request_payload(
@@ -100,7 +98,9 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
 
     filing_details_url = f"{submission_base_url}/{filing_details_filename}"
 
-    filing_details_filename_extension = Path(filing_details_filename).suffix
+    filing_details_filename_extension = Path(filing_details_filename).suffix.replace(
+        "htm", "html"
+    )
     filing_details_filename = (
         f"{FILING_DETAILS_FILENAME_STEM}{filing_details_filename_extension}"
     )
@@ -109,7 +109,7 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
         accession_number=accession_number,
         full_submission_url=full_submission_url,
         filing_details_url=filing_details_url,
-        filing_details_filename=filing_details_filename.replace("htm", "html"),
+        filing_details_filename=filing_details_filename,
     )
 
 
@@ -146,8 +146,8 @@ def get_filing_urls_to_download(
                 )
             except (ValueError, KeyError):  # pragma: no cover
                 raise EdgarSearchApiError(
-                    "Edgar Search API encountered an unknown error."
-                    f"Request payload: {payload}"
+                    "Edgar Search API encountered an unknown error. "
+                    f"Request payload:\n{payload}"
                 )
 
         query_hits = search_query_results["hits"]["hits"]
@@ -179,7 +179,7 @@ def get_filing_urls_to_download(
         query_size = search_query_results["query"]["size"]
         start_index += query_size
 
-        # Limit the number of API requests per minute
+        # Prevent rate limiting
         time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
     return filings_to_fetch
@@ -194,6 +194,9 @@ def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
     for image in soup.find_all("img", src=True):
         image["src"] = urljoin(base_url, image["src"])
 
+    if soup.original_encoding is None:
+        return soup
+
     return soup.encode(soup.original_encoding)
 
 
@@ -204,6 +207,7 @@ def download_and_save_filing(
     filing_type: str,
     download_url: str,
     save_filename: str,
+    *,
     resolve_urls: bool = False,
 ) -> None:
     resp = requests.get(download_url)
@@ -227,6 +231,9 @@ def download_and_save_filing(
     save_path.parent.mkdir(parents=True, exist_ok=True)
     save_path.write_bytes(filing_text)
 
+    # Prevent rate limiting
+    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+
 
 def download_filings(
     download_folder: Path,
@@ -244,7 +251,6 @@ def download_filings(
             filing.full_submission_url,
             FILING_FULL_SUBMISSION_FILENAME,
         )
-        time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
         if include_filing_details:
             download_and_save_filing(
@@ -256,7 +262,6 @@ def download_filings(
                 filing.filing_details_filename,
                 resolve_urls=True,
             )
-            time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:

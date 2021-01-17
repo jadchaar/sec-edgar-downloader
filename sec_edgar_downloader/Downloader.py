@@ -66,8 +66,8 @@ class Downloader:
             Defaults to today.
         :param include_amends: denotes whether or not to include filing amends (e.g. 8-K/A).
             Defaults to False.
-        :param download_details: denotes whether or not to download filing detail documents
-            (e.g. form 4 XML, 8-K HTML). Defaults to True.
+        :param download_details: denotes whether or not to download human-readable and easily
+            parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
         :param query: keyword to search for in filing documents.
         :return: number of filings downloaded.
 
@@ -88,7 +88,7 @@ class Downloader:
             # Get the five most recent 10-K filings for Apple
             >>> dl.get("10-K", "AAPL", amount=5)
 
-            # Get all 10-K filings for Apple, excluding the human-readable details
+            # Get all 10-K filings for Apple, excluding the filing detail documents
             >>> dl.get("10-K", "AAPL", amount=1, download_details=False)
 
             # Get all Apple proxy statements that contain the term "antitrust"

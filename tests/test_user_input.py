@@ -159,7 +159,7 @@ def test_non_string_date(downloader):
     filing_type = "8-K"
     ticker = "AAPL"
 
-    with pytest.raises(ValueError):
+    with pytest.raises(TypeError):
         dl.get(filing_type, ticker, after=DEFAULT_AFTER_DATE)
 
 

@@ -37,6 +37,7 @@ dl.get(
     query="sample query"
 )
 ```
+- The `after_date`, `before_date`, and `num_filings_to_download` kwargs have been renamed to `after`, `before`, and `amount`, respectively.
 
 ## 3.0.5 - 5/16/2020
 

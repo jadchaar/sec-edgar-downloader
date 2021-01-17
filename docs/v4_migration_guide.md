@@ -21,6 +21,8 @@ dl.get(
 )
 ```
 
+In addition to keyword-only arguments, the `after_date`, `before_date`, `num_filings_to_download` kwargs have been renamed to `after`, `before`, and `amount`, respectively.
+
 ## Date Range of Downloads
 
 The package now uses the [SEC Edgar Full Text Search API](https://www.sec.gov/edgar/search/) to fetch filing information, and this API is only capable of fetching filings after December 1, 2000. Thus, this package can only download filings filed after 2000-01-01.
