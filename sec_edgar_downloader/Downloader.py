@@ -109,7 +109,7 @@ class Downloader:
             # Get all SD filings for Apple
             >>> dl.get("SD", "AAPL")
         """
-        ticker_or_cik = str(ticker_or_cik).strip().upper().lstrip("0")
+        ticker_or_cik = str(ticker_or_cik).strip().upper()
 
         if amount is None:
             # If amount is not specified, obtain all available filings.
