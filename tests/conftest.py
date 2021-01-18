@@ -6,12 +6,25 @@ import shutil
 import pytest
 
 from sec_edgar_downloader import Downloader
+from sec_edgar_downloader._constants import (
+    DATE_FORMAT_TOKENS,
+    DEFAULT_AFTER_DATE,
+    DEFAULT_BEFORE_DATE,
+)
 
 
 @pytest.fixture(scope="function")
 def downloader(tmp_path):
-    tmp_dir = tmp_path / "Downloads"
-    tmp_dir.mkdir()
-    dl = Downloader(tmp_dir)
-    yield dl, tmp_dir
-    shutil.rmtree(tmp_dir)
+    dl = Downloader(tmp_path)
+    yield dl, tmp_path
+    shutil.rmtree(tmp_path)
+
+
+@pytest.fixture(scope="session")
+def formatted_earliest_after_date():
+    return DEFAULT_AFTER_DATE.strftime(DATE_FORMAT_TOKENS)
+
+
+@pytest.fixture(scope="session")
+def formatted_latest_before_date():
+    return DEFAULT_BEFORE_DATE.strftime(DATE_FORMAT_TOKENS)

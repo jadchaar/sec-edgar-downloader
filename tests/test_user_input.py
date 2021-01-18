@@ -7,6 +7,12 @@ from datetime import datetime, timedelta
 
 import pytest
 
+from sec_edgar_downloader._constants import (
+    DATE_FORMAT_TOKENS,
+    DEFAULT_AFTER_DATE,
+    ROOT_SAVE_FOLDER_NAME,
+)
+
 
 def test_invalid_filing_type(downloader):
     dl, _ = downloader
@@ -31,7 +37,7 @@ def test_invalid_ticker(downloader):
     assert num_filings_downloaded == 0
     assert len(list(dl_path.glob("*"))) == 0
 
-    filings_save_path = dl_path / "sec_edgar_filings"
+    filings_save_path = dl_path / ROOT_SAVE_FOLDER_NAME
     assert not filings_save_path.exists()
 
     ticker_save_path = filings_save_path / ticker
@@ -43,26 +49,24 @@ def test_invalid_ticker(downloader):
 
 def test_invalid_num_filings_to_download(downloader):
     dl, _ = downloader
-    expected_msg = (
-        "Please enter a number greater than 1 for the number of filings to download."
-    )
+    expected_msg = "Invalid amount. Please enter a number greater than 1."
 
     filing_type = "10-K"
     ticker = "AAPL"
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, -1)
+        dl.get(filing_type, ticker, amount=-1)
     assert expected_msg in str(excinfo.value)
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, 0)
+        dl.get(filing_type, ticker, amount=0)
     assert expected_msg in str(excinfo.value)
 
 
 def test_invalid_before_and_after_dates(downloader):
     dl, _ = downloader
     expected_msg = (
-        "Incorrect date format. Please enter a date string of the form YYYYMMDD."
+        "Incorrect date format. Please enter a date string of the form YYYY-MM-DD."
     )
 
     filing_type = "8-K"
@@ -71,43 +75,100 @@ def test_invalid_before_and_after_dates(downloader):
     # AAPL filed a 8-K on 2019-11-15
     after_date = datetime(2019, 11, 15)
     before_date = datetime(2019, 11, 15)
+    incorrect_date_format = "%Y%m%d"
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, after_date=after_date.strftime("%Y-%m-%d"))
+        dl.get(filing_type, ticker, after=after_date.strftime(incorrect_date_format))
     assert expected_msg in str(excinfo.value)
 
     with pytest.raises(ValueError) as excinfo:
-        dl.get(filing_type, ticker, before_date=before_date.strftime("%Y-%m-%d"))
+        dl.get(filing_type, ticker, before=before_date.strftime(incorrect_date_format))
     assert expected_msg in str(excinfo.value)
+
+
+def test_valid_before_and_after_date_combos(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    # AAPL filed a 8-K on 2019-11-15
+    after_date = datetime(2019, 11, 15)
+    before_date = datetime(2019, 11, 15)
 
     # after_date == before_date
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime("%Y%m%d"),
-        before_date=before_date.strftime("%Y%m%d"),
+        after=after_date.strftime(DATE_FORMAT_TOKENS),
+        before=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
     # after_date < before_date
-    after_date -= timedelta(1)
-    before_date += timedelta(1)
+    after_date -= timedelta(days=1)
+    before_date += timedelta(days=1)
     num_filings_downloaded = dl.get(
         filing_type,
         ticker,
-        after_date=after_date.strftime("%Y%m%d"),
-        before_date=before_date.strftime("%Y%m%d"),
+        after=after_date.strftime(DATE_FORMAT_TOKENS),
+        before=before_date.strftime(DATE_FORMAT_TOKENS),
     )
     assert num_filings_downloaded == 1
 
+
+def test_invalid_before_and_after_date_combos(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    # AAPL filed a 8-K on 2019-11-15
+    after_date = datetime(2019, 11, 15)
+    before_date = datetime(2019, 11, 15)
+
     # after_date > before_date
-    after_date += timedelta(3)
-    expected_msg = "Invalid after_date and before_date."
+    after_date += timedelta(days=3)
+    expected_msg = "Invalid after and before date combination."
     with pytest.raises(ValueError) as excinfo:
         dl.get(
             filing_type,
             ticker,
-            after_date=after_date.strftime("%Y%m%d"),
-            before_date=before_date.strftime("%Y%m%d"),
+            after=after_date.strftime(DATE_FORMAT_TOKENS),
+            before=before_date.strftime(DATE_FORMAT_TOKENS),
         )
     assert expected_msg in str(excinfo.value)
+
+
+def test_pre_default_after_date(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    invalid_date = DEFAULT_AFTER_DATE - timedelta(days=1)
+    expected_msg = f"Filings cannot be downloaded prior to {DEFAULT_AFTER_DATE.year}."
+    with pytest.raises(ValueError) as excinfo:
+        dl.get(filing_type, ticker, after=invalid_date.strftime(DATE_FORMAT_TOKENS))
+    assert expected_msg in str(excinfo.value)
+
+
+def test_non_string_date(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+
+    with pytest.raises(TypeError):
+        dl.get(filing_type, ticker, after=DEFAULT_AFTER_DATE)
+
+
+def test_invalid_query_type(downloader):
+    dl, _ = downloader
+
+    filing_type = "8-K"
+    ticker = "AAPL"
+    query = 25
+
+    with pytest.raises(TypeError):
+        dl.get(filing_type, ticker, query=query)

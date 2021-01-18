@@ -8,24 +8,25 @@
 
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.abspath(".."))
 
+version = Path("../sec_edgar_downloader/_version.py").read_text(encoding="utf-8")
 about = {}
-with open("../sec_edgar_downloader/_version.py", encoding="utf-8") as f:
-    exec(f.read(), about)
+exec(version, about)
 
 # -- Project information -----------------------------------------------------
 
-project = "sec-edgar-downloader"
-copyright = "2019, Jad Chaar"
+project = "SEC EDGAR Downloader 📈"
+copyright = "2020, Jad Chaar"
 author = "Jad Chaar"
 
 release = about["__version__"]
 
 # -- General configuration ---------------------------------------------------
 
-extensions = ["sphinx.ext.autodoc"]
+extensions = ["sphinx.ext.autodoc", "sphinx_autodoc_typehints"]
 
 autodoc_member_order = "bysource"
 
@@ -44,7 +45,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 
 html_theme = "alabaster"
 html_theme_options = {
-    "description": "Download SEC filings with ease.",
+    "description": "Download SEC filings with ease",
     "github_user": "jadchaar",
     "github_repo": "sec-edgar-downloader",
     "github_banner": True,

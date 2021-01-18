@@ -14,7 +14,7 @@ from sec_edgar_downloader._constants import SUPPORTED_FILINGS
 
 def test_constructor_no_params():
     dl = Downloader()
-    expected = Path.home().joinpath("Downloads")
+    expected = Path.cwd()
     assert dl.download_folder == expected
 
 
@@ -26,22 +26,22 @@ def test_constructor_blank_path():
 
 
 @pytest.mark.skipif(
-    os.name == "nt", reason="Test should only run on non-Windows systems."
+    os.name == "nt", reason="test should only run on Unix-based systems"
 )
 def test_constructor_relative_path():
     dl = Downloader("./Downloads")
-    expected = Path.cwd().joinpath("Downloads")
+    expected = Path.cwd() / "Downloads"
     assert dl.download_folder == expected
 
 
 def test_constructor_user_path():
     dl = Downloader("~/Downloads")
-    expected = Path.home().joinpath("Downloads")
+    expected = Path.home() / "Downloads"
     assert dl.download_folder == expected
 
 
 def test_constructor_custom_path():
-    custom_path = Path.home().joinpath("Downloads/SEC/EDGAR/Downloader")
+    custom_path = Path.home() / "Downloads/SEC/EDGAR/Downloader"
     dl = Downloader(custom_path)
     assert dl.download_folder == custom_path
 

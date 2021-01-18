@@ -1,11 +1,11 @@
+from pathlib import Path
+
 from setuptools import setup
 
-with open("README.rst", encoding="utf-8") as f:
-    readme = f.read()
-
+readme = Path("README.rst").read_text(encoding="utf-8")
+version = Path("sec_edgar_downloader/_version.py").read_text(encoding="utf-8")
 about = {}
-with open("sec_edgar_downloader/_version.py", encoding="utf-8") as f:
-    exec(f.read(), about)
+exec(version, about)
 
 setup(
     name="sec-edgar-downloader",
@@ -19,7 +19,7 @@ setup(
     url="https://github.com/jadchaar/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,
-    install_requires=["lxml>=4.3.4", "requests"],
+    install_requires=["requests", "bs4"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -35,6 +35,7 @@ setup(
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: OS Independent",
     ],
