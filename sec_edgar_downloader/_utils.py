@@ -252,7 +252,7 @@ def download_filings(
                 filing.full_submission_url,
                 FILING_FULL_SUBMISSION_FILENAME,
             )
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:  # pragma: no cover
             print(
                 "Skipping full submission download for "
                 f"'{filing.accession_number}' due to network error: {e}."
@@ -269,7 +269,7 @@ def download_filings(
                     filing.filing_details_filename,
                     resolve_urls=True,
                 )
-            except requests.exceptions.HTTPError as e:
+            except requests.exceptions.HTTPError as e:  # pragma: no cover
                 print(
                     f"Skipping filing detail download for "
                     f"'{filing.accession_number}' due to network error: {e}."
