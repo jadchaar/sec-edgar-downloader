@@ -1,6 +1,12 @@
 # Changelog
 
-## 4.0.0 - 1/16/2021
+## 4.0.1 - 1/23/2021
+
+### Fixed
+
+- Downloads will no longer halt prematurely if a filing document (full or detail) cannot be found (e.g. when the EDGAR Search API outputs incorrect download URLs). Now, the package will automatically catch such network errors, print a helpful warning message, and then proceed to download the remaining filings.
+
+## 4.0.0 - 1/17/2021
 
 This is a major breaking release. Please see the [v4 migration guide](https://github.com/jadchaar/sec-edgar-downloader/blob/master/docs/v4_migration_guide.md) for information on how to upgrade and adapt your existing codebase to the new package version.
 

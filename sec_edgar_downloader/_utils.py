@@ -243,25 +243,37 @@ def download_filings(
     include_filing_details: bool,
 ) -> None:
     for filing in filings_to_fetch:
-        download_and_save_filing(
-            download_folder,
-            ticker_or_cik,
-            filing.accession_number,
-            filing_type,
-            filing.full_submission_url,
-            FILING_FULL_SUBMISSION_FILENAME,
-        )
-
-        if include_filing_details:
+        try:
             download_and_save_filing(
                 download_folder,
                 ticker_or_cik,
                 filing.accession_number,
                 filing_type,
-                filing.filing_details_url,
-                filing.filing_details_filename,
-                resolve_urls=True,
+                filing.full_submission_url,
+                FILING_FULL_SUBMISSION_FILENAME,
             )
+        except requests.exceptions.HTTPError as e:  # pragma: no cover
+            print(
+                "Skipping full submission download for "
+                f"'{filing.accession_number}' due to network error: {e}."
+            )
+
+        if include_filing_details:
+            try:
+                download_and_save_filing(
+                    download_folder,
+                    ticker_or_cik,
+                    filing.accession_number,
+                    filing_type,
+                    filing.filing_details_url,
+                    filing.filing_details_filename,
+                    resolve_urls=True,
+                )
+            except requests.exceptions.HTTPError as e:  # pragma: no cover
+                print(
+                    f"Skipping filing detail download for "
+                    f"'{filing.accession_number}' due to network error: {e}."
+                )
 
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
