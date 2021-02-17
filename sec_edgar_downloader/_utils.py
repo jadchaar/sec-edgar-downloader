@@ -269,6 +269,11 @@ def download_filings(
                     filing.filing_details_filename,
                     resolve_urls=True,
                 )
+            except RecursionError as e:  # pragma: no cover
+                print(
+                    f"Skipping filing detail download for "
+                    f"'{filing.accession_number}' due to parse error: {e}."
+                )
             except requests.exceptions.HTTPError as e:  # pragma: no cover
                 print(
                     f"Skipping filing detail download for "
