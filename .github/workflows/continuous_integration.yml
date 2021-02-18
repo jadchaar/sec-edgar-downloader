@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      # Prevent SEC rate-limiting by limiting parallel runners
+      # Prevent SEC rate-limiting by limiting number of parallel runners
       max-parallel: 6
       fail-fast: false
       matrix:

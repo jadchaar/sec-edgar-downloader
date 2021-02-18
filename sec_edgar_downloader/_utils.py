@@ -186,7 +186,7 @@ def get_filing_urls_to_download(
 
 
 def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
-    soup = BeautifulSoup(filing_text, "html.parser")
+    soup = BeautifulSoup(filing_text, "lxml")
 
     for url in soup.find_all("a", href=True):
         url["href"] = urljoin(base_url, url["href"])
@@ -194,7 +194,7 @@ def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
     for image in soup.find_all("img", src=True):
         image["src"] = urljoin(base_url, image["src"])
 
-    if soup.original_encoding is None:
+    if soup.original_encoding is None:  # pragma: no cover
         return soup
 
     return soup.encode(soup.original_encoding)

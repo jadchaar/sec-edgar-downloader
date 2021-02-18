@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.0.2 - 2/18/2021
+
+### Fixed
+
+- Fixed a `RecursionError` that could occur when downloading older filings with the `download_details` flag set to true. Thanks to @neilbartlett for reporting and fixing this bug!
+
 ## 4.0.1 - 1/23/2021
 
 ### Fixed
