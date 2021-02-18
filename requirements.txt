@@ -1,4 +1,5 @@
 bs4
+lxml
 pre-commit
 pytest
 pytest-cov
