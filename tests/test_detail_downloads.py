@@ -1,5 +1,5 @@
 # Regression test for issue 60
-def test_http_error_on_download(downloader):
+def test_recursion_error_older_filings(downloader):
     dl, _ = downloader
 
     filing_type = "10-K"
