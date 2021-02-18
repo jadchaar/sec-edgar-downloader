@@ -186,7 +186,8 @@ def get_filing_urls_to_download(
 
 
 def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
-    soup = BeautifulSoup(filing_text, "html.parser")
+
+    soup = BeautifulSoup(filing_text, "lxml")
 
     for url in soup.find_all("a", href=True):
         url["href"] = urljoin(base_url, url["href"])
@@ -268,11 +269,6 @@ def download_filings(
                     filing.filing_details_url,
                     filing.filing_details_filename,
                     resolve_urls=True,
-                )
-            except RecursionError as e:  # pragma: no cover
-                print(
-                    f"Skipping filing detail download for "
-                    f"'{filing.accession_number}' due to parse error: {e}."
                 )
             except requests.exceptions.HTTPError as e:  # pragma: no cover
                 print(
