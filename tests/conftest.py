@@ -36,4 +36,4 @@ def formatted_latest_before_date():
 def prevent_rate_limit():
     """Prevent SEC rate-limiting by sleeping between test cases."""
     yield
-    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL * 2)
