@@ -9,6 +9,7 @@ from urllib.parse import urljoin
 
 import requests
 from bs4 import BeautifulSoup
+from faker import Faker
 
 from ._constants import (
     DATE_FORMAT_TOKENS,
@@ -35,6 +36,9 @@ FilingMetadata = namedtuple(
         "filing_details_filename",
     ],
 )
+
+# Object for generating fake user-agent strings
+fake = Faker()
 
 
 def validate_date_format(date_format: str) -> None:
@@ -129,7 +133,11 @@ def get_filing_urls_to_download(
         payload = form_request_payload(
             ticker_or_cik, [filing_type], after_date, before_date, start_index, query
         )
-        resp = requests.post(SEC_EDGAR_SEARCH_API_ENDPOINT, json=payload)
+        resp = requests.post(
+            SEC_EDGAR_SEARCH_API_ENDPOINT,
+            json=payload,
+            headers=get_random_user_agent_header(),
+        )
         resp.raise_for_status()
         search_query_results = resp.json()
 
@@ -210,7 +218,7 @@ def download_and_save_filing(
     *,
     resolve_urls: bool = False,
 ) -> None:
-    resp = requests.get(download_url)
+    resp = requests.get(download_url, headers=get_random_user_agent_header())
     resp.raise_for_status()
     filing_text = resp.content
 
@@ -278,3 +286,10 @@ def download_filings(
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
     return len({metadata.accession_number for metadata in filings})
+
+
+def get_random_user_agent_header() -> dict:
+    """Generate a fake user-agent string to prevent SEC rate-limiting."""
+    user_agent_chrome = fake.chrome()
+    headers = {"User-Agent": user_agent_chrome}
+    return headers
