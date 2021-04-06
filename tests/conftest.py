@@ -2,6 +2,7 @@
 
 
 import shutil
+import time
 
 import pytest
 
@@ -10,6 +11,7 @@ from sec_edgar_downloader._constants import (
     DATE_FORMAT_TOKENS,
     DEFAULT_AFTER_DATE,
     DEFAULT_BEFORE_DATE,
+    SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
 )
 
 
@@ -28,3 +30,10 @@ def formatted_earliest_after_date():
 @pytest.fixture(scope="session")
 def formatted_latest_before_date():
     return DEFAULT_BEFORE_DATE.strftime(DATE_FORMAT_TOKENS)
+
+
+@pytest.fixture(autouse=True)
+def prevent_rate_limit():
+    """Prevent SEC rate-limiting by sleeping between test cases."""
+    yield
+    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
