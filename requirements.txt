@@ -1,4 +1,5 @@
 bs4
+Faker
 lxml
 pre-commit
 pytest
