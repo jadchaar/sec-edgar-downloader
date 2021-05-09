@@ -1,5 +1,19 @@
 # Changelog
 
+## 4.1.0 - 5/9/2021
+
+### New
+
+- HTTP connections are now re-used when possible (using [`httpx.Client()`](https://www.python-httpx.org/advanced/#client-instances)) to improve download performance.
+
+### Fixed
+
+- Requests are now retried at most 5 times if a request fails. This should solve the `500 Server Error`s that some users are experiencing when downloading a large number of filings.
+
+### Changed
+
+- Replaced the internal `requests` package with [`httpx`](https://github.com/encode/httpx), a more modern and performant alternative.
+
 ## 4.0.3 - 4/6/2021
 
 ### Fixed
