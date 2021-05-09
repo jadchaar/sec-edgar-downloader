@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import List
 from urllib.parse import urljoin
 
-import requests
+import httpx
 from bs4 import BeautifulSoup
 from faker import Faker
 
@@ -15,6 +15,7 @@ from ._constants import (
     DATE_FORMAT_TOKENS,
     FILING_DETAILS_FILENAME_STEM,
     FILING_FULL_SUBMISSION_FILENAME,
+    MAX_RETRIES,
     ROOT_SAVE_FOLDER_NAME,
     SEC_EDGAR_ARCHIVES_BASE_URL,
     SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
@@ -39,6 +40,9 @@ FilingMetadata = namedtuple(
 
 # Object for generating fake user-agent strings
 fake = Faker()
+
+# Specify max number of request retries
+transport = httpx.HTTPTransport(retries=MAX_RETRIES)
 
 
 def validate_date_format(date_format: str) -> None:
@@ -129,66 +133,73 @@ def get_filing_urls_to_download(
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
 
-    while len(filings_to_fetch) < num_filings_to_download:
-        payload = form_request_payload(
-            ticker_or_cik, [filing_type], after_date, before_date, start_index, query
-        )
-        resp = requests.post(
-            SEC_EDGAR_SEARCH_API_ENDPOINT,
-            json=payload,
-            headers=get_random_user_agent_header(),
-        )
-        resp.raise_for_status()
-        search_query_results = resp.json()
+    with httpx.Client(
+        headers={"User-Agent": fake.chrome()}, transport=transport
+    ) as client:
+        while len(filings_to_fetch) < num_filings_to_download:
+            payload = form_request_payload(
+                ticker_or_cik,
+                [filing_type],
+                after_date,
+                before_date,
+                start_index,
+                query,
+            )
+            resp = client.post(
+                SEC_EDGAR_SEARCH_API_ENDPOINT,
+                json=payload,
+            )
+            resp.raise_for_status()
+            search_query_results = resp.json()
 
-        if "error" in search_query_results:
-            try:
-                root_cause = search_query_results["error"]["root_cause"]
-                if not root_cause:  # pragma: no cover
-                    raise ValueError
+            if "error" in search_query_results:
+                try:
+                    root_cause = search_query_results["error"]["root_cause"]
+                    if not root_cause:  # pragma: no cover
+                        raise ValueError
 
-                error_reason = root_cause[0]["reason"]
-                raise EdgarSearchApiError(
-                    f"Edgar Search API encountered an error: {error_reason}. "
-                    f"Request payload: {payload}"
-                )
-            except (ValueError, KeyError):  # pragma: no cover
-                raise EdgarSearchApiError(
-                    "Edgar Search API encountered an unknown error. "
-                    f"Request payload:\n{payload}"
-                )
+                    error_reason = root_cause[0]["reason"]
+                    raise EdgarSearchApiError(
+                        f"Edgar Search API encountered an error: {error_reason}. "
+                        f"Request payload: {payload}"
+                    )
+                except (ValueError, KeyError):  # pragma: no cover
+                    raise EdgarSearchApiError(
+                        "Edgar Search API encountered an unknown error. "
+                        f"Request payload:\n{payload}"
+                    )
 
-        query_hits = search_query_results["hits"]["hits"]
+            query_hits = search_query_results["hits"]["hits"]
 
-        # No more results to process
-        if not query_hits:
-            break
+            # No more results to process
+            if not query_hits:
+                break
 
-        for hit in query_hits:
-            hit_filing_type = hit["_source"]["file_type"]
+            for hit in query_hits:
+                hit_filing_type = hit["_source"]["file_type"]
 
-            is_amend = hit_filing_type[-2:] == "/A"
-            if not include_amends and is_amend:
-                continue
+                is_amend = hit_filing_type[-2:] == "/A"
+                if not include_amends and is_amend:
+                    continue
 
-            # Work around bug where incorrect filings are sometimes included.
-            # For example, AAPL 8-K searches include N-Q entries.
-            if not is_amend and hit_filing_type != filing_type:
-                continue
+                # Work around bug where incorrect filings are sometimes included.
+                # For example, AAPL 8-K searches include N-Q entries.
+                if not is_amend and hit_filing_type != filing_type:
+                    continue
 
-            metadata = build_filing_metadata_from_hit(hit)
-            filings_to_fetch.append(metadata)
+                metadata = build_filing_metadata_from_hit(hit)
+                filings_to_fetch.append(metadata)
 
-            if len(filings_to_fetch) == num_filings_to_download:
-                return filings_to_fetch
+                if len(filings_to_fetch) == num_filings_to_download:
+                    return filings_to_fetch
 
-        # Edgar queries 100 entries at a time, but it is best to set this
-        # from the response payload in case it changes in the future
-        query_size = search_query_results["query"]["size"]
-        start_index += query_size
+            # Edgar queries 100 entries at a time, but it is best to set this
+            # from the response payload in case it changes in the future
+            query_size = search_query_results["query"]["size"]
+            start_index += query_size
 
-        # Prevent rate limiting
-        time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+            # Prevent rate limiting
+            time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
     return filings_to_fetch
 
@@ -209,6 +220,7 @@ def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
 
 
 def download_and_save_filing(
+    client: httpx.Client,
     download_folder: Path,
     ticker_or_cik: str,
     accession_number: str,
@@ -218,7 +230,7 @@ def download_and_save_filing(
     *,
     resolve_urls: bool = False,
 ) -> None:
-    resp = requests.get(download_url, headers=get_random_user_agent_header())
+    resp = client.get(download_url)
     resp.raise_for_status()
     filing_text = resp.content
 
@@ -250,46 +262,44 @@ def download_filings(
     filings_to_fetch: List[FilingMetadata],
     include_filing_details: bool,
 ) -> None:
-    for filing in filings_to_fetch:
-        try:
-            download_and_save_filing(
-                download_folder,
-                ticker_or_cik,
-                filing.accession_number,
-                filing_type,
-                filing.full_submission_url,
-                FILING_FULL_SUBMISSION_FILENAME,
-            )
-        except requests.exceptions.HTTPError as e:  # pragma: no cover
-            print(
-                "Skipping full submission download for "
-                f"'{filing.accession_number}' due to network error: {e}."
-            )
-
-        if include_filing_details:
+    with httpx.Client(
+        headers={"User-Agent": fake.chrome()}, transport=transport
+    ) as client:
+        for filing in filings_to_fetch:
             try:
                 download_and_save_filing(
+                    client,
                     download_folder,
                     ticker_or_cik,
                     filing.accession_number,
                     filing_type,
-                    filing.filing_details_url,
-                    filing.filing_details_filename,
-                    resolve_urls=True,
+                    filing.full_submission_url,
+                    FILING_FULL_SUBMISSION_FILENAME,
                 )
-            except requests.exceptions.HTTPError as e:  # pragma: no cover
+            except httpx.HTTPError as e:  # pragma: no cover
                 print(
-                    f"Skipping filing detail download for "
+                    "Skipping full submission download for "
                     f"'{filing.accession_number}' due to network error: {e}."
                 )
+
+            if include_filing_details:
+                try:
+                    download_and_save_filing(
+                        client,
+                        download_folder,
+                        ticker_or_cik,
+                        filing.accession_number,
+                        filing_type,
+                        filing.filing_details_url,
+                        filing.filing_details_filename,
+                        resolve_urls=True,
+                    )
+                except httpx.HTTPError as e:  # pragma: no cover
+                    print(
+                        f"Skipping filing detail download for "
+                        f"'{filing.accession_number}' due to network error: {e}."
+                    )
 
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
     return len({metadata.accession_number for metadata in filings})
-
-
-def get_random_user_agent_header() -> dict:
-    """Generate a fake user-agent string to prevent SEC rate-limiting."""
-    user_agent_chrome = fake.chrome()
-    headers = {"User-Agent": user_agent_chrome}
-    return headers

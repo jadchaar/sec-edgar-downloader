@@ -1,8 +1,8 @@
 bs4
 Faker
+httpx
 lxml
 pre-commit
 pytest
 pytest-cov
-requests
 sphinx-autodoc-typehints
