@@ -10,6 +10,9 @@ SEC_EDGAR_ARCHIVES_BASE_URL = "https://www.sec.gov/Archives/edgar/data"
 # Source: https://www.sec.gov/developer
 SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.1
 
+# Number of times to retry a request to sec.gov
+MAX_RETRIES = 5
+
 DATE_FORMAT_TOKENS = "%Y-%m-%d"
 DEFAULT_BEFORE_DATE = date.today()
 DEFAULT_AFTER_DATE = date(2000, 1, 1)

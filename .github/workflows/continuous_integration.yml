@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       # Prevent SEC rate-limiting by limiting number of parallel runners
-      max-parallel: 4
+      max-parallel: 10
       fail-fast: true
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9"]
@@ -49,7 +49,7 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -U pip setuptools wheel
-          pip install tox
+          pip install -U tox
       - name: Lint code
         run: tox -e lint
       - name: Lint docs
