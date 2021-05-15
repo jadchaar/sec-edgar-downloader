@@ -52,6 +52,7 @@ class Downloader:
         before: Optional[str] = None,
         include_amends: bool = False,
         download_details: bool = True,
+        return_meta: bool = False,
         query: str = "",
     ) -> int:
         """Download filings and save them to disk.
@@ -69,7 +70,10 @@ class Downloader:
         :param download_details: denotes whether or not to download human-readable and easily
             parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
         :param query: keyword to search for in filing documents.
-        :return: number of filings downloaded.
+        :param return_meta: when set to true, this function returns tuple with the FilingMetaData list
+            included.
+        :return: number of filings downloaded, or a tuple of the number of filings downloaded 
+            plus the FilllingMetaData if return_meta is true.
 
         Usage::
 
@@ -171,8 +175,9 @@ class Downloader:
             ticker_or_cik,
             filing,
             filings_to_fetch,
-            download_details,
+            download_details
         )
 
         # Get number of unique accession numbers downloaded
-        return get_number_of_unique_filings(filings_to_fetch)
+        num_unique_filings = get_number_of_unique_filings(filings_to_fetch) 
+        return (num_unique_filings, filings_to_fetch) if return_meta else num_unique_filings 

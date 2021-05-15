@@ -35,6 +35,8 @@ FilingMetadata = namedtuple(
         "full_submission_url",
         "filing_details_url",
         "filing_details_filename",
+        "filing_details_xbrl_url",
+        "filing_details_xbrl_filename"
     ],
 )
 
@@ -113,11 +115,16 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
         f"{FILING_DETAILS_FILENAME_STEM}{filing_details_filename_extension}"
     )
 
+    filing_details_xbrl_url = f"{submission_base_url}/{accession_number}-xbrl.zip"
+    filing_details_xbrl_filename = f"{accession_number}-xbrl.zip"
+
     return FilingMetadata(
         accession_number=accession_number,
         full_submission_url=full_submission_url,
         filing_details_url=filing_details_url,
         filing_details_filename=filing_details_filename,
+        filing_details_xbrl_url=filing_details_xbrl_url,
+        filing_details_xbrl_filename=filing_details_xbrl_filename
     )
 
 
@@ -297,6 +304,23 @@ def download_filings(
                 except httpx.HTTPError as e:  # pragma: no cover
                     print(
                         f"Skipping filing detail download for "
+                        f"'{filing.accession_number}' due to network error: {e}."
+                    )
+
+                try:
+                    download_and_save_filing(
+                        client,
+                        download_folder,
+                        ticker_or_cik,
+                        filing.accession_number,
+                        filing_type,
+                        filing.filing_details_xbrl_url,
+                        filing.filing_details_xbrl_filename,
+                        resolve_urls=True,
+                    )
+                except httpx.HTTPError as e:  # pragma: no cover
+                    print(
+                        f"Skipping filing xbrl detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
 
