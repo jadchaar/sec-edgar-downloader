@@ -19,7 +19,7 @@ setup(
     url="https://github.com/jadchaar/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,
-    install_requires=["httpx", "bs4", "lxml", "Faker"],
+    install_requires=["requests", "bs4", "lxml", "Faker"],
     python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
