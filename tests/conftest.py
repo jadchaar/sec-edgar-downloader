@@ -11,7 +11,7 @@ from sec_edgar_downloader._constants import (
     DATE_FORMAT_TOKENS,
     DEFAULT_AFTER_DATE,
     DEFAULT_BEFORE_DATE,
-    SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
+    DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 )
 
 
@@ -36,4 +36,4 @@ def formatted_latest_before_date():
 def prevent_rate_limit():
     """Prevent SEC rate-limiting by sleeping between test cases."""
     yield
-    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL * 2)
+    time.sleep(DEFAULT_RATE_LIMIT_SLEEP_INTERVAL * 2)

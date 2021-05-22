@@ -4,7 +4,12 @@ import sys
 from pathlib import Path
 from typing import ClassVar, List, Optional, Union
 
-from ._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
+from ._constants import (
+    DATE_FORMAT_TOKENS, 
+    DEFAULT_AFTER_DATE, 
+    DEFAULT_BEFORE_DATE, 
+    DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
+)
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
 from ._utils import (
     download_filings,
@@ -20,6 +25,10 @@ class Downloader:
     :param download_folder: relative or absolute path to download location.
         Defaults to the current working directory.
 
+    :param rate_limit_seconds: Float to specify rate limit to use
+        for downloads. Defaults to DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
+        from _constants.py
+
     Usage::
 
         >>> from sec_edgar_downloader import Downloader
@@ -33,7 +42,9 @@ class Downloader:
 
     supported_filings: ClassVar[List[str]] = sorted(_SUPPORTED_FILINGS)
 
-    def __init__(self, download_folder: Union[str, Path, None] = None) -> None:
+    def __init__(self, 
+                 download_folder: Union[str, Path, None] = None,
+                 rate_limit_seconds: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL) -> None:
         """Constructor for the :class:`Downloader` class."""
         if download_folder is None:
             self.download_folder = Path.cwd()
@@ -41,6 +52,8 @@ class Downloader:
             self.download_folder = download_folder
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
+
+        self._rate_limit_seconds = rate_limit_seconds
 
     def get(
         self,
@@ -173,7 +186,8 @@ class Downloader:
             after,
             before,
             include_amends,
-            query
+            query,
+            rate_limit=self._rate_limit_seconds
         )
 
         download_filings(
@@ -183,7 +197,8 @@ class Downloader:
             filings_to_fetch,
             download_details,
             download_xbrl_data,
-            include_filing_submission=download_filing_submission
+            include_filing_submission=download_filing_submission,
+            rate_limit=self._rate_limit_seconds
         )
 
         # Get number of unique accession numbers downloaded

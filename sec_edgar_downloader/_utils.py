@@ -13,12 +13,12 @@ from faker import Faker
 
 from ._constants import (
     DATE_FORMAT_TOKENS,
+    DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
     FILING_DETAILS_FILENAME_STEM,
     FILING_FULL_SUBMISSION_FILENAME,
     MAX_RETRIES,
     ROOT_SAVE_FOLDER_NAME,
     SEC_EDGAR_ARCHIVES_BASE_URL,
-    SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
     SEC_EDGAR_SEARCH_API_ENDPOINT,
 )
 
@@ -136,6 +136,7 @@ def get_filing_urls_to_download(
     before_date: str,
     include_amends: bool,
     query: str = "",
+    rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 ) -> List[FilingMetadata]:
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
@@ -206,7 +207,7 @@ def get_filing_urls_to_download(
             start_index += query_size
 
             # Prevent rate limiting
-            time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+            time.sleep(rate_limit)
 
     return filings_to_fetch
 
@@ -236,6 +237,7 @@ def download_and_save_filing(
     save_filename: str,
     *,
     resolve_urls: bool = False,
+    rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
 ) -> None:
     resp = client.get(download_url)
     resp.raise_for_status()
@@ -259,7 +261,7 @@ def download_and_save_filing(
     save_path.write_bytes(filing_text)
 
     # Prevent rate limiting
-    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+    time.sleep(rate_limit)
 
 
 def download_filings(
@@ -271,6 +273,7 @@ def download_filings(
     include_filing_xbrl_details: bool,
     *,
     include_filing_submission: bool = True,
+    rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 ) -> None:
     with httpx.Client(
         headers={"User-Agent": fake.chrome()}, transport=transport
@@ -287,6 +290,7 @@ def download_filings(
                         filing_type,
                         filing.full_submission_url,
                         FILING_FULL_SUBMISSION_FILENAME,
+                        rate_limit=rate_limit
                     )
                 except httpx.HTTPError as e:  # pragma: no cover
                     print(
@@ -305,6 +309,7 @@ def download_filings(
                         filing.filing_details_url,
                         filing.filing_details_filename,
                         resolve_urls=True,
+                        rate_limit=rate_limit
                     )
                 except httpx.HTTPError as e:  # pragma: no cover
                     print(
@@ -323,6 +328,7 @@ def download_filings(
                         filing.filing_details_xbrl_url,
                         filing.filing_details_xbrl_filename,
                         resolve_urls=True,
+                        rate_limit=rate_limit
                     )
                 except httpx.HTTPError as e:  # pragma: no cover
                     print(
