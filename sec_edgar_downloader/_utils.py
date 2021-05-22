@@ -49,7 +49,7 @@ fake = Faker()
 # https://stackoverflow.com/a/35504626/3820660
 retries = Retry(
     total=MAX_RETRIES,
-    backoff_factor=SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
+    backoff_factor=DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
     status_forcelist=[403, 500, 502, 503, 504],
 )
 
@@ -148,9 +148,13 @@ def get_filing_urls_to_download(
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
 
+    # Update retries if user specific a different rate limit,
+    retries.backoff_factor = rate_limit
+
     client = requests.Session()
     client.mount("http://", HTTPAdapter(max_retries=retries))
     client.mount("https://", HTTPAdapter(max_retries=retries))
+    
     try:
         while len(filings_to_fetch) < num_filings_to_download:
             payload = form_request_payload(
@@ -287,9 +291,14 @@ def download_filings(
     include_filing_submission: bool = True,
     rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 ) -> None:
+
+    # Update retries if user specific a different rate limit,
+    retries.backoff_factor = rate_limit
+
     client = requests.Session()
     client.mount("http://", HTTPAdapter(max_retries=retries))
     client.mount("https://", HTTPAdapter(max_retries=retries))
+
     try:
         for filing in filings_to_fetch:
             
@@ -305,7 +314,7 @@ def download_filings(
                         FILING_FULL_SUBMISSION_FILENAME,
                         rate_limit=rate_limit
                     )
-                except httpx.HTTPError as e:  # pragma: no cover
+                except requests.exceptions.HTTPError as e:  # pragma: no cover
                     print(
                         "Skipping full submission download for "
                         f"'{filing.accession_number}' due to network error: {e}."
@@ -329,8 +338,7 @@ def download_filings(
                         f"Skipping filing detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
-    finally:
-        client.close()
+
 
             if include_filing_xbrl_details:
                 try:
@@ -345,12 +353,13 @@ def download_filings(
                         resolve_urls=True,
                         rate_limit=rate_limit
                     )
-                except httpx.HTTPError as e:  # pragma: no cover
+                except requests.exceptions.HTTPError as e:  # pragma: no cover
                     print(
                         f"Skipping filing xbrl detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
-
+    finally:
+        client.close()
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
     return len({metadata.accession_number for metadata in filings})
