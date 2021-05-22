@@ -7,9 +7,11 @@ from pathlib import Path
 from typing import List
 from urllib.parse import urljoin
 
-import httpx
+import requests
 from bs4 import BeautifulSoup
 from faker import Faker
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 from ._constants import (
     DATE_FORMAT_TOKENS,
@@ -44,7 +46,12 @@ FilingMetadata = namedtuple(
 fake = Faker()
 
 # Specify max number of request retries
-transport = httpx.HTTPTransport(retries=MAX_RETRIES)
+# https://stackoverflow.com/a/35504626/3820660
+retries = Retry(
+    total=MAX_RETRIES,
+    backoff_factor=SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
+    status_forcelist=[403, 500, 502, 503, 504],
+)
 
 
 def validate_date_format(date_format: str) -> None:
@@ -141,9 +148,10 @@ def get_filing_urls_to_download(
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
 
-    with httpx.Client(
-        headers={"User-Agent": fake.chrome()}, transport=transport
-    ) as client:
+    client = requests.Session()
+    client.mount("http://", HTTPAdapter(max_retries=retries))
+    client.mount("https://", HTTPAdapter(max_retries=retries))
+    try:
         while len(filings_to_fetch) < num_filings_to_download:
             payload = form_request_payload(
                 ticker_or_cik,
@@ -156,6 +164,7 @@ def get_filing_urls_to_download(
             resp = client.post(
                 SEC_EDGAR_SEARCH_API_ENDPOINT,
                 json=payload,
+                headers={"User-Agent": fake.chrome()},
             )
             resp.raise_for_status()
             search_query_results = resp.json()
@@ -208,6 +217,9 @@ def get_filing_urls_to_download(
 
             # Prevent rate limiting
             time.sleep(rate_limit)
+            
+    finally:
+        client.close()
 
     return filings_to_fetch
 
@@ -228,7 +240,7 @@ def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
 
 
 def download_and_save_filing(
-    client: httpx.Client,
+    client: requests.Session,
     download_folder: Path,
     ticker_or_cik: str,
     accession_number: str,
@@ -239,7 +251,7 @@ def download_and_save_filing(
     resolve_urls: bool = False,
     rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
 ) -> None:
-    resp = client.get(download_url)
+    resp = client.get(download_url, headers={"User-Agent": fake.chrome()})
     resp.raise_for_status()
     filing_text = resp.content
 
@@ -275,9 +287,10 @@ def download_filings(
     include_filing_submission: bool = True,
     rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 ) -> None:
-    with httpx.Client(
-        headers={"User-Agent": fake.chrome()}, transport=transport
-    ) as client:
+    client = requests.Session()
+    client.mount("http://", HTTPAdapter(max_retries=retries))
+    client.mount("https://", HTTPAdapter(max_retries=retries))
+    try:
         for filing in filings_to_fetch:
             
             if include_filing_submission:
@@ -311,11 +324,13 @@ def download_filings(
                         resolve_urls=True,
                         rate_limit=rate_limit
                     )
-                except httpx.HTTPError as e:  # pragma: no cover
+                except requests.exceptions.HTTPError as e:  # pragma: no cover
                     print(
                         f"Skipping filing detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
+    finally:
+        client.close()
 
             if include_filing_xbrl_details:
                 try:

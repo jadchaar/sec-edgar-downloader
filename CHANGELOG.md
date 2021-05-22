@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.2.0 - 5/19/2021
+
+### New
+
+- The `httpx` package has been replaced by `requests` to enable the use of an exponential backoff retry mechanism to help alleviate `403 Forbidden` errors some users are seeing. A request to `sec.gov` will be retried at most 10 times (with an exponential backoff applied to each request) before failing.
+- A random `User-Agent` string is now included in the headers of each `GET` and `POST` request to `sec.gov`, rather than per session.
+
 ## 4.1.0 - 5/9/2021
 
 ### New
