@@ -13,10 +13,19 @@ from ._constants import (
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
 from ._utils import (
     download_filings,
+    FilingMetadata,
     get_filing_urls_to_download,
     get_number_of_unique_filings,
     validate_date_format,
 )
+
+class DownloadResults:
+
+    def __init__(self, 
+                 results: FilingMetadata):
+
+        self.results = results
+        self.length = get_number_of_unique_filings(results)
 
 
 class Downloader:
@@ -67,9 +76,8 @@ class Downloader:
         download_details: bool = True,
         download_xbrl_data: bool = False,
         download_filing_submission: bool = True,
-        return_meta: bool = False,
         query: str = "",
-    ) -> int:
+    ) -> DownloadResults:
         """Download filings and save them to disk.
 
         :param filing: filing type to download (e.g. 8-K).
@@ -88,11 +96,9 @@ class Downloader:
             containing XBRL data for a given filing. Defaults to False.
         :param download_filing_submission: denotes whether or not to download out the full text submission
             of the filing or not. Defaults to True.
-        :param return_meta: when set to true, this function returns tuple with the FilingMetaData list
-            included.
         :param query: keyword to search for in filing documents.
-        :return: number of filings downloaded, or a tuple of the number of filings downloaded 
-            plus the FilllingMetaData if return_meta is true.
+        :return: number object contaning the meta data of the filings downloaded and 
+            also the number of unique filings.
 
         Usage::
 
@@ -201,6 +207,5 @@ class Downloader:
             rate_limit=self._rate_limit_seconds
         )
 
-        # Get number of unique accession numbers downloaded
-        num_unique_filings = get_number_of_unique_filings(filings_to_fetch) 
-        return (num_unique_filings, filings_to_fetch) if return_meta else num_unique_filings 
+        # Store meta data in a DownloadResults object to return to user.
+        return DownloadResults(filings_to_fetch)
