@@ -35,10 +35,13 @@ FilingMetadata = namedtuple(
     [
         "accession_number",
         "full_submission_url",
+        "full_submission_status",
         "filing_details_url",
         "filing_details_filename",
+        "filing_details_status",
         "filing_details_xbrl_url",
-        "filing_details_xbrl_filename"
+        "filing_details_xbrl_filename",
+        "filing_details_xbrl_status",
     ],
 )
 
@@ -128,10 +131,13 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
     return FilingMetadata(
         accession_number=accession_number,
         full_submission_url=full_submission_url,
+        full_submission_status="",
         filing_details_url=filing_details_url,
         filing_details_filename=filing_details_filename,
+        filing_details_status="",
         filing_details_xbrl_url=filing_details_xbrl_url,
-        filing_details_xbrl_filename=filing_details_xbrl_filename
+        filing_details_xbrl_filename=filing_details_xbrl_filename,
+        filing_details_xbrl_status="",
     )
 
 
@@ -154,7 +160,7 @@ def get_filing_urls_to_download(
     client = requests.Session()
     client.mount("http://", HTTPAdapter(max_retries=retries))
     client.mount("https://", HTTPAdapter(max_retries=retries))
-    
+
     try:
         while len(filings_to_fetch) < num_filings_to_download:
             payload = form_request_payload(
@@ -221,7 +227,7 @@ def get_filing_urls_to_download(
 
             # Prevent rate limiting
             time.sleep(rate_limit)
-            
+
     finally:
         client.close()
 
@@ -253,8 +259,8 @@ def download_and_save_filing(
     save_filename: str,
     *,
     resolve_urls: bool = False,
-    rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
-) -> None:
+    rate_limit: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
+) -> int:
     resp = client.get(download_url, headers={"User-Agent": fake.chrome()})
     resp.raise_for_status()
     filing_text = resp.content
@@ -279,6 +285,8 @@ def download_and_save_filing(
     # Prevent rate limiting
     time.sleep(rate_limit)
 
+    return resp.status_code
+
 
 def download_filings(
     download_folder: Path,
@@ -300,11 +308,15 @@ def download_filings(
     client.mount("https://", HTTPAdapter(max_retries=retries))
 
     try:
-        for filing in filings_to_fetch:
-            
+        for i in range(len(filings_to_fetch)):
+
+            # Use range method to index so the underlying filing
+            # namedtuple can be updated with the HTTP status code.
+            filing = filings_to_fetch[i]
+
             if include_filing_submission:
                 try:
-                    download_and_save_filing(
+                    status = download_and_save_filing(
                         client,
                         download_folder,
                         ticker_or_cik,
@@ -312,9 +324,13 @@ def download_filings(
                         filing_type,
                         filing.full_submission_url,
                         FILING_FULL_SUBMISSION_FILENAME,
-                        rate_limit=rate_limit
+                        rate_limit=rate_limit,
                     )
+                    filing = filing._replace(full_submission_status=status)
                 except requests.exceptions.HTTPError as e:  # pragma: no cover
+                    filing = filing._replace(
+                        full_submission_status=e.response.status_code
+                    )
                     print(
                         "Skipping full submission download for "
                         f"'{filing.accession_number}' due to network error: {e}."
@@ -322,7 +338,7 @@ def download_filings(
 
             if include_filing_details:
                 try:
-                    download_and_save_filing(
+                    status = download_and_save_filing(
                         client,
                         download_folder,
                         ticker_or_cik,
@@ -331,18 +347,21 @@ def download_filings(
                         filing.filing_details_url,
                         filing.filing_details_filename,
                         resolve_urls=True,
-                        rate_limit=rate_limit
+                        rate_limit=rate_limit,
                     )
+                    filing = filing._replace(filing_details_status=status)
                 except requests.exceptions.HTTPError as e:  # pragma: no cover
+                    filing = filing._replace(
+                        filing_details_status=e.response.status_code
+                    )
                     print(
                         f"Skipping filing detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
 
-
             if include_filing_xbrl_details:
                 try:
-                    download_and_save_filing(
+                    status = download_and_save_filing(
                         client,
                         download_folder,
                         ticker_or_cik,
@@ -351,15 +370,23 @@ def download_filings(
                         filing.filing_details_xbrl_url,
                         filing.filing_details_xbrl_filename,
                         resolve_urls=True,
-                        rate_limit=rate_limit
+                        rate_limit=rate_limit,
                     )
+                    filing = filing._replace(filing_details_xbrl_status=status)
                 except requests.exceptions.HTTPError as e:  # pragma: no cover
+                    filing = filing._replace(
+                        filing_details_xbrl_status=e.response.status_code
+                    )
                     print(
                         f"Skipping filing xbrl detail download for "
                         f"'{filing.accession_number}' due to network error: {e}."
                     )
+
+            filings_to_fetch[i] = filing
+
     finally:
         client.close()
+
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
     return len({metadata.accession_number for metadata in filings})

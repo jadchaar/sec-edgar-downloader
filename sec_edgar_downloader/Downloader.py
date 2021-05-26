@@ -5,24 +5,23 @@ from pathlib import Path
 from typing import ClassVar, List, Optional, Union
 
 from ._constants import (
-    DATE_FORMAT_TOKENS, 
-    DEFAULT_AFTER_DATE, 
-    DEFAULT_BEFORE_DATE, 
-    DEFAULT_RATE_LIMIT_SLEEP_INTERVAL
+    DATE_FORMAT_TOKENS,
+    DEFAULT_AFTER_DATE,
+    DEFAULT_BEFORE_DATE,
+    DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
 )
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
 from ._utils import (
-    download_filings,
     FilingMetadata,
+    download_filings,
     get_filing_urls_to_download,
     get_number_of_unique_filings,
     validate_date_format,
 )
 
-class DownloadResults:
 
-    def __init__(self, 
-                 results: FilingMetadata):
+class DownloadResults:
+    def __init__(self, results: FilingMetadata):
 
         self.results = results
         self.length = get_number_of_unique_filings(results)
@@ -51,9 +50,11 @@ class Downloader:
 
     supported_filings: ClassVar[List[str]] = sorted(_SUPPORTED_FILINGS)
 
-    def __init__(self, 
-                 download_folder: Union[str, Path, None] = None,
-                 rate_limit_seconds: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL) -> None:
+    def __init__(
+        self,
+        download_folder: Union[str, Path, None] = None,
+        rate_limit_seconds: float = DEFAULT_RATE_LIMIT_SLEEP_INTERVAL,
+    ) -> None:
         """Constructor for the :class:`Downloader` class."""
         if download_folder is None:
             self.download_folder = Path.cwd()
@@ -92,12 +93,12 @@ class Downloader:
             Defaults to False.
         :param download_details: denotes whether or not to download human-readable and easily
             parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
-        :param download_xbrl_data: denotes whether or not to attempt downloading a zip file 
+        :param download_xbrl_data: denotes whether or not to attempt downloading a zip file
             containing XBRL data for a given filing. Defaults to False.
-        :param download_filing_submission: denotes whether or not to download out the full text submission
-            of the filing or not. Defaults to True.
+        :param download_filing_submission: denotes whether or not to download out the
+            full text submission of the filing or not. Defaults to True.
         :param query: keyword to search for in filing documents.
-        :return: number object contaning the meta data of the filings downloaded and 
+        :return: number object contaning the meta data of the filings downloaded and
             also the number of unique filings.
 
         Usage::
@@ -193,7 +194,7 @@ class Downloader:
             before,
             include_amends,
             query,
-            rate_limit=self._rate_limit_seconds
+            rate_limit=self._rate_limit_seconds,
         )
 
         download_filings(
@@ -204,7 +205,7 @@ class Downloader:
             download_details,
             download_xbrl_data,
             include_filing_submission=download_filing_submission,
-            rate_limit=self._rate_limit_seconds
+            rate_limit=self._rate_limit_seconds,
         )
 
         # Store meta data in a DownloadResults object to return to user.
