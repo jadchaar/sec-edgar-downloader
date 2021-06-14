@@ -35,6 +35,7 @@ FilingMetadata = namedtuple(
     [
         "accession_number",
         "full_submission_url",
+        "full_submission_filename",
         "full_submission_status",
         "filing_details_url",
         "filing_details_filename",
@@ -131,6 +132,7 @@ def build_filing_metadata_from_hit(hit: dict) -> FilingMetadata:
     return FilingMetadata(
         accession_number=accession_number,
         full_submission_url=full_submission_url,
+        full_submission_filename=FILING_FULL_SUBMISSION_FILENAME,
         full_submission_status="",
         filing_details_url=filing_details_url,
         filing_details_filename=filing_details_filename,
