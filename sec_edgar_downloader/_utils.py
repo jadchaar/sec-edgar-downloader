@@ -215,10 +215,14 @@ def get_filing_urls_to_download(
     return filings_to_fetch
 
 
-def resolve_relative_urls_in_filing(filing_text: str, base_url: str) -> str:
+def resolve_relative_urls_in_filing(filing_text: str, download_url: str) -> str:
     soup = BeautifulSoup(filing_text, "lxml")
+    base_url = f"{download_url.rsplit('/', 1)[0]}/"
 
     for url in soup.find_all("a", href=True):
+        # Do not resolve a URL if it is a fragment or it already contains a full URL
+        if url["href"].startswith("#") or url["href"].startswith("http"):
+            continue
         url["href"] = urljoin(base_url, url["href"])
 
     for image in soup.find_all("img", src=True):
@@ -247,8 +251,7 @@ def download_and_save_filing(
 
     # Only resolve URLs in HTML files
     if resolve_urls and Path(save_filename).suffix == ".html":
-        base_url = f"{download_url.rsplit('/', 1)[0]}/"
-        filing_text = resolve_relative_urls_in_filing(filing_text, base_url)
+        filing_text = resolve_relative_urls_in_filing(filing_text, download_url)
 
     # Create all parent directories as needed and write content to file
     save_path = (
