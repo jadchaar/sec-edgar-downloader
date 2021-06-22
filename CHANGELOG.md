@@ -1,5 +1,12 @@
 # Changelog
 
+## 4.2.1 - 6/22/2021
+
+### Fixed
+
+- Anchor links inside of filings are now resolved correctly. Fragments and external links should now function as intended.
+- Renamed `requirements.txt` to `requirements-dev.txt` in order to prevent confusion with the dependencies listed in `setup.py`.
+
 ## 4.2.0 - 5/19/2021
 
 ### New
