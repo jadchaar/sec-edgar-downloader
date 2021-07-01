@@ -8,7 +8,7 @@ SEC_EDGAR_ARCHIVES_BASE_URL = "https://www.sec.gov/Archives/edgar/data"
 # SEC limits users to no more than 10 requests per second
 # Sleep 0.1s between each request to prevent rate-limiting
 # Source: https://www.sec.gov/developer
-SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.1
+SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.2
 
 # Number of times to retry a request to sec.gov
 MAX_RETRIES = 10
