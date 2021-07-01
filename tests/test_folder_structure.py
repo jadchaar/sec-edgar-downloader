@@ -71,23 +71,23 @@ def test_file_structure(downloader):
     assert len(list(filings_save_path.glob("*"))) == 1
 
     # Verify IBM Form 4 download
-    ticker = "IBM"
-    filing_type = "4"
-    dl.get(filing_type, ticker, amount=1, download_details=True)
-    assert len(list((filings_save_path / ticker).glob("*"))) == 1
+    # ticker = "IBM"
+    # filing_type = "4"
+    # dl.get(filing_type, ticker, amount=1, download_details=True)
+    # assert len(list((filings_save_path / ticker).glob("*"))) == 1
 
-    filings_downloaded = list((filings_save_path / ticker / filing_type).glob("*"))
-    assert len(filings_downloaded) == 1
-    filing = filings_downloaded[0]
-    assert len(list(filing.glob("*"))) == 2
+    # filings_downloaded = list((filings_save_path / ticker / filing_type).glob("*"))
+    # assert len(filings_downloaded) == 1
+    # filing = filings_downloaded[0]
+    # assert len(list(filing.glob("*"))) == 2
 
-    downloaded_filing = filing / FILING_FULL_SUBMISSION_FILENAME
-    assert downloaded_filing.exists()
-    assert downloaded_filing.is_file()
+    # downloaded_filing = filing / FILING_FULL_SUBMISSION_FILENAME
+    # assert downloaded_filing.exists()
+    # assert downloaded_filing.is_file()
 
-    downloaded_filing = filing / f"{FILING_DETAILS_FILENAME_STEM}.xml"
-    assert downloaded_filing.exists()
-    assert downloaded_filing.is_file()
+    # downloaded_filing = filing / f"{FILING_DETAILS_FILENAME_STEM}.xml"
+    # assert downloaded_filing.exists()
+    # assert downloaded_filing.is_file()
 
-    # Ensure that two tickers are present after AAPL and IBM downloads
-    assert len(list(filings_save_path.glob("*"))) == 2
+    # # Ensure that two tickers are present after AAPL and IBM downloads
+    # assert len(list(filings_save_path.glob("*"))) == 2
