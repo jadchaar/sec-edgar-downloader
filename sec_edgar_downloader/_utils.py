@@ -245,6 +245,9 @@ def download_and_save_filing(
     *,
     resolve_urls: bool = False,
 ) -> None:
+    # Prevent rate limiting
+    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
+
     resp = client.get(download_url, headers={"User-Agent": fake.chrome()})
     resp.raise_for_status()
     filing_text = resp.content
@@ -264,9 +267,6 @@ def download_and_save_filing(
     )
     save_path.parent.mkdir(parents=True, exist_ok=True)
     save_path.write_bytes(filing_text)
-
-    # Prevent rate limiting
-    time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
 
 def download_filings(

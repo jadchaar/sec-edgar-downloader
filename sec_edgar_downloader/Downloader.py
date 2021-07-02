@@ -1,16 +1,10 @@
 """Provides a :class:`Downloader` class for downloading SEC EDGAR filings."""
 
 import sys
-import time
 from pathlib import Path
 from typing import ClassVar, List, Optional, Union
 
-from ._constants import (
-    DATE_FORMAT_TOKENS,
-    DEFAULT_AFTER_DATE,
-    DEFAULT_BEFORE_DATE,
-    SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL,
-)
+from ._constants import DATE_FORMAT_TOKENS, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FILINGS as _SUPPORTED_FILINGS
 from ._utils import (
     download_filings,
@@ -179,8 +173,6 @@ class Downloader:
             filings_to_fetch,
             download_details,
         )
-
-        time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
 
         # Get number of unique accession numbers downloaded
         return get_number_of_unique_filings(filings_to_fetch)
