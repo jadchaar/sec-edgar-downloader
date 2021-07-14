@@ -1,6 +1,6 @@
 .PHONY: auto test docs clean
 
-auto: build38
+auto: build39
 
 build36: PYTHON_VER = python3.6
 build37: PYTHON_VER = python3.7

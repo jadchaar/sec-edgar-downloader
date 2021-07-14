@@ -1,5 +1,11 @@
 # Changelog
 
+## 4.2.2 - 7/14/2021
+
+### Fixed
+
+- Updated the `User-Agent` header to comply with new [SEC Edgar Fair Access requirements](https://www.sec.gov/os/accessing-edgar-data). This should resolve the 403 network errors some users are encountering when downloading a significant number of filings.
+
 ## 4.2.1 - 6/22/2021
 
 ### Fixed
