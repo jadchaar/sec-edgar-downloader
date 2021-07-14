@@ -156,7 +156,7 @@ def get_filing_urls_to_download(
             resp = client.post(
                 SEC_EDGAR_SEARCH_API_ENDPOINT,
                 json=payload,
-                headers={"User-Agent": fake.chrome()},
+                headers=generate_random_user_agent(),
             )
             resp.raise_for_status()
             search_query_results = resp.json()
@@ -245,7 +245,7 @@ def download_and_save_filing(
     *,
     resolve_urls: bool = False,
 ) -> None:
-    resp = client.get(download_url, headers={"User-Agent": fake.chrome()})
+    resp = client.get(download_url, headers=generate_random_user_agent())
     resp.raise_for_status()
     filing_text = resp.content
 
@@ -320,3 +320,7 @@ def download_filings(
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
     return len({metadata.accession_number for metadata in filings})
+
+
+def generate_random_user_agent() -> dict:
+    return {"User-Agent": f"{fake.first_name()} {fake.last_name()} {fake.email()}"}
