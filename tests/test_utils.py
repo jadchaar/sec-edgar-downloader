@@ -1,6 +1,6 @@
 """Test miscellaneous utility functions."""
 
-from sec_edgar_downloader._utils import resolve_relative_urls_in_filing
+from sec_edgar_downloader._utils import is_cik, resolve_relative_urls_in_filing
 
 
 def test_resolve_relative_urls():
@@ -43,3 +43,14 @@ def test_resolve_relative_urls():
     assert resolved_filing_html.count(f'"{sample_anchor_fragment}"') == 2
     assert resolved_filing_html.count(f'"{base_url}{sample_anchor_html}"') == 1
     assert sample_filing_html.count(f'"{sample_anchor_full_url}"') == 1
+
+
+def test_is_cik():
+    # CIKs are 10 digit identifiers that are zero-padded
+    # if they are shorter than 10 digits long
+    assert is_cik("0000789019")
+    assert is_cik("789019")
+    assert is_cik(789019)
+
+    assert not is_cik("AAPL")
+    assert not is_cik("")

@@ -1,5 +1,25 @@
 # Changelog
 
+## 4.2.2 - 7/14/2021
+
+### New
+
+- CIKs are now automatically zero-padded to 10 digits to ensure that filings are accurately retrieved by the SEC Edgar system. For example, passing either `"0000789019"` or `"789019"` (the CIK for MSFT) to `get()` will yield equivalent results:
+
+```python
+>>> dl.get("10-K", "0000789019", amount=1)
+1
+>>> dl.get("10-K", "789019", amount=1)
+1
+```
+
+### Fixed
+
+- Updated the `User-Agent` header to comply with new [SEC Edgar Fair Access requirements](https://www.sec.gov/os/accessing-edgar-data). This should resolve the 403 network errors some users are encountering when downloading a significant number of filings.
+
+### Changed
+- A `ValueError` is now raised when a CIK of length >10 or a blank ticker/CIK is passed to `get()`.
+
 ## 4.2.1 - 6/22/2021
 
 ### Fixed
