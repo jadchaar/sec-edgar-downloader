@@ -10,6 +10,7 @@ from ._utils import (
     download_filings,
     get_filing_urls_to_download,
     get_number_of_unique_filings,
+    is_cik,
     validate_date_format,
 )
 
@@ -110,6 +111,19 @@ class Downloader:
             >>> dl.get("SD", "AAPL")
         """
         ticker_or_cik = str(ticker_or_cik).strip().upper()
+
+        # Check for blank tickers or CIKs
+        if not ticker_or_cik:
+            raise ValueError("Invalid ticker or CIK. Please enter a non-blank value.")
+
+        # Detect CIKs and ensure that they are properly zero-padded
+        if is_cik(ticker_or_cik):
+            if len(ticker_or_cik) > 10:
+                raise ValueError("Invalid CIK. CIKs must be at most 10 digits long.")
+            # Pad CIK with 0s to ensure that it is exactly 10 digits long
+            # The SEC Edgar Search API requires zero-padded CIKs to ensure
+            # that search results are accurate. Relates to issue #84.
+            ticker_or_cik = ticker_or_cik.zfill(10)
 
         if amount is None:
             # If amount is not specified, obtain all available filings.

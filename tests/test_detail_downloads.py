@@ -1,4 +1,4 @@
-# Regression test for issue 60
+# Regression test for issue #60
 def test_recursion_error_older_filings(downloader):
     dl, _ = downloader
 
