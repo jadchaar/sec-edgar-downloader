@@ -59,9 +59,9 @@ def validate_date_format(date_format: str) -> None:
 
     try:
         datetime.strptime(date_format, DATE_FORMAT_TOKENS)
-    except ValueError:
+    except ValueError as exc:
         # Re-raise with custom error message
-        raise ValueError(f"Incorrect date format. {error_msg_base}")
+        raise ValueError(f"Incorrect date format. {error_msg_base}") from exc
 
 
 def form_request_payload(
@@ -169,13 +169,13 @@ def get_filing_urls_to_download(
                     error_reason = root_cause[0]["reason"]
                     raise EdgarSearchApiError(
                         f"Edgar Search API encountered an error: {error_reason}. "
-                        f"Request payload: {payload}"
+                        f"Request payload:\n{payload}"
                     )
                 except (ValueError, KeyError):  # pragma: no cover
                     raise EdgarSearchApiError(
                         "Edgar Search API encountered an unknown error. "
                         f"Request payload:\n{payload}"
-                    )
+                    ) from None
 
             query_hits = search_query_results["hits"]["hits"]
 
