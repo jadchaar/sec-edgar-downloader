@@ -155,7 +155,7 @@ def get_filing_urls_to_download(
             headers = {
                 "User-Agent": generate_random_user_agent(),
                 "Accept-Encoding": "gzip, deflate",
-                "Host": "www.sec.gov",
+                "Host": "efts.sec.gov",
             }
             resp = client.post(
                 SEC_EDGAR_SEARCH_API_ENDPOINT, json=payload, headers=headers
