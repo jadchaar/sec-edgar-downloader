@@ -152,10 +152,13 @@ def get_filing_urls_to_download(
                 start_index,
                 query,
             )
+            headers = {
+                "User-Agent": generate_random_user_agent(),
+                "Accept-Encoding": "gzip, deflate",
+                "Host": "www.sec.gov",
+            }
             resp = client.post(
-                SEC_EDGAR_SEARCH_API_ENDPOINT,
-                json=payload,
-                headers={"User-Agent": generate_random_user_agent()},
+                SEC_EDGAR_SEARCH_API_ENDPOINT, json=payload, headers=headers
             )
             resp.raise_for_status()
             search_query_results = resp.json()
@@ -244,9 +247,12 @@ def download_and_save_filing(
     *,
     resolve_urls: bool = False,
 ) -> None:
-    resp = client.get(
-        download_url, headers={"User-Agent": generate_random_user_agent()}
-    )
+    headers = {
+        "User-Agent": generate_random_user_agent(),
+        "Accept-Encoding": "gzip, deflate",
+        "Host": "www.sec.gov",
+    }
+    resp = client.get(download_url, headers=headers)
     resp.raise_for_status()
     filing_text = resp.content
 
