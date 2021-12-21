@@ -1,5 +1,10 @@
 # Changelog
 
+## 4.3.0 - 12/21/2021
+
+- Add official support for Python 3.10.
+- Pass `Accept-Encoding: gzip, deflate` and `Host: www.sec.gov` headers into all requests as recommended by the SEC fair access rules: https://www.sec.gov/os/accessing-edgar-data. This should lead to smaller request sizes as all requests are now gzipped. It should also help with 403 Forbidden errors since the package is now conforming with the entire suite of fair access rules.
+
 ## 4.2.2 - 7/14/2021
 
 ### New

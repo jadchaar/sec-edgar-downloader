@@ -35,4 +35,5 @@ def formatted_latest_before_date():
 @pytest.fixture(autouse=True)
 def prevent_rate_limit():
     """Prevent SEC rate-limiting by sleeping between test cases."""
+    yield
     time.sleep(SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL)
