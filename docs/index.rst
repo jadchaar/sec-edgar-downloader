@@ -6,8 +6,8 @@
 API Guide
 ---------
 
-sec_edgar_downloader.Downloader
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Downloader
+^^^^^^^^^^
 
 .. automodule:: sec_edgar_downloader.Downloader
     :members:
