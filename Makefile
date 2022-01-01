@@ -12,7 +12,8 @@ build36 build37 build38 build39 build310: clean
 	$(PYTHON_VER) -m venv venv
 	. venv/bin/activate; \
 	pip install -U pip setuptools wheel; \
-	pip install -r requirements-dev.txt; \
+	pip install -r requirements/requirements-docs.txt; \
+	pip install -r requirements/requirements-tests.txt; \
 	pre-commit install
 
 test:
@@ -22,9 +23,17 @@ test:
 lint:
 	. venv/bin/activate; pre-commit run --all-files --show-diff-on-failure
 
-docs:
+clean-docs:
 	rm -rf docs/_build
-	. venv/bin/activate; cd docs; make html
+
+docs: clean-docs
+	. venv/bin/activate; \
+	cd docs; \
+	make html
+
+live-docs: clean-docs
+	. venv/bin/activate; \
+	sphinx-autobuild docs docs/_build/html
 
 clean: clean-dist
 	rm -rf venv .pytest_cache ./**/__pycache__
@@ -39,6 +48,7 @@ build-dist:
 	python setup.py sdist bdist_wheel
 
 upload-dist:
-	. venv/bin/activate; twine upload dist/*
+	. venv/bin/activate; \
+	twine upload dist/*
 
 publish: test clean-dist build-dist upload-dist clean-dist

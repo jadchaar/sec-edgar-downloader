@@ -12,7 +12,6 @@ jobs:
   test:
     name: ${{ matrix.os }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
-
     strategy:
       # Prevent SEC rate-limiting by limiting number of parallel runners
       max-parallel: 5
@@ -20,8 +19,20 @@ jobs:
       matrix:
         python-version: ["3.6", "3.7", "3.8", "3.9", "3.10"]
         os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+          - os: macos-latest
+            path: ~/Library/Caches/pip
+          - os: windows-latest
+            path: ~\AppData\Local\pip\Cache
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ${{ matrix.path }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
@@ -33,15 +44,24 @@ jobs:
       - name: Test with tox
         run: tox
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
+        uses: codecov/codecov-action@v2
         with:
           file: coverage.xml
 
   lint:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - uses: actions/cache@v2
+        with:
+          path: ~/.cache/pre-commit
+          key: ${{ runner.os }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
+          restore-keys: ${{ runner.os }}-pre-commit-
       - name: Set up Python 3.10
         uses: actions/setup-python@v2
         with:
@@ -51,6 +71,6 @@ jobs:
           pip install -U pip setuptools wheel
           pip install -U tox
       - name: Lint code
-        run: tox -e lint
+        run: tox -e lint -- --show-diff-on-failure
       - name: Lint docs
         run: tox -e docs

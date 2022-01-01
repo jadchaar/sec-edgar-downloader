@@ -1,8 +1,0 @@
-bs4
-Faker
-lxml
-pre-commit
-pytest
-pytest-cov
-requests
-sphinx-autodoc-typehints
