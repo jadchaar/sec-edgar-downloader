@@ -54,6 +54,7 @@ class Downloader:
         include_amends: bool = False,
         download_details: bool = True,
         query: str = "",
+        skip_existing: bool = False,
     ) -> int:
         """Download filings and save them to disk.
 
@@ -70,6 +71,8 @@ class Downloader:
         :param download_details: denotes whether or not to download human-readable and easily
             parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
         :param query: keyword to search for in filing documents.
+        :param skip_existing: whether or not to skip already downloaded files
+
         :return: number of filings downloaded.
 
         Usage::
@@ -186,6 +189,7 @@ class Downloader:
             filing,
             filings_to_fetch,
             download_details,
+            skip_existing,
         )
 
         # Get number of unique accession numbers downloaded

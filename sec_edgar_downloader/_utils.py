@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List
 from urllib.parse import urljoin
+import os
 
 import requests
 from bs4 import BeautifulSoup
@@ -246,7 +247,26 @@ def download_and_save_filing(
     save_filename: str,
     *,
     resolve_urls: bool = False,
+    skip_existing: bool = False,
 ) -> None:
+    # check if path exists already
+    # Create all parent directories as needed and write content to file
+    save_path = (
+        download_folder
+        / ROOT_SAVE_FOLDER_NAME
+        / ticker_or_cik
+        / filing_type
+        / accession_number
+        / save_filename
+    )
+    save_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # quick return if path already exists
+    if os.path.exists(save_path) and skip_existing:
+        # TODO: add logger?
+        print(f"skipping existing filing at {save_path} as requested")
+        return
+
     headers = {
         "User-Agent": generate_random_user_agent(),
         "Accept-Encoding": "gzip, deflate",
@@ -260,16 +280,6 @@ def download_and_save_filing(
     if resolve_urls and Path(save_filename).suffix == ".html":
         filing_text = resolve_relative_urls_in_filing(filing_text, download_url)
 
-    # Create all parent directories as needed and write content to file
-    save_path = (
-        download_folder
-        / ROOT_SAVE_FOLDER_NAME
-        / ticker_or_cik
-        / filing_type
-        / accession_number
-        / save_filename
-    )
-    save_path.parent.mkdir(parents=True, exist_ok=True)
     save_path.write_bytes(filing_text)
 
     # Prevent rate limiting
@@ -282,6 +292,7 @@ def download_filings(
     filing_type: str,
     filings_to_fetch: List[FilingMetadata],
     include_filing_details: bool,
+    skip_existing: bool = False,
 ) -> None:
     client = requests.Session()
     client.mount("http://", HTTPAdapter(max_retries=retries))
@@ -297,6 +308,7 @@ def download_filings(
                     filing_type,
                     filing.full_submission_url,
                     FILING_FULL_SUBMISSION_FILENAME,
+                    skip_existing=skip_existing,
                 )
             except requests.exceptions.HTTPError as e:  # pragma: no cover
                 print(
@@ -315,6 +327,7 @@ def download_filings(
                         filing.filing_details_url,
                         filing.filing_details_filename,
                         resolve_urls=True,
+                        skip_existing=skip_existing,
                     )
                 except requests.exceptions.HTTPError as e:  # pragma: no cover
                     print(
