@@ -323,6 +323,7 @@ def download_filings(
                     )
     finally:
         client.close()
+        return 0
 
 
 def get_number_of_unique_filings(filings: List[FilingMetadata]) -> int:
