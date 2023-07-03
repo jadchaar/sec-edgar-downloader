@@ -53,6 +53,7 @@ class Downloader:
         before: Optional[str] = None,
         include_amends: bool = False,
         download_details: bool = True,
+        useragent_info: Optional[object] = None,
         query: str = "",
     ) -> int:
         """Download filings and save them to disk.
@@ -186,6 +187,7 @@ class Downloader:
             filing,
             filings_to_fetch,
             download_details,
+            useragent_info
         )
 
         # Get number of unique accession numbers downloaded

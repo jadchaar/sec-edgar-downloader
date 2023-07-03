@@ -6,11 +6,15 @@ from pathlib import Path
 from typing import List
 from urllib.parse import urljoin
 
+from typing import List, Optional
+
 import requests
 from bs4 import BeautifulSoup
 from faker import Faker
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
+
+
 
 from ._constants import (
     DATE_FORMAT_TOKENS,
@@ -135,6 +139,7 @@ def get_filing_urls_to_download(
     before_date: str,
     include_amends: bool,
     query: str = "",
+    useragent_info: Optional[str] = None,
 ) -> List[FilingMetadata]:
     filings_to_fetch: List[FilingMetadata] = []
     start_index = 0
@@ -153,7 +158,7 @@ def get_filing_urls_to_download(
                 query,
             )
             headers = {
-                "User-Agent": generate_random_user_agent(),
+                "User-Agent": useragent_info or generate_random_user_agent(),
                 "Accept-Encoding": "gzip, deflate",
                 "Host": "efts.sec.gov",
             }
@@ -246,9 +251,10 @@ def download_and_save_filing(
     save_filename: str,
     *,
     resolve_urls: bool = False,
+    useragent_info: Optional[str] = None,
 ) -> None:
     headers = {
-        "User-Agent": generate_random_user_agent(),
+        "User-Agent": useragent_info or generate_random_user_agent(),
         "Accept-Encoding": "gzip, deflate",
         "Host": "www.sec.gov",
     }
@@ -282,6 +288,7 @@ def download_filings(
     filing_type: str,
     filings_to_fetch: List[FilingMetadata],
     include_filing_details: bool,
+    useragent_info: Optional[str] = None,
 ) -> None:
     client = requests.Session()
     client.mount("http://", HTTPAdapter(max_retries=retries))
@@ -297,6 +304,7 @@ def download_filings(
                     filing_type,
                     filing.full_submission_url,
                     FILING_FULL_SUBMISSION_FILENAME,
+                    useragent_info = useragent_info
                 )
             except requests.exceptions.HTTPError as e:  # pragma: no cover
                 print(
