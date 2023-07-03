@@ -53,7 +53,7 @@ class Downloader:
         before: Optional[str] = None,
         include_amends: bool = False,
         download_details: bool = True,
-        useragent_info: Optional[object] = None,
+        useragent_info: Optional[str] = None,
         query: str = "",
     ) -> int:
         """Download filings and save them to disk.
