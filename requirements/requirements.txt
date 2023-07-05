@@ -1,4 +1,5 @@
-bs4
-Faker
-lxml
+# bs4
+# Faker
+# lxml
 requests
+pyrate-limiter
