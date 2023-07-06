@@ -2,6 +2,7 @@ from datetime import datetime as dt, date
 from ._constants import DATE_FORMAT_TOKENS
 from ._types import DownloadMetadata
 
+
 def is_cik(ticker_or_cik: str) -> bool:
     try:
         int(ticker_or_cik)

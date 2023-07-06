@@ -1,5 +1,5 @@
 import sys
-from typing import Union, Literal
+from typing import Union
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
@@ -18,13 +18,6 @@ class DownloadMetadata:
     before: date = DEFAULT_BEFORE_DATE
     include_amends: bool = False
     download_details: bool = False
-
-
-# @dataclass
-# class FilingMetadata:
-#     """Class for representing internal filing metadata."""
-#     accession_number: str
-#     save_filename: str
 
 
 @dataclass

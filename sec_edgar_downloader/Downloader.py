@@ -32,7 +32,7 @@ class Downloader:
         before: Optional[str] = None,
         include_amends: bool = False,
         download_details: bool = True,
-    ):
+    ) -> int:
         # TODO: add conversion from ticker to CIK
         # TODO: add validation and defaulting
         # TODO: can we rely on class default values rather than manually checking None?
@@ -77,7 +77,7 @@ class Downloader:
         else:
             before = validate_and_parse_date(before)
 
-        filings = fetch_and_save_filings(
+        num_downloaded = fetch_and_save_filings(
             DownloadMetadata(
                 self.download_folder,
                 form,
@@ -85,22 +85,10 @@ class Downloader:
                 limit,
                 after,
                 before,
-                include_amends
+                include_amends,
+                download_details
             ),
             self.user_agent
         )
 
-        print(filings)
-
-        # get_filings(
-        #     DownloadMetadata(
-        #         self.download_folder,
-        #         form,
-        #         ticker_or_cik,
-        #         limit,
-        #         after,
-        #         before,
-        #         include_amends
-        #     ),
-        #     self.user_agent
-        # )
+        return num_downloaded
