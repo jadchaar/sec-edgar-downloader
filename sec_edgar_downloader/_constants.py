@@ -1,4 +1,5 @@
 from datetime import date
+
 from pyrate_limiter import Duration, RequestRate
 
 DATE_FORMAT_TOKENS = "%Y-%m-%d"
@@ -11,7 +12,9 @@ AMENDS_SUFFIX = "/A"
 # https://www.sec.gov/os/webmaster-faq#developers
 SEC_RATE_LIMIT = RequestRate(10, Duration.SECOND)
 
-FILING_URL = "https://www.sec.gov/Archives/edgar/data/{cik}/{acc_num_no_dash}/{document}"
+FILING_URL = (
+    "https://www.sec.gov/Archives/edgar/data/{cik}/{acc_num_no_dash}/{document}"
+)
 SUBMISSIONS_URL = "https://data.sec.gov/submissions/{submission}"
 SUBMISSION_FILE_FORMAT = "CIK{cik}.json"
 STANDARD_HEADERS = {

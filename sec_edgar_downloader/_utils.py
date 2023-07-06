@@ -1,4 +1,6 @@
-from datetime import datetime as dt, date
+from datetime import date
+from datetime import datetime as dt
+
 from ._constants import DATE_FORMAT_TOKENS
 from ._types import DownloadMetadata
 
@@ -25,8 +27,8 @@ def validate_and_parse_date(date_format: str) -> date:
 
 
 def within_requested_date_range(
-        download_metadata: DownloadMetadata,
-        filing_date: str,
+    download_metadata: DownloadMetadata,
+    filing_date: str,
 ) -> bool:
     target_date = dt.strptime(filing_date, DATE_FORMAT_TOKENS).date()
     return download_metadata.after <= target_date <= download_metadata.before

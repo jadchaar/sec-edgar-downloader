@@ -1,15 +1,17 @@
 import sys
-from typing import Union
-from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
-from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from enum import Enum
+from pathlib import Path
+from typing import Union
+
+from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 
 
 @dataclass
 class DownloadMetadata:
     """Class for representing internal download metadata."""
+
     download_folder: Path
     form: str
     cik: str

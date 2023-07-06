@@ -1,17 +1,20 @@
+import sys
 from pathlib import Path
 from typing import Optional
-import sys
-from ._types import DownloadPath, DownloadMetadata
-from ._sec_gateway import fetch_and_save_filings
+
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
-from ._utils import (
-    is_cik,
-    validate_and_parse_date,
-)
+from ._orchestrator import fetch_and_save_filings
+from ._types import DownloadMetadata, DownloadPath
+from ._utils import is_cik, validate_and_parse_date
 
 
 class Downloader:
-    def __init__(self, company_name: str, email_address: str, download_folder: Optional[DownloadPath] = None) -> None:
+    def __init__(
+        self,
+        company_name: str,
+        email_address: str,
+        download_folder: Optional[DownloadPath] = None,
+    ) -> None:
         # TODO: add validation for email
         self.user_agent = f"{company_name} {email_address}"
 
@@ -86,9 +89,9 @@ class Downloader:
                 after,
                 before,
                 include_amends,
-                download_details
+                download_details,
             ),
-            self.user_agent
+            self.user_agent,
         )
 
         return num_downloaded
