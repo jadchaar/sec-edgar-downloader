@@ -1,9 +1,13 @@
 from pathlib import Path
 from typing import Optional
 import sys
-from ._utils import is_cik
 from ._types import DownloadPath, DownloadMetadata
-from ._sec_gateway import get_filings, get_filings_to_download
+from ._sec_gateway import fetch_and_save_filings
+from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
+from ._utils import (
+    is_cik,
+    validate_and_parse_date,
+)
 
 
 class Downloader:
@@ -27,9 +31,11 @@ class Downloader:
         after: Optional[str] = None,
         before: Optional[str] = None,
         include_amends: bool = False,
+        download_details: bool = True,
     ):
         # TODO: add conversion from ticker to CIK
         # TODO: add validation and defaulting
+        # TODO: can we rely on class default values rather than manually checking None?
         ticker_or_cik = str(ticker_or_cik).strip().upper()
 
         # Check for blank tickers or CIKs
@@ -57,7 +63,21 @@ class Downloader:
                     "Invalid amount. Please enter a number greater than 1."
                 )
 
-        filings = get_filings_to_download(
+        # SEC allows for filing searches from 1994 onwards
+        if after is None:
+            after = DEFAULT_AFTER_DATE
+        else:
+            after = validate_and_parse_date(after)
+
+            if after < DEFAULT_AFTER_DATE:
+                after = DEFAULT_AFTER_DATE
+
+        if before is None:
+            before = DEFAULT_BEFORE_DATE
+        else:
+            before = validate_and_parse_date(before)
+
+        filings = fetch_and_save_filings(
             DownloadMetadata(
                 self.download_folder,
                 form,
@@ -69,6 +89,8 @@ class Downloader:
             ),
             self.user_agent
         )
+
+        print(filings)
 
         # get_filings(
         #     DownloadMetadata(
