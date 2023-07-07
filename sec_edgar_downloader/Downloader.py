@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Optional
 
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
-from ._orchestrator import fetch_and_save_filings
+from ._orchestrator import fetch_and_save_filings, get_ticker_to_cik_mapping
 from ._types import DownloadMetadata, DownloadPath
-from ._utils import is_cik, validate_and_parse_date
+from ._utils import validate_and_convert_ticker_or_cik, validate_and_parse_date
 
 
 class Downloader:
@@ -25,6 +25,8 @@ class Downloader:
         else:
             self.download_folder = Path(download_folder).expanduser().resolve()
 
+        self.ticker_to_cik_mapping = get_ticker_to_cik_mapping(self.user_agent)
+
     def get(
         self,
         form: str,
@@ -36,23 +38,11 @@ class Downloader:
         include_amends: bool = False,
         download_details: bool = True,
     ) -> int:
-        # TODO: add conversion from ticker to CIK
         # TODO: add validation and defaulting
         # TODO: can we rely on class default values rather than manually checking None?
-        ticker_or_cik = str(ticker_or_cik).strip().upper()
-
-        # Check for blank tickers or CIKs
-        if not ticker_or_cik:
-            raise ValueError("Invalid ticker or CIK. Please enter a non-blank value.")
-
-        # Detect CIKs and ensure that they are properly zero-padded
-        if is_cik(ticker_or_cik):
-            if len(ticker_or_cik) > 10:
-                raise ValueError("Invalid CIK. CIKs must be at most 10 digits long.")
-            # Pad CIK with 0s to ensure that it is exactly 10 digits long
-            # The SEC Edgar Search API requires zero-padded CIKs to ensure
-            # that search results are accurate. Relates to issue #84.
-            ticker_or_cik = ticker_or_cik.zfill(10)
+        cik = validate_and_convert_ticker_or_cik(
+            ticker_or_cik, self.ticker_to_cik_mapping
+        )
 
         if limit is None:
             # If amount is not specified, obtain all available filings.
@@ -84,7 +74,7 @@ class Downloader:
             DownloadMetadata(
                 self.download_folder,
                 form,
-                ticker_or_cik,
+                cik,
                 limit,
                 after,
                 before,

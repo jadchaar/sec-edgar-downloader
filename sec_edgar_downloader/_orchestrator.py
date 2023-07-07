@@ -1,21 +1,27 @@
 from collections import deque
 from pathlib import Path
-from typing import Any, List
+from typing import Any, Dict, List
 
 from ._constants import (
     AMENDS_SUFFIX,
+    CIK_LENGTH,
     FILING_FULL_SUBMISSION_FILENAME,
-    FILING_URL,
     PRIMARY_DOC_FILENAME_STEM,
     ROOT_SAVE_FOLDER_NAME,
     SUBMISSION_FILE_FORMAT,
-    SUBMISSIONS_URL,
+    URL_FILING,
+    URL_SUBMISSIONS,
 )
-from ._sec_gateway import fetch_from_sec
-from ._types import DownloadMetadata, DownloadType, ToDownload
+from ._sec_gateway import (
+    download_filing,
+    get_list_of_available_filings,
+    get_ticker_metadata,
+)
+from ._types import DownloadMetadata, ToDownload
 from ._utils import within_requested_date_range
 
 
+# TODO: resolve URLs so that images show up in HTML files?
 def save_document(
     filing_text: Any,
     download_metadata: DownloadMetadata,
@@ -41,13 +47,13 @@ def aggregate_filings_to_download(
     filings_to_download: List[ToDownload] = []
     fetched_count = 0
     filings_available = True
-    submissions_uri = SUBMISSIONS_URL.format(
+    submissions_uri = URL_SUBMISSIONS.format(
         submission=SUBMISSION_FILE_FORMAT.format(cik=download_metadata.cik)
     )
     additional_submissions = None
 
     while fetched_count < download_metadata.limit and filings_available:
-        resp_json = fetch_from_sec(submissions_uri, user_agent, DownloadType.API)
+        resp_json = get_list_of_available_filings(submissions_uri, user_agent)
         # First API response is different from further API responses
         if additional_submissions is None:
             filings_json = resp_json["filings"]["recent"]
@@ -76,10 +82,10 @@ def aggregate_filings_to_download(
 
             cik = download_metadata.cik.strip("0")
             acc_num_no_dash = acc_num.replace("-", "")
-            raw_filing_uri = FILING_URL.format(
+            raw_filing_uri = URL_FILING.format(
                 cik=cik, acc_num_no_dash=acc_num_no_dash, document=f"{acc_num}.txt"
             )
-            primary_doc_uri = FILING_URL.format(
+            primary_doc_uri = URL_FILING.format(
                 cik=cik, acc_num_no_dash=acc_num_no_dash, document=doc
             )
             primary_doc_suffix = Path(doc).suffix.replace("htm", "html")
@@ -103,7 +109,7 @@ def aggregate_filings_to_download(
             break
 
         next_page = additional_submissions.popleft()["name"]
-        submissions_uri = SUBMISSIONS_URL.format(submission=next_page)
+        submissions_uri = URL_SUBMISSIONS.format(submission=next_page)
 
     return filings_to_download
 
@@ -112,7 +118,7 @@ def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str)
     successfully_downloaded = 0
     to_download = aggregate_filings_to_download(download_metadata, user_agent)
     for td in to_download:
-        raw_filing = fetch_from_sec(td.raw_filing_uri, user_agent, DownloadType.FILING)
+        raw_filing = download_filing(td.raw_filing_uri, user_agent)
         save_document(
             raw_filing,
             download_metadata,
@@ -121,9 +127,7 @@ def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str)
         )
 
         if download_metadata.download_details:
-            primary_doc = fetch_from_sec(
-                td.primary_doc_uri, user_agent, DownloadType.FILING
-            )
+            primary_doc = download_filing(td.primary_doc_uri, user_agent)
             primary_doc_filename = f"{PRIMARY_DOC_FILENAME_STEM}{td.details_doc_suffix}"
             save_document(
                 primary_doc,
@@ -135,3 +139,18 @@ def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str)
         successfully_downloaded += 1
 
     return successfully_downloaded
+
+
+def get_ticker_to_cik_mapping(user_agent: str) -> Dict[str, str]:
+    ticker_metadata = get_ticker_metadata(user_agent)
+    fields = ticker_metadata["fields"]
+    ticker_data = ticker_metadata["data"]
+
+    # Find index that corresponds with the CIK and ticker fields
+    cik_idx = fields.index("cik")
+    ticker_idx = fields.index("ticker")
+
+    return {
+        str(td[ticker_idx]).upper(): str(td[cik_idx]).zfill(CIK_LENGTH)
+        for td in ticker_data
+    }

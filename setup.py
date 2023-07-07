@@ -19,8 +19,9 @@ setup(
     url="https://github.com/jadchaar/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,
+    # TODO: update this!
     install_requires=["requests", "bs4", "lxml", "Faker"],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
@@ -32,11 +33,11 @@ setup(
         "Topic :: Office/Business :: Financial :: Investment",
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Programming Language :: Python :: 3 :: Only",
         "Operating System :: OS Independent",
     ],

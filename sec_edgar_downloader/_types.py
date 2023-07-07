@@ -1,7 +1,6 @@
 import sys
 from dataclasses import dataclass
 from datetime import date
-from enum import Enum
 from pathlib import Path
 from typing import Union
 
@@ -31,8 +30,3 @@ class ToDownload:
 
 
 DownloadPath = Union[str, Path]
-
-
-class DownloadType(Enum):
-    API = "EdgarAPI"
-    FILING = "EdgarFiling"
