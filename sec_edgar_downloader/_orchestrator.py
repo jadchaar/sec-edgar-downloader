@@ -115,6 +115,8 @@ def aggregate_filings_to_download(
 
 
 def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str) -> int:
+    # TODO: do not download files that already exist
+    # TODO: add try/except around failed downloads and continue
     successfully_downloaded = 0
     to_download = aggregate_filings_to_download(download_metadata, user_agent)
     for td in to_download:

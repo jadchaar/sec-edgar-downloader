@@ -1,14 +1,17 @@
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import ClassVar, List, Optional
 
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
+from ._constants import SUPPORTED_FORMS as _SUPPORTED_FORMS
 from ._orchestrator import fetch_and_save_filings, get_ticker_to_cik_mapping
 from ._types import DownloadMetadata, DownloadPath
 from ._utils import validate_and_convert_ticker_or_cik, validate_and_parse_date
 
 
 class Downloader:
+    supported_forms: ClassVar[List[str]] = sorted(_SUPPORTED_FORMS)
+
     def __init__(
         self,
         company_name: str,
@@ -69,6 +72,13 @@ class Downloader:
             before = DEFAULT_BEFORE_DATE
         else:
             before = validate_and_parse_date(before)
+
+        if form not in _SUPPORTED_FORMS:
+            form_options = ", ".join(self.supported_forms)
+            raise ValueError(
+                f"{form!r} forms are not supported. "
+                f"Please choose from the following: {form_options}."
+            )
 
         num_downloaded = fetch_and_save_filings(
             DownloadMetadata(
