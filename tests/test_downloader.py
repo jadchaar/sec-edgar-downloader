@@ -1,72 +1,65 @@
+from unittest.mock import patch
+
 import pytest
 
 
-def test_invalid_filing_type(downloader):
+def test_invalid_filing_type(downloader, apple_ticker):
     dl, _ = downloader
     invalid_filing_type = "10-INVALID"
-    ticker = "AAPL"
 
     with pytest.raises(ValueError) as exc_info:
-        dl.get(invalid_filing_type, ticker)
+        dl.get(invalid_filing_type, apple_ticker)
 
-    assert "'10-INVALID' forms are not supported" in str(exc_info)
+    assert "'10-INVALID' forms are not supported" in str(exc_info.value)
 
 
-def test_invalid_ticker(downloader):
+def test_invalid_ticker(downloader, form_10k):
     dl, dl_path = downloader
-    filing_type = "10-K"
     invalid_ticker = "INVALIDTICKER"
 
     with pytest.raises(ValueError) as exc_info:
-        dl.get(filing_type, invalid_ticker)
+        dl.get(form_10k, invalid_ticker)
 
-    assert "Ticker is invalid" in str(exc_info)
+    assert "Ticker is invalid" in str(exc_info.value)
 
 
-# def test_invalid_cik(downloader):
-#     dl, _ = downloader
-#     expected_msg = "Invalid CIK. CIKs must be at most 10 digits long."
-#
-#     filing_type = "10-K"
-#     cik = "12345678910"
-#
-#     with pytest.raises(ValueError) as exc_info:
-#         dl.get(filing_type, cik, amount=1)
-#     assert expected_msg in str(exc_info.value)
-#
-#
-# def test_blank_ticker(downloader):
-#     dl, _ = downloader
-#     expected_msg = "Invalid ticker or CIK. Please enter a non-blank value."
-#
-#     filing_type = "10-K"
-#     ticker = ""
-#
-#     with pytest.raises(ValueError) as exc_info:
-#         dl.get(filing_type, ticker, amount=1)
-#     assert expected_msg in str(exc_info.value)
-#
-#
-# def test_cik_zero_padding(downloader):
-#     # Regression test for issue #84
-#     dl, dl_path = downloader
-#
-#     filing_type = "10-K"
-#     cik = "0000789019"
-#     num_filings_downloaded_full_cik = dl.get(filing_type, cik, amount=1)
-#
-#     trimmed_cik = "789019"
-#     num_filings_downloaded_trimmed_cik = dl.get(filing_type, trimmed_cik, amount=1)
-#
-#     assert num_filings_downloaded_full_cik == 1
-#     assert num_filings_downloaded_trimmed_cik == 1
-#
-#     # Both filings should be saved under the directory 0000789019
-#     # if the CIK is properly padded. If zero-padding was not being done
-#     # properly, we would have two parent directories of 789019 and 0000789019.
-#     assert len(list(dl_path.glob("*"))) == 1
-#
-#
+def test_invalid_cik(downloader, form_10k):
+    dl, _ = downloader
+    cik = "12345678910"
+
+    with pytest.raises(ValueError) as exc_info:
+        dl.get(form_10k, cik)
+
+    assert "Invalid CIK" in str(exc_info.value)
+
+
+def test_blank_ticker(downloader, form_10k):
+    dl, _ = downloader
+    expected_msg = "Invalid ticker or CIK. Please enter a non-blank value."
+    ticker = ""
+
+    with pytest.raises(ValueError) as exc_info:
+        dl.get(form_10k, ticker)
+    assert expected_msg in str(exc_info.value)
+
+
+def test_cik_zero_padding(downloader, form_10k, apple_cik):
+    dl, _ = downloader
+
+    with patch(
+        "sec_edgar_downloader.Downloader.fetch_and_save_filings"
+    ) as mocked_fetch:
+        dl.get(form_10k, apple_cik)
+        dl.get(form_10k, apple_cik.strip("0"))
+
+    assert mocked_fetch.call_count == 2
+    assert (
+        mocked_fetch.call_args_list[0].args[0].cik
+        == mocked_fetch.call_args_list[1].args[0].cik
+        == apple_cik
+    )
+
+
 # def test_invalid_num_filings_to_download(downloader):
 #     dl, _ = downloader
 #     expected_msg = "Invalid amount. Please enter a number greater than 1."
