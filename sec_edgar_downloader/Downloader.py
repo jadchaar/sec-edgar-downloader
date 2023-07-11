@@ -73,6 +73,9 @@ class Downloader:
         else:
             before = validate_and_parse_date(before)
 
+        if after > before:
+            raise ValueError("After date cannot be greater than the before date.")
+
         if form not in _SUPPORTED_FORMS:
             form_options = ", ".join(self.supported_forms)
             raise ValueError(
