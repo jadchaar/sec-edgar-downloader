@@ -61,19 +61,19 @@ class Downloader:
 
         # SEC allows for filing searches from 1994 onwards
         if after is None:
-            after = DEFAULT_AFTER_DATE
+            after_date = DEFAULT_AFTER_DATE
         else:
-            after = validate_and_parse_date(after)
+            after_date = validate_and_parse_date(after)
 
-            if after < DEFAULT_AFTER_DATE:
-                after = DEFAULT_AFTER_DATE
+            if after_date < DEFAULT_AFTER_DATE:
+                after_date = DEFAULT_AFTER_DATE
 
         if before is None:
-            before = DEFAULT_BEFORE_DATE
+            before_date = DEFAULT_BEFORE_DATE
         else:
-            before = validate_and_parse_date(before)
+            before_date = validate_and_parse_date(before)
 
-        if after > before:
+        if after_date > before_date:
             raise ValueError("After date cannot be greater than the before date.")
 
         if form not in _SUPPORTED_FORMS:
@@ -89,8 +89,8 @@ class Downloader:
                 form,
                 cik,
                 limit,
-                after,
-                before,
+                after_date,
+                before_date,
                 include_amends,
                 download_details,
             ),
