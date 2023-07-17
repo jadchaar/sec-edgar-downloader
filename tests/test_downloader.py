@@ -104,7 +104,7 @@ def test_equal_before_and_after_dates(downloader, form_10k, apple_cik):
     ) as mocked_fetch:
         dl.get(form_10k, apple_cik, after=dt, before=dt)
 
-    mocked_fetch.assert_called_once()
+    assert mocked_fetch.call_count == 1
 
 
 def test_invalid_before_and_after_date_combos(downloader, form_10k, apple_cik):
@@ -137,7 +137,7 @@ def test_pre_default_after_date(downloader, form_10k, apple_cik):
             after=(dt - timedelta(days=1)).strftime(DATE_FORMAT_TOKENS),
         )
 
-    mocked_fetch.assert_called_once()
+    assert mocked_fetch.call_count == 1
     assert mocked_fetch.call_args_list[0].args[0].after == datetime(1994, 1, 1).date()
 
 

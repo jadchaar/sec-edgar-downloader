@@ -21,15 +21,12 @@ from ._types import DownloadMetadata, ToDownload
 from ._utils import within_requested_date_range
 
 
-# TODO: resolve URLs so that images show up in HTML files?
-def save_document(
-    filing_text: Any,
+def get_save_location(
     download_metadata: DownloadMetadata,
     accession_number: str,
     save_filename: str,
-) -> None:
-    # Create all parent directories as needed and write content to file
-    save_path = (
+) -> Path:
+    return (
         download_metadata.download_folder
         / ROOT_SAVE_FOLDER_NAME
         / download_metadata.cik
@@ -37,8 +34,19 @@ def save_document(
         / accession_number
         / save_filename
     )
+
+
+def save_document(
+    filing_contents: Any,
+    download_metadata: DownloadMetadata,
+    accession_number: str,
+    save_filename: str,
+) -> None:
+    # Create all parent directories as needed and write content to file
+    save_path = get_save_location(download_metadata, accession_number, save_filename)
     save_path.parent.mkdir(parents=True, exist_ok=True)
-    save_path.write_bytes(filing_text)
+    # TODO: resolve URLs so that images show up in HTML files?
+    save_path.write_bytes(filing_contents)
 
 
 def aggregate_filings_to_download(
@@ -80,23 +88,8 @@ def aggregate_filings_to_download(
             ):
                 continue
 
-            cik = download_metadata.cik.strip("0")
-            acc_num_no_dash = acc_num.replace("-", "")
-            raw_filing_uri = URL_FILING.format(
-                cik=cik, acc_num_no_dash=acc_num_no_dash, document=f"{acc_num}.txt"
-            )
-            primary_doc_uri = URL_FILING.format(
-                cik=cik, acc_num_no_dash=acc_num_no_dash, document=doc
-            )
-            primary_doc_suffix = Path(doc).suffix.replace("htm", "html")
-
             filings_to_download.append(
-                ToDownload(
-                    raw_filing_uri,
-                    primary_doc_uri,
-                    acc_num,
-                    primary_doc_suffix,
-                )
+                get_to_download(download_metadata.cik, acc_num, doc)
             )
 
             fetched_count += 1
@@ -112,6 +105,25 @@ def aggregate_filings_to_download(
         submissions_uri = URL_SUBMISSIONS.format(submission=next_page)
 
     return filings_to_download
+
+
+def get_to_download(cik: str, acc_num: str, doc: str) -> ToDownload:
+    cik = cik.strip("0")
+    acc_num_no_dash = acc_num.replace("-", "")
+    raw_filing_uri = URL_FILING.format(
+        cik=cik, acc_num_no_dash=acc_num_no_dash, document=f"{acc_num}.txt"
+    )
+    primary_doc_uri = URL_FILING.format(
+        cik=cik, acc_num_no_dash=acc_num_no_dash, document=doc
+    )
+    primary_doc_suffix = Path(doc).suffix.replace("htm", "html")
+
+    return ToDownload(
+        raw_filing_uri,
+        primary_doc_uri,
+        acc_num,
+        primary_doc_suffix,
+    )
 
 
 def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str) -> int:
