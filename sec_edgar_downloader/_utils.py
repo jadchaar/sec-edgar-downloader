@@ -192,7 +192,8 @@ def get_filing_urls_to_download(
                 is_amend = hit_filing_type[-2:] == "/A"
                 if not include_amends and is_amend:
                     continue
-
+                if is_amend:
+                    num_filings_to_download+=1
                 # Work around bug where incorrect filings are sometimes included.
                 # For example, AAPL 8-K searches include N-Q entries.
                 if not is_amend and hit_filing_type != filing_type:
