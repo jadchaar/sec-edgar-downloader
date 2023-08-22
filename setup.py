@@ -16,7 +16,7 @@ setup(
     description="Download SEC filings from the EDGAR database using Python.",
     long_description=readme,
     long_description_content_type="text/x-rst",
-    url="https://github.com/jadchaar/sec-edgar-downloader",
+    url="https://github.com/codeoftristan/sec-edgar-downloader",
     packages=["sec_edgar_downloader"],
     zip_safe=False,
     install_requires=["requests", "bs4", "lxml", "Faker"],
