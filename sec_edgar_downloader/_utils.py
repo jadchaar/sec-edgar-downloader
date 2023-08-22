@@ -1,5 +1,6 @@
 """Utility functions for the downloader class."""
 import time
+import json
 from collections import namedtuple
 from datetime import datetime
 from pathlib import Path
@@ -206,7 +207,7 @@ def get_filing_urls_to_download(
 
             # Edgar queries 100 entries at a time, but it is best to set this
             # from the response payload in case it changes in the future
-            query_size = search_query_results["query"]["size"]
+            query_size = json.loads(search_query_results["query"])["size"]
             start_index += query_size
 
             # Prevent rate limiting
