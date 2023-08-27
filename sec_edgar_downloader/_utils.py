@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List
 from urllib.parse import urljoin
 
+import json
 import requests
 from bs4 import BeautifulSoup
 from faker import Faker
@@ -206,7 +207,7 @@ def get_filing_urls_to_download(
 
             # Edgar queries 100 entries at a time, but it is best to set this
             # from the response payload in case it changes in the future
-            query_size = search_query_results["query"]["size"]
+            query_size = json.loads(search_query_results["query"])["size"]
             start_index += query_size
 
             # Prevent rate limiting
