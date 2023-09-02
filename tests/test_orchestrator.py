@@ -98,16 +98,17 @@ def test_fetch_and_save_filings_given_download_details(user_agent, form_10k, app
     assert len(actual_user_agent) == 1
     assert actual_user_agent.pop() == user_agent
 
-    # Assert accession number
+    # Assert save locations
     expected_acc_nums = {td.accession_number for td in to_download_list}
-    actual_acc_nums = {c.args[2] for c in mock_save_document.call_args_list}
+    paths = [c.args[1] for c in mock_save_document.call_args_list]
+    actual_acc_nums = {p.parts[3] for p in paths}
     assert len(actual_acc_nums) == 2
     assert expected_acc_nums == actual_acc_nums
 
     # Assert filenames
-    actual_filenames = [c.args[3] for c in mock_save_document.call_args_list]
-    assert actual_filenames.count("primary-document.xml")
-    assert actual_filenames.count("full-submission.txt")
+    actual_filenames = [p.name for p in paths]
+    assert actual_filenames.count("primary-document.xml") == 2
+    assert actual_filenames.count("full-submission.txt") == 2
 
 
 def test_fetch_and_save_filings_skip_download_details(user_agent, form_10k, apple_cik):
@@ -146,6 +147,10 @@ def test_fetch_and_save_filings_skip_download_details(user_agent, form_10k, appl
     assert num_downloaded == 2
     assert mock_download_filing.call_count == 2
     assert mock_save_document.call_count == 2
+
+
+def fetch_and_save_filings_given_paths_that_already_exist():
+    pass
 
 
 def test_get_ticker_to_cik_mapping(user_agent, sample_cik_ticker_payload):

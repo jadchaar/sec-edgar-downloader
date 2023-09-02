@@ -36,16 +36,10 @@ def get_save_location(
     )
 
 
-def save_document(
-    filing_contents: Any,
-    download_metadata: DownloadMetadata,
-    accession_number: str,
-    save_filename: str,
-) -> None:
-    # Create all parent directories as needed and write content to file
-    save_path = get_save_location(download_metadata, accession_number, save_filename)
-    save_path.parent.mkdir(parents=True, exist_ok=True)
+def save_document(filing_contents: Any, save_path: Path) -> None:
     # TODO: resolve URLs so that images show up in HTML files?
+    # Create all parent directories as needed and write content to file
+    save_path.parent.mkdir(parents=True, exist_ok=True)
     save_path.write_bytes(filing_contents)
 
 
@@ -132,23 +126,31 @@ def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str)
     successfully_downloaded = 0
     to_download = aggregate_filings_to_download(download_metadata, user_agent)
     for td in to_download:
-        raw_filing = download_filing(td.raw_filing_uri, user_agent)
-        save_document(
-            raw_filing,
-            download_metadata,
-            td.accession_number,
-            FILING_FULL_SUBMISSION_FILENAME,
-        )
-
-        if download_metadata.download_details:
-            primary_doc = download_filing(td.primary_doc_uri, user_agent)
-            primary_doc_filename = f"{PRIMARY_DOC_FILENAME_STEM}{td.details_doc_suffix}"
-            save_document(
-                primary_doc,
-                download_metadata,
-                td.accession_number,
-                primary_doc_filename,
+        try:
+            save_location = get_save_location(
+                download_metadata, td.accession_number, FILING_FULL_SUBMISSION_FILENAME
             )
+            if not save_location.exists():
+                raw_filing = download_filing(td.raw_filing_uri, user_agent)
+                save_document(raw_filing, save_location)
+
+            if download_metadata.download_details:
+                primary_doc_filename = (
+                    f"{PRIMARY_DOC_FILENAME_STEM}{td.details_doc_suffix}"
+                )
+                save_location = get_save_location(
+                    download_metadata, td.accession_number, primary_doc_filename
+                )
+                if not save_location.exists():
+                    primary_doc = download_filing(td.primary_doc_uri, user_agent)
+                    save_document(primary_doc, save_location)
+        except Exception as e:
+            print(
+                "Error occurred while downloading filing for accession number {}: {}",
+                td.accession_number,
+                e,
+            )
+            continue
 
         successfully_downloaded += 1
 
