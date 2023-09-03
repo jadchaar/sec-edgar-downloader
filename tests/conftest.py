@@ -1,6 +1,9 @@
 """Pytest fixtures for testing suite."""
+import json
 import shutil
-from typing import Any
+from datetime import date, datetime
+from pathlib import Path
+from typing import Any, Dict, Union
 from unittest.mock import patch
 
 import pytest
@@ -76,3 +79,38 @@ def sample_cik_ticker_payload() -> Any:
             [1018724, "AMAZON COM INC", "AMZN", "Nasdaq"],
         ],
     }
+
+
+@pytest.fixture(scope="session")
+def accession_number_to_metadata() -> Dict[str, Dict[str, Union[str, date]]]:
+    test_data_path = Path(__file__).parent / "test_data"
+    filing_data = []
+    for p in test_data_path.glob("*.json"):
+        with p.open() as f:
+            json_output = json.load(f)
+        # First page of SEC Edgar API response
+        if "filings" in json_output:
+            filing_data.append(json_output["filings"]["recent"])
+        # Second page onward of SEC Edgar API response
+        else:
+            filing_data.append(json_output)
+
+    accession_number_to_metadata = {}
+    for fd in filing_data:
+        acc_nums = fd["accessionNumber"]
+        for idx, acc_num in enumerate(acc_nums):
+            acc_num_metadata = {}
+            for key in fd.keys():
+                if key == "accessionNumber":
+                    continue
+                if key == "filingDate":
+                    acc_num_metadata[key] = datetime.strptime(
+                        fd[key][idx], "%Y-%m-%d"
+                    ).date()
+                else:
+                    acc_num_metadata[key] = fd[key][idx]
+            accession_number_to_metadata[acc_num] = acc_num_metadata
+
+    assert len(accession_number_to_metadata) == 1988
+
+    return accession_number_to_metadata
