@@ -68,8 +68,8 @@ def aggregate_filings_to_download(
         documents = filings_json["primaryDocument"]
         filing_dates = filings_json["filingDate"]
 
-        for acc_num, form, doc, f_date in zip(
-            accession_numbers, forms, documents, filing_dates, strict=True
+        for acc_num, form, doc, f_date in zip(  # noqa: B905
+            accession_numbers, forms, documents, filing_dates
         ):
             if (
                 form.rstrip(AMENDS_SUFFIX) != download_metadata.form
