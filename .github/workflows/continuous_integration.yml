@@ -13,9 +13,9 @@ jobs:
     name: ${{ matrix.os }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
-      # Prevent SEC rate-limiting by limiting number of parallel runners
-      max-parallel: 5
-      fail-fast: true
+#      # Prevent SEC rate-limiting by limiting number of parallel runners
+#      max-parallel: 5
+#      fail-fast: true
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
         os: [ubuntu-latest, macos-latest, windows-latest]
