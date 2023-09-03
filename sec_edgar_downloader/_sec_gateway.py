@@ -2,6 +2,7 @@ from typing import Any
 
 import requests
 from pyrate_limiter import Limiter
+from requests import Response
 
 from ._constants import (
     HOST_DATA_SEC,
@@ -15,7 +16,7 @@ limiter = Limiter(SEC_RATE_LIMIT)
 
 
 @limiter.ratelimit("sec_global_rate_limit", delay=True)
-def _call_sec(uri: str, user_agent: str, host: str) -> Any:
+def _call_sec(uri: str, user_agent: str, host: str) -> Response:
     resp = requests.get(
         uri,
         headers={
@@ -28,7 +29,7 @@ def _call_sec(uri: str, user_agent: str, host: str) -> Any:
     return resp
 
 
-def download_filing(uri: str, user_agent: str) -> Any:
+def download_filing(uri: str, user_agent: str) -> bytes:
     return _call_sec(uri, user_agent, HOST_WWW_SEC).content
 
 
