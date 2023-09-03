@@ -241,7 +241,7 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
         after=DEFAULT_AFTER_DATE,
         before=DEFAULT_BEFORE_DATE,
         include_amends=True,
-        download_details=False,
+        download_details=True,
     )
 
     with patch.object(Path, "exists") as mock_exists, patch(
@@ -261,7 +261,7 @@ def test_fetch_and_save_filings_given_exception(user_agent, form_10k, apple_cik)
         download_folder=Path("."),
         form=form_10k,
         cik=apple_cik,
-        limit=1,
+        limit=3,
         after=DEFAULT_AFTER_DATE,
         before=DEFAULT_BEFORE_DATE,
         include_amends=True,

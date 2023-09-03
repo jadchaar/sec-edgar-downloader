@@ -1,9 +1,58 @@
+import os
 from datetime import datetime, timedelta
+from pathlib import Path
 from unittest.mock import patch
 
 import pytest
 
-from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS
+from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS, SUPPORTED_FORMS
+from sec_edgar_downloader.Downloader import Downloader
+
+
+def test_downloader_folder_default_path():
+    downloader = Downloader("foo", "bar@baz.com")
+
+    assert downloader.download_folder == Path.cwd()
+
+
+def test_downloader_folder_given_pathlib_path():
+    downloader = Downloader("foo", "bar@baz.com", Path("folder-foo"))
+
+    assert downloader.download_folder == Path("folder-foo")
+
+
+def test_downloader_folder_given_blank_path():
+    dl = Downloader("foo", "bar@baz.com", "")
+    # pathlib treats blank paths as the current working directory
+    expected = Path.cwd()
+    assert dl.download_folder == expected
+
+
+@pytest.mark.skipif(
+    os.name == "nt", reason="test should only run on Unix-based systems"
+)
+def test_downloader_folder_given_relative_path():
+    dl = Downloader("foo", "bar@baz.com", "./Downloads")
+    expected = Path.cwd() / "Downloads"
+    assert dl.download_folder == expected
+
+
+def test_downloader_folder_given_user_path():
+    dl = Downloader("foo", "bar@baz.com", "~/Downloads")
+    expected = Path.home() / "Downloads"
+    assert dl.download_folder == expected
+
+
+def test_downloader_folder_given_custom_path():
+    custom_path = Path.home() / "Downloads/SEC/EDGAR/Downloader"
+    dl = Downloader("foo", "bar@baz.com", custom_path)
+    assert dl.download_folder == custom_path
+
+
+def test_supported_filings(downloader):
+    dl, _ = downloader
+    expected = sorted(SUPPORTED_FORMS)
+    assert dl.supported_forms == expected
 
 
 def test_invalid_filing_type(downloader, apple_ticker):
@@ -135,6 +184,7 @@ def test_pre_default_after_date(downloader, form_10k, apple_cik):
             form_10k,
             apple_cik,
             after=(dt - timedelta(days=1)).strftime(DATE_FORMAT_TOKENS),
+            limit=1,
         )
 
     assert mocked_fetch.call_count == 1

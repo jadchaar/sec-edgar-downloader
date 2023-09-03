@@ -42,7 +42,6 @@ class Downloader:
         download_details: bool = True,
     ) -> int:
         # TODO: add validation and defaulting
-        # TODO: can we rely on class default values rather than manually checking None?
         cik = validate_and_convert_ticker_or_cik(
             ticker_or_cik, self.ticker_to_cik_mapping
         )

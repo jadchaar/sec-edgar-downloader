@@ -48,13 +48,12 @@ def aggregate_filings_to_download(
 ) -> List[ToDownload]:
     filings_to_download: List[ToDownload] = []
     fetched_count = 0
-    filings_available = True
     submissions_uri = URL_SUBMISSIONS.format(
         submission=SUBMISSION_FILE_FORMAT.format(cik=download_metadata.cik)
     )
     additional_submissions = None
 
-    while fetched_count < download_metadata.limit and filings_available:
+    while fetched_count < download_metadata.limit:
         resp_json = get_list_of_available_filings(submissions_uri, user_agent)
         # First API response is different from further API responses
         if additional_submissions is None:
@@ -88,9 +87,10 @@ def aggregate_filings_to_download(
 
             fetched_count += 1
 
-            # We have reached the requested download limit, so exit early
+            # We have reached the requested download limit, so break inner for loop
+            # early and allow the outer while loop to break.
             if fetched_count == download_metadata.limit:
-                return filings_to_download
+                break
 
         if len(additional_submissions) == 0:
             break
