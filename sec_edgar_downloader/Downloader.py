@@ -10,6 +10,33 @@ from ._utils import validate_and_convert_ticker_or_cik, validate_and_parse_date
 
 
 class Downloader:
+    """A :class:`Downloader` object.
+
+    :param company_name: company name to comply with SEC Edgar's programmatic downloading
+        fair access policy. All programmatic SEC interactions must declare a header comprised
+        of a company name and email address.
+        More info: https://www.sec.gov/os/webmaster-faq#code-support.
+    :param email_address: email address to comply with SEC Edgar's programmatic downloading
+        fair access policy. All programmatic SEC interactions must declare a header comprised
+        of a company name and email address.
+        More info: https://www.sec.gov/os/webmaster-faq#code-support.
+    :param download_folder: relative or absolute path to download location.
+        Defaults to the current working directory.
+
+    Usage::
+
+        >>> from sec_edgar_downloader import Downloader
+
+        # Download to current working directory.
+        # Must declare company name and email address to comply with SEC Edgar's
+        # programmatic downloading fair access policy.
+        # More info: https://www.sec.gov/os/webmaster-faq#code-support
+        >>> dl = Downloader("Personal", "foo.bar@baz.com")
+
+        # Download to relative or absolute path
+        >>> dl = Downloader("Personal", "foo.bar@baz.com", "/path/to/valid/save/location")
+    """
+
     supported_forms: ClassVar[List[str]] = sorted(_SUPPORTED_FORMS)
 
     def __init__(
@@ -18,7 +45,7 @@ class Downloader:
         email_address: str,
         download_folder: Optional[DownloadPath] = None,
     ) -> None:
-        # TODO: add validation for email
+        """Constructor for the :class:`Downloader` class."""
         self.user_agent = f"{company_name} {email_address}"
 
         if download_folder is None:
@@ -41,6 +68,59 @@ class Downloader:
         include_amends: bool = False,
         download_details: bool = True,
     ) -> int:
+        """Download filings and save them to disk.
+
+        :param form: form type to download (e.g. 8-K, 10-K).
+        :param ticker_or_cik: ticker or CIK for whcih to download filings.
+        :param limit: max number of filings to download.
+            Defaults to all available filings.
+        :param after: date of form YYYY-MM-DD after which to download filings.
+            Date or datetime objects can also be passed.
+            Defaults to 1994-01-01, the earliest date supported by SEC EDGAR.
+        :param before: date of form YYYY-MM-DD before which to download filings.
+            Date or datetime objects can also be passed.
+            Defaults to today.
+        :param include_amends: denotes whether to include filing amends (e.g. 8-K/A).
+            Defaults to False.
+        :param download_details: denotes whether to download human-readable and easily
+            parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
+        :return: number of filings downloaded.
+
+        Usage::
+
+            >>> from sec_edgar_downloader import Downloader
+            >>> dl = Downloader()
+
+            # Get all 8-K filings for Apple
+            >>> dl.get("8-K", "AAPL")
+
+            # Get all 8-K filings for Apple, including filing amends (8-K/A)
+            >>> dl.get("8-K", "AAPL", include_amends=True)
+
+            # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
+            >>> dl.get("8-K", "AAPL", after="2017-01-01", before="2017-03-25")
+
+            # Get the five most recent 10-K filings for Apple
+            >>> dl.get("10-K", "AAPL", limit=5)
+
+            # Get all 10-K filings for Apple, excluding the filing detail documents
+            >>> dl.get("10-K", "AAPL", amount=1, download_details=False)
+
+            # Get all 10-Q filings for Visa
+            >>> dl.get("10-Q", "V")
+
+            # Get all 13F-NT filings for the Vanguard Group
+            >>> dl.get("13F-NT", "0000102909")
+
+            # Get all 13F-HR filings for the Vanguard Group
+            >>> dl.get("13F-HR", "0000102909")
+
+            # Get all SC 13G filings for Apple
+            >>> dl.get("SC 13G", "AAPL")
+
+            # Get all SD filings for Apple
+            >>> dl.get("SD", "AAPL")
+        """
         cik = validate_and_convert_ticker_or_cik(
             ticker_or_cik, self.ticker_to_cik_mapping
         )

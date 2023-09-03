@@ -1,16 +1,12 @@
 from datetime import date
 
-from pyrate_limiter import Duration, RequestRate
-
 DATE_FORMAT_TOKENS = "%Y-%m-%d"
 DEFAULT_BEFORE_DATE = date.today()
 DEFAULT_AFTER_DATE = date(1994, 1, 1)
 
 AMENDS_SUFFIX = "/A"
 
-# 10 requests per second rate limit set by SEC:
-# https://www.sec.gov/os/webmaster-faq#developers
-SEC_RATE_LIMIT = RequestRate(10, Duration.SECOND)
+SEC_REQUESTS_PER_SEC_MAX = 10
 
 HOST_WWW_SEC = "www.sec.gov"
 HOST_DATA_SEC = "data.sec.gov"
