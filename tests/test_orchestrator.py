@@ -1,8 +1,10 @@
 import json
 import sys
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 from requests.exceptions import RequestException
 
 from sec_edgar_downloader._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
@@ -49,17 +51,37 @@ def test_save_document(tmp_path):
     assert save_path.stat().st_size > 0
 
 
-def test_aggregate_filings_to_download_given_multiple_pages_and_no_limit(
-    user_agent, form_10k, apple_cik, accession_number_to_metadata
+@pytest.mark.parametrize(
+    "limit,after_date,before_date,include_amends,expected_num_results",
+    [
+        # Test limit handling
+        (3, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 3),
+        (sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 27),
+        # Test amends handling
+        (sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, True, 29),
+        # Test date range handling
+        (sys.maxsize, date(2008, 1, 1), date(2012, 1, 1), False, 4),
+    ],
+)
+def test_aggregate_filings_to_download_given_multiple_pages(
+    user_agent,
+    form_10k,
+    apple_cik,
+    accession_number_to_metadata,
+    limit: int,
+    after_date: date,
+    before_date: date,
+    include_amends: bool,
+    expected_num_results: int,
 ):
     download_metadata = DownloadMetadata(
         download_folder=Path("."),
         form=form_10k,
         cik=apple_cik,
-        limit=sys.maxsize,
-        after=DEFAULT_AFTER_DATE,
-        before=DEFAULT_BEFORE_DATE,
-        include_amends=True,
+        limit=limit,
+        after=after_date,
+        before=before_date,
+        include_amends=include_amends,
         download_details=True,
     )
 
@@ -71,46 +93,14 @@ def test_aggregate_filings_to_download_given_multiple_pages_and_no_limit(
         )
         result = aggregate_filings_to_download(download_metadata, user_agent)
 
-    assert len(result) == 27
+    assert len(result) == expected_num_results
     for td in result:
-        acc_num = td.accession_number
-        metadata = accession_number_to_metadata[acc_num]
-        assert metadata["form"] == form_10k
-        assert metadata["filingDate"] >= DEFAULT_AFTER_DATE
-        assert metadata["filingDate"] <= DEFAULT_BEFORE_DATE
-
-
-def test_aggregate_filings_to_download_given_multiple_pages_and_configured_limit(
-    user_agent, form_10k, apple_cik
-):
-    download_metadata = DownloadMetadata(
-        download_folder=Path("."),
-        form=form_10k,
-        cik=apple_cik,
-        limit=3,
-        after=DEFAULT_AFTER_DATE,
-        before=DEFAULT_BEFORE_DATE,
-        include_amends=True,
-        download_details=True,
-    )
-
-    with patch(
-        "sec_edgar_downloader._sec_gateway.get_list_of_available_filings"
-    ) as mock_get_list_of_available_filings:
-        mock_get_list_of_available_filings.side_effect = (
-            _mock_sec_api_response_multi_page
+        metadata = accession_number_to_metadata[td.accession_number]
+        assert metadata["form"] == form_10k or (
+            include_amends and metadata["form"] == f"{form_10k}/A"
         )
-        result = aggregate_filings_to_download(download_metadata, user_agent)
-
-    assert len(result) == 3
-
-
-# TODO: test date ranges
-# TODO: test including amends
-
-
-# def test_aggregate_filings_to_download_given_multiple_pages():
-#     assert False
+        assert metadata["filingDate"] >= after_date
+        assert metadata["filingDate"] <= before_date
 
 
 def test_get_to_download_given_xml(apple_cik, accession_number, form_4_primary_doc):

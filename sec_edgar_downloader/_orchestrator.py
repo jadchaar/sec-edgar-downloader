@@ -73,7 +73,7 @@ def aggregate_filings_to_download(
             accession_numbers, forms, documents, filing_dates, strict=True
         ):
             if (
-                form != download_metadata.form
+                form.rstrip(AMENDS_SUFFIX) != download_metadata.form
                 or (
                     not download_metadata.include_amends
                     and form.endswith(AMENDS_SUFFIX)
