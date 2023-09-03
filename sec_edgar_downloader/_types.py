@@ -1,6 +1,6 @@
 import sys
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from typing import Union
 
@@ -30,3 +30,5 @@ class ToDownload:
 
 
 DownloadPath = Union[str, Path]
+
+Date = Union[str, date, datetime]

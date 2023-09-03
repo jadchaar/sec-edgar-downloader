@@ -82,6 +82,11 @@ def sample_cik_ticker_payload() -> Any:
 
 
 @pytest.fixture(scope="session")
+def sample_ticker_to_cik_mapping() -> Any:
+    return {"AAPL": "0000320193", "MSFT": "0000789019"}
+
+
+@pytest.fixture(scope="session")
 def accession_number_to_metadata() -> Dict[str, Dict[str, Union[str, date]]]:
     test_data_path = Path(__file__).parent / "test_data"
     filing_data = []

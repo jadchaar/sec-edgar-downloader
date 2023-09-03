@@ -189,12 +189,3 @@ def test_pre_default_after_date(downloader, form_10k, apple_cik):
 
     assert mocked_fetch.call_count == 1
     assert mocked_fetch.call_args_list[0].args[0].after == datetime(1994, 1, 1).date()
-
-
-def test_non_string_date(downloader, form_10k, apple_cik):
-    dl, _ = downloader
-
-    dt = datetime(2023, 1, 1)
-
-    with pytest.raises(TypeError):
-        dl.get(form_10k, apple_cik, after=dt)

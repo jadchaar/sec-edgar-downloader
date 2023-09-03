@@ -5,7 +5,7 @@ from typing import ClassVar, List, Optional
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FORMS as _SUPPORTED_FORMS
 from ._orchestrator import fetch_and_save_filings, get_ticker_to_cik_mapping
-from ._types import DownloadMetadata, DownloadPath
+from ._types import Date, DownloadMetadata, DownloadPath
 from ._utils import validate_and_convert_ticker_or_cik, validate_and_parse_date
 
 
@@ -36,12 +36,11 @@ class Downloader:
         ticker_or_cik: str,
         *,
         limit: Optional[int] = None,
-        after: Optional[str] = None,
-        before: Optional[str] = None,
+        after: Optional[Date] = None,
+        before: Optional[Date] = None,
         include_amends: bool = False,
         download_details: bool = True,
     ) -> int:
-        # TODO: add validation and defaulting
         cik = validate_and_convert_ticker_or_cik(
             ticker_or_cik, self.ticker_to_cik_mapping
         )
