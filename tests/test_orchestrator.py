@@ -86,7 +86,8 @@ def test_aggregate_filings_to_download_given_multiple_pages(
     )
 
     with patch(
-        "sec_edgar_downloader._sec_gateway.get_list_of_available_filings"
+        "sec_edgar_downloader._orchestrator.get_list_of_available_filings",
+        autospec=True,
     ) as mock_get_list_of_available_filings:
         mock_get_list_of_available_filings.side_effect = (
             _mock_sec_api_response_multi_page
@@ -156,9 +157,9 @@ def test_fetch_and_save_filings_given_download_details(user_agent, form_10k, app
         "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
         new=lambda x, y: to_download_list,
     ), patch(
-        "sec_edgar_downloader._orchestrator.download_filing",
+        "sec_edgar_downloader._orchestrator.download_filing", autospec=True
     ) as mock_download_filing, patch(
-        "sec_edgar_downloader._orchestrator.save_document",
+        "sec_edgar_downloader._orchestrator.save_document", autospec=True
     ) as mock_save_document:
         num_downloaded = fetch_and_save_filings(download_metadata, user_agent)
 
@@ -219,9 +220,9 @@ def test_fetch_and_save_filings_skip_download_details(user_agent, form_10k, appl
         "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
         new=lambda x, y: to_download_list,
     ), patch(
-        "sec_edgar_downloader._orchestrator.download_filing",
+        "sec_edgar_downloader._orchestrator.download_filing", autospec=True
     ) as mock_download_filing, patch(
-        "sec_edgar_downloader._orchestrator.save_document",
+        "sec_edgar_downloader._orchestrator.save_document", autospec=True
     ) as mock_save_document:
         num_downloaded = fetch_and_save_filings(download_metadata, user_agent)
 
@@ -233,22 +234,41 @@ def test_fetch_and_save_filings_skip_download_details(user_agent, form_10k, appl
 def test_fetch_and_save_filings_given_paths_that_already_exist(
     user_agent, form_10k, apple_cik
 ):
+    limit = 2
     download_metadata = DownloadMetadata(
         download_folder=Path("."),
         form=form_10k,
         cik=apple_cik,
-        limit=1,
+        limit=limit,
         after=DEFAULT_AFTER_DATE,
         before=DEFAULT_BEFORE_DATE,
         include_amends=True,
         download_details=True,
     )
 
-    with patch.object(Path, "exists") as mock_exists, patch(
-        "sec_edgar_downloader._orchestrator.download_filing",
-    ) as mock_download_filing, patch(
-        "sec_edgar_downloader._orchestrator.save_document",
-    ) as mock_save_document:
+    to_download_list = [
+        ToDownload(
+            raw_filing_uri=f"raw_{i}",
+            primary_doc_uri=f"pd_{i}",
+            accession_number=f"acc_num_{i}",
+            details_doc_suffix=".xml",
+        )
+        for i in range(limit)
+    ]
+
+    with (
+        patch.object(Path, "exists") as mock_exists,
+        patch(
+            "sec_edgar_downloader._orchestrator.download_filing", autospec=True
+        ) as mock_download_filing,
+        patch(
+            "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
+            new=lambda x, y: to_download_list,
+        ),
+        patch(
+            "sec_edgar_downloader._orchestrator.save_document", autospec=True
+        ) as mock_save_document,
+    ):
         mock_exists.return_value = True
         fetch_and_save_filings(download_metadata, user_agent)
 
@@ -257,21 +277,35 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
 
 
 def test_fetch_and_save_filings_given_exception(user_agent, form_10k, apple_cik):
+    limit = 2
     download_metadata = DownloadMetadata(
         download_folder=Path("."),
         form=form_10k,
         cik=apple_cik,
-        limit=3,
+        limit=limit,
         after=DEFAULT_AFTER_DATE,
         before=DEFAULT_BEFORE_DATE,
         include_amends=True,
         download_details=False,
     )
 
+    to_download_list = [
+        ToDownload(
+            raw_filing_uri=f"raw_{i}",
+            primary_doc_uri=f"pd_{i}",
+            accession_number=f"acc_num_{i}",
+            details_doc_suffix=".xml",
+        )
+        for i in range(limit)
+    ]
+
     with patch(
-        "sec_edgar_downloader._orchestrator.download_filing",
+        "sec_edgar_downloader._orchestrator.download_filing", autospec=True
     ) as mock_download_filing, patch(
-        "sec_edgar_downloader._orchestrator.save_document",
+        "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
+        new=lambda x, y: to_download_list,
+    ), patch(
+        "sec_edgar_downloader._orchestrator.save_document", autospec=True
     ) as mock_save_document:
         mock_download_filing.side_effect = RequestException("Error")
         fetch_and_save_filings(download_metadata, user_agent)
@@ -295,7 +329,7 @@ def test_get_ticker_to_cik_mapping(user_agent, sample_cik_ticker_payload):
 
 
 def _mock_sec_api_response_multi_page(submissions_uri, _):
-    json_path = Path("test_data") / submissions_uri.split("/")[-1]
+    json_path = Path(__file__).parent / "test_data" / submissions_uri.split("/")[-1]
     assert json_path.exists()
     with json_path.open() as f:
         return json.load(f)

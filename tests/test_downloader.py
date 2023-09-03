@@ -9,41 +9,47 @@ from sec_edgar_downloader._constants import DATE_FORMAT_TOKENS, SUPPORTED_FORMS
 from sec_edgar_downloader.Downloader import Downloader
 
 
-def test_downloader_folder_default_path():
-    downloader = Downloader("foo", "bar@baz.com")
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
+def test_downloader_folder_default_path(_):
+    dl = Downloader("foo", "bar@baz.com")
 
-    assert downloader.download_folder == Path.cwd()
-
-
-def test_downloader_folder_given_pathlib_path():
-    downloader = Downloader("foo", "bar@baz.com", Path("folder-foo"))
-
-    assert downloader.download_folder == Path("folder-foo")
+    assert dl.download_folder == Path.cwd()
 
 
-def test_downloader_folder_given_blank_path():
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
+def test_downloader_folder_given_pathlib_path(_):
+    dl = Downloader("foo", "bar@baz.com", Path("folder-foo"))
+
+    assert dl.download_folder == Path("folder-foo")
+
+
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
+def test_downloader_folder_given_blank_path(_):
     dl = Downloader("foo", "bar@baz.com", "")
     # pathlib treats blank paths as the current working directory
     expected = Path.cwd()
     assert dl.download_folder == expected
 
 
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
 @pytest.mark.skipif(
     os.name == "nt", reason="test should only run on Unix-based systems"
 )
-def test_downloader_folder_given_relative_path():
+def test_downloader_folder_given_relative_path(_):
     dl = Downloader("foo", "bar@baz.com", "./Downloads")
     expected = Path.cwd() / "Downloads"
     assert dl.download_folder == expected
 
 
-def test_downloader_folder_given_user_path():
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
+def test_downloader_folder_given_user_path(_):
     dl = Downloader("foo", "bar@baz.com", "~/Downloads")
     expected = Path.home() / "Downloads"
     assert dl.download_folder == expected
 
 
-def test_downloader_folder_given_custom_path():
+@patch("sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True)
+def test_downloader_folder_given_custom_path(_):
     custom_path = Path.home() / "Downloads/SEC/EDGAR/Downloader"
     dl = Downloader("foo", "bar@baz.com", custom_path)
     assert dl.download_folder == custom_path
@@ -100,7 +106,7 @@ def test_cik_zero_padding(downloader, form_10k, apple_cik):
     dl, _ = downloader
 
     with patch(
-        "sec_edgar_downloader.Downloader.fetch_and_save_filings"
+        "sec_edgar_downloader.Downloader.fetch_and_save_filings", autospec=True
     ) as mocked_fetch:
         dl.get(form_10k, apple_cik)
         dl.get(form_10k, apple_cik.strip("0"))
@@ -149,7 +155,7 @@ def test_equal_before_and_after_dates(downloader, form_10k, apple_cik):
     dt = datetime(2019, 11, 15).strftime(DATE_FORMAT_TOKENS)
 
     with patch(
-        "sec_edgar_downloader.Downloader.fetch_and_save_filings"
+        "sec_edgar_downloader.Downloader.fetch_and_save_filings", autospec=True
     ) as mocked_fetch:
         dl.get(form_10k, apple_cik, after=dt, before=dt)
 
@@ -178,7 +184,7 @@ def test_pre_default_after_date(downloader, form_10k, apple_cik):
     dt = datetime(1900, 11, 15)
 
     with patch(
-        "sec_edgar_downloader.Downloader.fetch_and_save_filings"
+        "sec_edgar_downloader.Downloader.fetch_and_save_filings", autospec=True
     ) as mocked_fetch:
         dl.get(
             form_10k,

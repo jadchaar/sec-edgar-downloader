@@ -43,28 +43,28 @@ def mock_sec_request(*args, **kwargs):
     return MockResponse(None, None, 404)
 
 
-@mock.patch("requests.get", side_effect=mock_sec_request)
+@mock.patch("requests.get", side_effect=mock_sec_request, autospec=True)
 def test_download_filing(_):
     download_filing("data.sec.gov/submissions/", "user_agent")
 
 
-@mock.patch("requests.get", side_effect=mock_sec_request)
+@mock.patch("requests.get", side_effect=mock_sec_request, autospec=True)
 def test_get_list_of_available_filings(_):
     get_list_of_available_filings("sec.gov/Archives/edgar/data/", "user_agent")
 
 
-@mock.patch("requests.get", side_effect=mock_sec_request)
+@mock.patch("requests.get", side_effect=mock_sec_request, autospec=True)
 def test_get_ticker_metadata(_):
     get_ticker_metadata("user_agent")
 
 
-@mock.patch("requests.get", side_effect=mock_sec_request)
+@mock.patch("requests.get", side_effect=mock_sec_request, autospec=True)
 def test_call_sec_exception(_):
     with pytest.raises(RequestException):
         _call_sec("non-existent-url", "user_agent", "host")
 
 
-@mock.patch("requests.get", side_effect=mock_sec_request)
+@mock.patch("requests.get", side_effect=mock_sec_request, autospec=True)
 def test_call_sec_rate_limit(_):
     start = time.time()
     # SEC allows up to 10 requests per second before throttling customer requests
