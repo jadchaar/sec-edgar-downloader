@@ -10,7 +10,7 @@ on:
 
 jobs:
   unit-tests:
-    name: ${{ matrix.os }} (${{ matrix.python-version }})
+    name: Unit tests | ${{ matrix.os }} | Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -47,7 +47,7 @@ jobs:
           file: coverage.xml
 
   integration-tests:
-    name: ${{ matrix.os }} (${{ matrix.python-version }})
+    name: Integration tests | ${{ matrix.os }} | Python ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       # Run integration tests on a single OS at a time to prevent SEC rate-limiting
@@ -82,6 +82,7 @@ jobs:
         run: tox -e integration
 
   linting:
+    name: Unit tests | ${{ runner.os }} | Python ${{ runner.python-version }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -95,7 +96,7 @@ jobs:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
           restore-keys: ${{ runner.os }}-pre-commit-
-      - name: Set up Python 3.11
+      - name: Set up Python ${{ runner.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"
