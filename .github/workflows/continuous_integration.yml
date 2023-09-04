@@ -9,7 +9,7 @@ on:
     - cron: "0 0 1 * *"
 
 jobs:
-  test:
+  unit-tests:
     name: ${{ matrix.os }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -46,7 +46,7 @@ jobs:
         with:
           file: coverage.xml
 
-  integration-test:
+  integration-tests:
     name: ${{ matrix.os }} (${{ matrix.python-version }})
     runs-on: ${{ matrix.os }}
     strategy:
@@ -81,7 +81,7 @@ jobs:
       - name: Test with tox
         run: tox -e integration
 
-  lint:
+  linting:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
