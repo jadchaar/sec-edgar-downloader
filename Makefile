@@ -42,10 +42,10 @@ clean: clean-dist
 clean-dist:
 	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
 
-build-dist:
+build-dist: clean-dist
 	. venv/bin/activate; \
-	pip install -U setuptools twine wheel; \
-	python setup.py sdist bdist_wheel
+	pip install -U flit; \
+	flit build
 
 upload-dist:
 	. venv/bin/activate; \
