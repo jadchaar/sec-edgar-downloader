@@ -51,6 +51,9 @@ def test_save_document(tmp_path):
     assert save_path.stat().st_size > 0
 
 
+@pytest.mark.skipif(
+    not (Path(__file__).parent / "test_data").exists(), reason="test data is required"
+)
 @pytest.mark.parametrize(
     "limit,after_date,before_date,include_amends,expected_num_results",
     [
@@ -257,7 +260,7 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
     ]
 
     with (
-        patch.object(Path, "exists") as mock_exists,
+        patch.object(Path, "exists", return_value=True),
         patch(
             "sec_edgar_downloader._orchestrator.download_filing", autospec=True
         ) as mock_download_filing,
@@ -269,7 +272,6 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
             "sec_edgar_downloader._orchestrator.save_document", autospec=True
         ) as mock_save_document,
     ):
-        mock_exists.return_value = True
         fetch_and_save_filings(download_metadata, user_agent)
 
     assert mock_download_filing.call_count == 0
