@@ -10,7 +10,7 @@ on:
 
 jobs:
   unit-tests:
-    name: Unit tests | ${{ matrix.os }} | Python ${{ matrix.python-version }}
+    name: Unit tests | Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -47,7 +47,7 @@ jobs:
           file: coverage.xml
 
   integration-tests:
-    name: Integration tests | ${{ matrix.os }} | Python ${{ matrix.python-version }}
+    name: Integration tests | Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
       # Run integration tests on a single OS at a time to prevent SEC rate-limiting
