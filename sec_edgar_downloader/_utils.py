@@ -36,7 +36,7 @@ def validate_and_convert_ticker_or_cik(
 
     if cik is None:
         raise ValueError(
-            "Ticker is invalid and cannot be mapped to a CIK. "
+            f"Ticker {repr(ticker_or_cik)} is invalid and cannot be mapped to a CIK. "
             "Please enter a valid ticker or CIK."
         )
 

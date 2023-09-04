@@ -4,7 +4,6 @@ import shutil
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Dict, Union
-from unittest.mock import patch
 
 import pytest
 
@@ -12,15 +11,10 @@ from sec_edgar_downloader import Downloader
 
 
 @pytest.fixture(scope="function")
-def downloader(tmp_path, apple_cik, apple_ticker, company_name, email):
-    with patch(
-        "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
-        autospec=True,
-        return_value={"AAPL": "0000320193"},
-    ):
-        dl = Downloader(company_name, email, tmp_path)
-        yield dl, tmp_path
-        shutil.rmtree(tmp_path)
+def network_downloader(tmp_path, apple_cik, apple_ticker, company_name, email):
+    dl = Downloader(company_name, email, tmp_path)
+    yield dl, tmp_path
+    shutil.rmtree(tmp_path)
 
 
 @pytest.fixture(scope="session")
@@ -88,7 +82,7 @@ def sample_ticker_to_cik_mapping() -> Any:
 
 @pytest.fixture(scope="session")
 def accession_number_to_metadata() -> Dict[str, Dict[str, Union[str, date]]]:
-    test_data_path = Path(__file__).parent / "test_data"
+    test_data_path = Path(__file__).parent / "test_data" / "sample_api_responses"
     filing_data = []
     for p in test_data_path.glob("*.json"):
         with p.open() as f:

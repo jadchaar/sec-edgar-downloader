@@ -18,13 +18,13 @@ repos:
       - id: fix-encoding-pragma
         args: [--remove]
       - id: trailing-whitespace
-        exclude: ^tests/sample-filings/
+        exclude: ^tests/test_data
   - repo: https://github.com/timothycrosley/isort
     rev: 5.12.0
     hooks:
       - id: isort
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.9.0
+    rev: v3.10.1
     hooks:
       - id: pyupgrade
         args: [--py36-plus]
@@ -46,7 +46,7 @@ repos:
       - id: black
         args: [--quiet, --target-version=py36]
   - repo: https://github.com/pycqa/flake8
-    rev: 6.0.0
+    rev: 6.1.0
     hooks:
       - id: flake8
         additional_dependencies: [flake8-bugbear, flake8-comprehensions]

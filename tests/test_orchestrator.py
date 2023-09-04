@@ -40,6 +40,28 @@ def test_get_save_location(user_agent, form_10k, apple_cik):
     )
 
 
+def test_get_save_location_given_ticker(user_agent, form_10k, apple_cik):
+    download_metadata = DownloadMetadata(
+        download_folder=Path("."),
+        form=form_10k,
+        cik=apple_cik,
+        limit=1,
+        after=DEFAULT_AFTER_DATE,
+        before=DEFAULT_BEFORE_DATE,
+        include_amends=True,
+        download_details=True,
+        ticker="AAPL",
+    )
+    accession_number = "0000320193-22-000108"
+    save_filename = "foobar.txt"
+
+    result = get_save_location(download_metadata, accession_number, save_filename)
+
+    assert result == Path(
+        "./sec-edgar-filings/AAPL/10-K/0000320193-22-000108/foobar.txt"
+    )
+
+
 def test_save_document(tmp_path):
     sample_contents = b"example data to write"
     save_path = tmp_path / "foo" / "bar" / "baz" / "filing.txt"
@@ -114,7 +136,7 @@ def test_get_to_download_given_xml(apple_cik, accession_number, form_4_primary_d
         "https://www.sec.gov/Archives/edgar/data/320193/000032019322000108/0000320193-22-000108.txt"
     )
     assert result.primary_doc_uri == (
-        "https://www.sec.gov/Archives/edgar/data/320193/000032019322000108/xslF345X04/wf-form4_168444912415136.xml"
+        "https://www.sec.gov/Archives/edgar/data/320193/000032019322000108/wf-form4_168444912415136.xml"
     )
     assert result.accession_number == "0000320193-22-000108"
     assert result.details_doc_suffix == ".xml"
@@ -326,7 +348,12 @@ def test_get_ticker_to_cik_mapping(user_agent, sample_cik_ticker_payload):
 
 
 def _mock_sec_api_response_multi_page(submissions_uri, _):
-    json_path = Path(__file__).parent / "test_data" / submissions_uri.split("/")[-1]
+    json_path = (
+        Path(__file__).parent
+        / "test_data"
+        / "sample_api_responses"
+        / submissions_uri.split("/")[-1]
+    )
     assert json_path.exists()
     with json_path.open() as f:
         return json.load(f)

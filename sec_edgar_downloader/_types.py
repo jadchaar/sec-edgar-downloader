@@ -2,7 +2,7 @@ import sys
 from dataclasses import dataclass
 from datetime import date, datetime
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 
@@ -19,6 +19,7 @@ class DownloadMetadata:
     before: date = DEFAULT_BEFORE_DATE
     include_amends: bool = False
     download_details: bool = False
+    ticker: Optional[str] = None
 
 
 @dataclass

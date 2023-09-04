@@ -9,12 +9,10 @@ on:
     - cron: "0 0 1 * *"
 
 jobs:
-  test:
-    name: ${{ matrix.os }} (${{ matrix.python-version }})
+  unit-tests:
+    name: Unit tests | Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
-#      # Prevent SEC rate-limiting by limiting number of parallel runners
-#      max-parallel: 5
       fail-fast: false
       matrix:
         python-version: ["3.8", "3.9", "3.10", "3.11"]
@@ -48,7 +46,43 @@ jobs:
         with:
           file: coverage.xml
 
-  lint:
+  integration-tests:
+    name: Integration tests | Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Run integration tests on a single OS at a time to prevent SEC rate-limiting
+      max-parallel: 1
+      fail-fast: false
+      matrix:
+        python-version: ["3.11"]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
+        include:
+          - os: ubuntu-latest
+            path: ~/.cache/pip
+          - os: macos-latest
+            path: ~/Library/Caches/pip
+          - os: windows-latest
+            path: ~\AppData\Local\pip\Cache
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: ${{ matrix.path }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements*.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          pip install -U pip setuptools wheel
+          pip install -U tox tox-gh-actions
+      - name: Test with tox
+        run: tox -e integration
+
+  linting:
+    name: Linting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -62,7 +96,7 @@ jobs:
           path: ~/.cache/pre-commit
           key: ${{ runner.os }}-pre-commit-${{ hashFiles('**/.pre-commit-config.yaml') }}
           restore-keys: ${{ runner.os }}-pre-commit-
-      - name: Set up Python 3.11
+      - name: Set up Python ${{ runner.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: "3.11"

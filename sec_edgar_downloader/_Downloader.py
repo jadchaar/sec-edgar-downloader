@@ -6,7 +6,7 @@ from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FORMS as _SUPPORTED_FORMS
 from ._orchestrator import fetch_and_save_filings, get_ticker_to_cik_mapping
 from ._types import Date, DownloadMetadata, DownloadPath
-from ._utils import validate_and_convert_ticker_or_cik, validate_and_parse_date
+from ._utils import is_cik, validate_and_convert_ticker_or_cik, validate_and_parse_date
 
 
 class Downloader:
@@ -66,12 +66,12 @@ class Downloader:
         after: Optional[Date] = None,
         before: Optional[Date] = None,
         include_amends: bool = False,
-        download_details: bool = True,
+        download_details: bool = False,
     ) -> int:
         """Download filings and save them to disk.
 
         :param form: form type to download (e.g. 8-K, 10-K).
-        :param ticker_or_cik: ticker or CIK for whcih to download filings.
+        :param ticker_or_cik: ticker or CIK for which to download filings.
         :param limit: max number of filings to download.
             Defaults to all available filings.
         :param after: date of form YYYY-MM-DD after which to download filings.
@@ -83,7 +83,7 @@ class Downloader:
         :param include_amends: denotes whether to include filing amends (e.g. 8-K/A).
             Defaults to False.
         :param download_details: denotes whether to download human-readable and easily
-            parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to True.
+            parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to False.
         :return: number of filings downloaded.
 
         Usage::
@@ -171,6 +171,8 @@ class Downloader:
                 before_date,
                 include_amends,
                 download_details,
+                # Save ticker if passed in to form file system path for saving filings
+                ticker=ticker_or_cik if not is_cik(ticker_or_cik) else None,
             ),
             self.user_agent,
         )
