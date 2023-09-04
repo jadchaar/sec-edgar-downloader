@@ -259,19 +259,14 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
         for i in range(limit)
     ]
 
-    with (
-        patch.object(Path, "exists", return_value=True),
-        patch(
-            "sec_edgar_downloader._orchestrator.download_filing", autospec=True
-        ) as mock_download_filing,
-        patch(
-            "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
-            new=lambda x, y: to_download_list,
-        ),
-        patch(
-            "sec_edgar_downloader._orchestrator.save_document", autospec=True
-        ) as mock_save_document,
-    ):
+    with patch.object(Path, "exists", return_value=True), patch(
+        "sec_edgar_downloader._orchestrator.download_filing", autospec=True
+    ) as mock_download_filing, patch(
+        "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
+        new=lambda x, y: to_download_list,
+    ), patch(
+        "sec_edgar_downloader._orchestrator.save_document", autospec=True
+    ) as mock_save_document:
         fetch_and_save_filings(download_metadata, user_agent)
 
     assert mock_download_filing.call_count == 0
