@@ -14,10 +14,10 @@ from sec_edgar_downloader import Downloader
 @pytest.fixture(scope="function")
 def downloader(tmp_path, apple_cik, apple_ticker, company_name, email):
     with patch(
-        "sec_edgar_downloader.Downloader.get_ticker_to_cik_mapping", autospec=True
-    ) as mock_ticker_cik_mapping:
-        # Mock ticker to CIK mapping to prevent a call to SEC API
-        mock_ticker_cik_mapping.return_value = {apple_ticker: apple_cik}
+        "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
+        autospec=True,
+        return_value={"AAPL": "0000320193"},
+    ):
         dl = Downloader(company_name, email, tmp_path)
         yield dl, tmp_path
         shutil.rmtree(tmp_path)

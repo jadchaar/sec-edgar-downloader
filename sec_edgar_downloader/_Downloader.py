@@ -25,7 +25,7 @@ class Downloader:
 
     Usage::
 
-        >>> from sec_edgar_downloader import Downloader
+        >>> from sec_edgar_downloader import _Downloader
 
         # Download to current working directory.
         # Must declare company name and email address to comply with SEC Edgar's
@@ -88,7 +88,7 @@ class Downloader:
 
         Usage::
 
-            >>> from sec_edgar_downloader import Downloader
+            >>> from sec_edgar_downloader import _Downloader
             >>> dl = Downloader()
 
             # Get all 8-K filings for Apple

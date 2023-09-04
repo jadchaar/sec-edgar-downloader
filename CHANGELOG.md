@@ -153,7 +153,8 @@ dl.get(
 - Added the ability to specify an `after_date` argument to the `get` method. Example usage:
 
 ```python
-from sec_edgar_downloader import Downloader
+from sec_edgar_downloader import _Downloader
+
 dl = Downloader()
 
 # Get all 8-K filings for Apple after January 1, 2017 and before March 25, 2017
@@ -163,7 +164,8 @@ dl.get("8-K", "AAPL", after_date="20170101", before_date="20170325")
 - Added a `supported_filings` property to the `Downloader` class, which gets a list of all filings supported by the `sec_edgar_downloader` package. Example usage:
 
 ```python
-from sec_edgar_downloader import Downloader
+from sec_edgar_downloader import _Downloader
+
 dl = Downloader()
 
 dl.supported_filings
@@ -190,7 +192,8 @@ class Downloader:
 Example usage of the new method:
 
 ```python
-from sec_edgar_downloader import Downloader
+from sec_edgar_downloader import _Downloader
+
 dl = Downloader()
 
 # Get all 8-K filings for Apple
