@@ -1,29 +1,35 @@
-"""Constants used throughout the package."""
-
 from datetime import date
-
-SEC_EDGAR_SEARCH_API_ENDPOINT = "https://efts.sec.gov/LATEST/search-index"
-SEC_EDGAR_ARCHIVES_BASE_URL = "https://www.sec.gov/Archives/edgar/data"
-
-# SEC limits users to no more than 10 requests per second
-# Sleep 0.1s between each request to prevent rate-limiting
-# Source: https://www.sec.gov/developer
-SEC_EDGAR_RATE_LIMIT_SLEEP_INTERVAL = 0.1
-
-# Number of times to retry a request to sec.gov
-MAX_RETRIES = 10
 
 DATE_FORMAT_TOKENS = "%Y-%m-%d"
 DEFAULT_BEFORE_DATE = date.today()
-DEFAULT_AFTER_DATE = date(2000, 1, 1)
+DEFAULT_AFTER_DATE = date(1994, 1, 1)
 
+AMENDS_SUFFIX = "/A"
+
+SEC_REQUESTS_PER_SEC_MAX = 10
+
+HOST_WWW_SEC = "www.sec.gov"
+HOST_DATA_SEC = "data.sec.gov"
+
+URL_CIK_MAPPING = "https://www.sec.gov/files/company_tickers_exchange.json"
+URL_FILING = (
+    "https://www.sec.gov/Archives/edgar/data/{cik}/{acc_num_no_dash}/{document}"
+)
+URL_SUBMISSIONS = "https://data.sec.gov/submissions/{submission}"
+
+SUBMISSION_FILE_FORMAT = "CIK{cik}.json"
+STANDARD_HEADERS = {
+    "Accept-Encoding": "gzip, deflate",
+}
+
+# Save metadata
 ROOT_SAVE_FOLDER_NAME = "sec-edgar-filings"
 FILING_FULL_SUBMISSION_FILENAME = "full-submission.txt"
-# Extension will vary based on form (e.g. form 4 is XML, 8-K is HTML)
-FILING_DETAILS_FILENAME_STEM = "filing-details"
+PRIMARY_DOC_FILENAME_STEM = "primary-document"
 
-# Supported filings set to allow for fast validation checks
-SUPPORTED_FILINGS = {
+CIK_LENGTH = 10
+
+SUPPORTED_FORMS = {
     "1",
     "1-A",
     "1-A POS",

@@ -48,10 +48,11 @@ Basic Usage
 
     from sec_edgar_downloader import Downloader
 
-    # Initialize a downloader instance. If no argument is passed
-    # to the constructor, the package will download filings to
-    # the current working directory.
-    dl = Downloader("/path/to/valid/save/location")
+    # Initialize a downloader instance. Must declare company name and
+    # email address to form a user-agent string that complies with
+    # the SEC Edgar's programmatic downloading fair access policy.
+    # More info: https://www.sec.gov/os/webmaster-faq#code-support
+    dl = Downloader("Personal", "foo.bar@baz.com", "/path/to/valid/save/location")
 
     # Get all 8-K filings for Apple (ticker: AAPL)
     dl.get("8-K", "AAPL")
@@ -64,13 +65,13 @@ Basic Usage
     dl.get("8-K", "AAPL", after="2017-01-01", before="2017-03-25")
 
     # Get the five most recent 8-K filings for Apple
-    dl.get("8-K", "AAPL", amount=5)
+    dl.get("8-K", "AAPL", limit=5)
 
     # Get all 10-K filings for Microsoft
     dl.get("10-K", "MSFT")
 
     # Get the latest 10-K filing for Microsoft
-    dl.get("10-K", "MSFT", amount=1)
+    dl.get("10-K", "MSFT", limit=1)
 
     # Get all 10-Q filings for Visa
     dl.get("10-Q", "V")
@@ -95,24 +96,21 @@ Advanced Usage
     from sec_edgar_downloader import Downloader
 
     # Download filings to the current working directory
-    dl = Downloader()
-
-    # Get all Apple proxy statements that contain the term "antitrust"
-    dl.get("DEF 14A", "AAPL", query="antitrust")
+    dl = Downloader("Personal", "foo.bar@baz.com")
 
     # Get all 10-K filings for Microsoft without the filing details
     dl.get("10-K", "MSFT", download_details=False)
 
     # Get the latest supported filings, if available, for Apple
     for filing_type in dl.supported_filings:
-        dl.get(filing_type, "AAPL", amount=1)
+        dl.get(filing_type, "AAPL", limit=1)
 
     # Get the latest supported filings, if available, for a
     # specified list of tickers and CIKs
     equity_ids = ["AAPL", "MSFT", "0000102909", "V", "FB"]
     for equity_id in equity_ids:
         for filing_type in dl.supported_filings:
-            dl.get(filing_type, equity_id, amount=1)
+            dl.get(filing_type, equity_id, limit=1)
 
 Supported SEC Filing Types
 --------------------------
