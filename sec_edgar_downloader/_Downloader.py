@@ -25,16 +25,16 @@ class Downloader:
 
     Usage::
 
-        >>> from sec_edgar_downloader import _Downloader
+        >>> from sec_edgar_downloader import Downloader
 
         # Download to current working directory.
         # Must declare company name and email address to comply with SEC Edgar's
         # programmatic downloading fair access policy.
         # More info: https://www.sec.gov/os/webmaster-faq#code-support
-        >>> dl = Downloader("Personal", "foo.bar@baz.com")
+        >>> dl = Downloader("MyCompanyName", "my.email@domain.com")
 
         # Download to relative or absolute path
-        >>> dl = Downloader("Personal", "foo.bar@baz.com", "/path/to/valid/save/location")
+        >>> dl = Downloader("MyCompanyName", "my.email@domain.com", "/path/to/save/location")
     """
 
     supported_forms: ClassVar[List[str]] = sorted(_SUPPORTED_FORMS)
@@ -88,8 +88,8 @@ class Downloader:
 
         Usage::
 
-            >>> from sec_edgar_downloader import _Downloader
-            >>> dl = Downloader()
+            >>> from sec_edgar_downloader import Downloader
+            >>> dl = Downloader("MyCompanyName", "my.email@domain.com")
 
             # Get all 8-K filings for Apple
             >>> dl.get("8-K", "AAPL")
