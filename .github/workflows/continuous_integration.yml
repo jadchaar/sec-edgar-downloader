@@ -82,7 +82,7 @@ jobs:
         run: tox -e integration
 
   linting:
-    name: Unit tests | ${{ runner.os }} | Python ${{ runner.python-version }}
+    name: Linting
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
