@@ -18,7 +18,7 @@ repos:
       - id: fix-encoding-pragma
         args: [--remove]
       - id: trailing-whitespace
-        exclude: ^tests/sample-filings/
+        exclude: ^tests/test_data
   - repo: https://github.com/timothycrosley/isort
     rev: 5.12.0
     hooks:

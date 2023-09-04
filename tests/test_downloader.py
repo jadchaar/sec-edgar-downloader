@@ -77,8 +77,8 @@ def test_downloader_folder_given_custom_path(_):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_supported_filings(_, downloader):
-    dl, _ = downloader
+def test_supported_filings(_):
+    dl = Downloader("foo", "bar@baz.com")
     expected = sorted(SUPPORTED_FORMS)
     assert dl.supported_forms == expected
 
@@ -87,8 +87,8 @@ def test_supported_filings(_, downloader):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_filing_type(_, downloader, apple_ticker):
-    dl, _ = downloader
+def test_invalid_filing_type(_, apple_ticker):
+    dl = Downloader("foo", "bar@baz.com")
     invalid_filing_type = "10-INVALID"
 
     with pytest.raises(ValueError) as exc_info:
@@ -101,22 +101,22 @@ def test_invalid_filing_type(_, downloader, apple_ticker):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_ticker(_, downloader, form_10k):
-    dl, dl_path = downloader
+def test_invalid_ticker(_, form_10k):
+    dl = Downloader("foo", "bar@baz.com")
     invalid_ticker = "INVALIDTICKER"
 
     with pytest.raises(ValueError) as exc_info:
         dl.get(form_10k, invalid_ticker)
 
-    assert "Ticker is invalid" in str(exc_info.value)
+    assert "Ticker 'INVALIDTICKER' is invalid" in str(exc_info.value)
 
 
 @patch(
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_cik(_, downloader, form_10k):
-    dl, _ = downloader
+def test_invalid_cik(_, form_10k):
+    dl = Downloader("foo", "bar@baz.com")
     cik = "12345678910"
 
     with pytest.raises(ValueError) as exc_info:
@@ -129,8 +129,8 @@ def test_invalid_cik(_, downloader, form_10k):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_blank_ticker(_, downloader, form_10k):
-    dl, _ = downloader
+def test_blank_ticker(_, form_10k):
+    dl = Downloader("foo", "bar@baz.com")
     expected_msg = "Invalid ticker or CIK. Please enter a non-blank value."
     ticker = ""
 
@@ -144,8 +144,8 @@ def test_blank_ticker(_, downloader, form_10k):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_cik_zero_padding(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_cik_zero_padding(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     with patch(
         "sec_edgar_downloader._Downloader.fetch_and_save_filings",
@@ -165,8 +165,8 @@ def test_cik_zero_padding(_, downloader, form_10k, apple_cik):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_num_filings_to_download(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_invalid_num_filings_to_download(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     with pytest.raises(ValueError) as exc_info:
         dl.get(form_10k, apple_cik, limit=-1)
@@ -183,8 +183,8 @@ def test_invalid_num_filings_to_download(_, downloader, form_10k, apple_cik):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_before_and_after_dates(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_invalid_before_and_after_dates(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     dt = datetime(2019, 11, 15).strftime("%Y%m%d")
 
@@ -203,8 +203,8 @@ def test_invalid_before_and_after_dates(_, downloader, form_10k, apple_cik):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_equal_before_and_after_dates(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_equal_before_and_after_dates(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     dt = datetime(2019, 11, 15).strftime(DATE_FORMAT_TOKENS)
 
@@ -220,8 +220,8 @@ def test_equal_before_and_after_dates(_, downloader, form_10k, apple_cik):
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_invalid_before_and_after_date_combos(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_invalid_before_and_after_date_combos(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     dt = datetime(2019, 11, 15)
 
@@ -240,8 +240,8 @@ def test_invalid_before_and_after_date_combos(_, downloader, form_10k, apple_cik
     "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping",
     return_value={"AAPL": "0000320193"},
 )
-def test_pre_default_after_date(_, downloader, form_10k, apple_cik):
-    dl, _ = downloader
+def test_pre_default_after_date(_, form_10k, apple_cik):
+    dl = Downloader("foo", "bar@baz.com")
 
     dt = datetime(1900, 11, 15)
 

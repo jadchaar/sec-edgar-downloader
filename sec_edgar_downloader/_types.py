@@ -19,6 +19,7 @@ class DownloadMetadata:
     before: date = DEFAULT_BEFORE_DATE
     include_amends: bool = False
     download_details: bool = False
+    ticker: str = None
 
 
 @dataclass

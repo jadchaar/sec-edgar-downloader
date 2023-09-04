@@ -26,10 +26,15 @@ def get_save_location(
     accession_number: str,
     save_filename: str,
 ) -> Path:
+    company_identifier = (
+        download_metadata.ticker
+        if download_metadata.ticker is not None
+        else download_metadata.cik
+    )
     return (
         download_metadata.download_folder
         / ROOT_SAVE_FOLDER_NAME
-        / download_metadata.cik
+        / company_identifier
         / download_metadata.form
         / accession_number
         / save_filename
@@ -107,8 +112,11 @@ def get_to_download(cik: str, acc_num: str, doc: str) -> ToDownload:
     raw_filing_uri = URL_FILING.format(
         cik=cik, acc_num_no_dash=acc_num_no_dash, document=f"{acc_num}.txt"
     )
+    # Primary documents are returned with XSL prepended, which inhibits the
+    # ability to download raw XMLs. Need to strip away the leading prepended
+    # XSL metadata component to obtain the proper file to download.
     primary_doc_uri = URL_FILING.format(
-        cik=cik, acc_num_no_dash=acc_num_no_dash, document=doc
+        cik=cik, acc_num_no_dash=acc_num_no_dash, document=doc.rsplit("/")[-1]
     )
     primary_doc_suffix = Path(doc).suffix.replace("htm", "html")
 
