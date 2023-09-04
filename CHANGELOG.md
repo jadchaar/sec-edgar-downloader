@@ -1,5 +1,19 @@
 # Changelog
 
+## 5.0.0 - 9/4/23
+
+### New
+
+- Full package re-write to harness the SEC's new, official [Edgar API](https://www.sec.gov/edgar/sec-api-documentation).
+- Added Formal rate-limiting integration using [pyrate-limiter](https://pypi.org/project/pyrate-limiter/) to reduce the chances of surpassing the SEC's 10 requests per second fair access policy.
+  - The underlying rate-limiter will apply a delay to all requests that surpass the 10 requests per second rate for a maximum delay of 60 seconds before raising an exception.
+- Added support for declaring a company name and email to comply with the SEC's fair access guidelines for declaring a user-agent of the form: `Sample Company Name AdminContact@<sample company domain>.com`.
+  - More info on this policy can be found [here](https://www.sec.gov/os/webmaster-faq#developers)
+
+### Changed
+
+- Dropped support for Python 3.6 and 3.7 as they have reached end-of-life. This package now supports Python 3.8+.
+
 ## 4.3.0 - 12/21/2021
 
 - Add official support for Python 3.10.
