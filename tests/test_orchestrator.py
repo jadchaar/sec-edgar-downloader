@@ -155,6 +155,22 @@ def test_get_to_download_given_html(apple_cik, accession_number, form_8k_primary
     assert result.details_doc_suffix == ".html"
 
 
+# Regression test for https://github.com/jadchaar/sec-edgar-downloader/issues/126
+def test_get_to_download_given_cik_with_trailing_zero():
+    result = get_to_download(
+        "0000312070", "0000950103-23-014290", "dp200734_424b2-5333pps.htm"
+    )
+
+    assert result.raw_filing_uri == (
+        "https://www.sec.gov/Archives/edgar/data/312070/000095010323014290/0000950103-23-014290.txt"
+    )
+    assert result.primary_doc_uri == (
+        "https://www.sec.gov/Archives/edgar/data/312070/000095010323014290/dp200734_424b2-5333pps.htm"
+    )
+    assert result.accession_number == "0000950103-23-014290"
+    assert result.details_doc_suffix == ".html"
+
+
 def test_fetch_and_save_filings_given_download_details(user_agent, form_10k, apple_cik):
     limit = 2
     download_metadata = DownloadMetadata(

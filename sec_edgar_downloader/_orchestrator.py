@@ -107,7 +107,7 @@ def aggregate_filings_to_download(
 
 
 def get_to_download(cik: str, acc_num: str, doc: str) -> ToDownload:
-    cik = cik.strip("0")
+    cik = cik.lstrip("0")
     acc_num_no_dash = acc_num.replace("-", "")
     raw_filing_uri = URL_FILING.format(
         cik=cik, acc_num_no_dash=acc_num_no_dash, document=f"{acc_num}.txt"
