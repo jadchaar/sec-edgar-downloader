@@ -1,5 +1,11 @@
 # Changelog
 
+## 5.0.1 - 9/30/23
+
+### Fixed
+
+- Fixed download errors for CIKs containing trailing zeros.
+
 ## 5.0.0 - 9/4/23
 
 ### New

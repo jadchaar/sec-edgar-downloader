@@ -479,6 +479,50 @@ Contributing
 
 If you encounter a bug or would like to see a new company filing or feature added to **sec-edgar-downloader**, please `file an issue <https://github.com/jadchaar/sec-edgar-downloader/issues>`_ or `submit a pull request <https://help.github.com/en/articles/creating-a-pull-request>`_.
 
+Development
+^^^^^^^^^^^
+
+In order to validate local code changes before creating a pull request, you can run the following commands:
+
+.. code-block:: bash
+
+    # Run unit test suite on all locally-installed Python versions
+    $ tox
+
+    # Run unit test suite on a single Python version (e.g. Python 3.11)
+    $ tox -e py311
+
+    # Run end-to-end integration tests
+    $ tox -e integration
+
+    # Lint
+    $ tox -e lint
+
+    # Validate documentation
+    $ tox -e docs
+
+Release
+^^^^^^^
+
+In order to create a new release, complete the following steps:
+
+1. Outline changes made in the new release in :code:`CHANGELOG.md`.
+2. Bump the version in :code:`_version.py` and push change to master branch.
+3. Ensure all unit and integration tests pass locally and in the GitHub Actions testing workflow.
+4. Create a tag with the same version number specified in :code:`_version.py`. For example, if you are releasing v5.0.1, run the following:
+
+.. code-block:: bash
+
+    # Create tag
+    $ git tag 5.0.1 master
+
+    # Push a single tag to origin
+    $ git push origin 5.0.1
+
+5. Once the tag is pushed, a `GitHub Actions release workflow <https://github.com/jadchaar/sec-edgar-downloader/actions/workflows/release.yml>`_ will be
+kicked off that automatically creates the package artifacts and uploads them to PyPI.
+6. Create a new version based off of the published tag on the `GitHub repository's release page <https://github.com/jadchaar/sec-edgar-downloader/releases>`_.
+
 Documentation
 -------------
 
