@@ -46,9 +46,3 @@ build-dist: clean-dist
 	. venv/bin/activate; \
 	pip install -U flit; \
 	flit build
-
-upload-dist:
-	. venv/bin/activate; \
-	twine upload dist/*
-
-publish: test clean-dist build-dist upload-dist clean-dist
