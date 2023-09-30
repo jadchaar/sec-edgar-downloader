@@ -18,13 +18,12 @@ build38 build39 build310 build311 build312: clean
 
 test:
 	rm -f .coverage coverage.xml
-	. venv/bin/activate; pytest
+	. venv/bin/activate; \
+	pytest
 
 lint:
-	. venv/bin/activate; pre-commit run --all-files --show-diff-on-failure
-
-clean-docs:
-	rm -rf docs/_build
+	. venv/bin/activate; \
+	pre-commit run --all-files --show-diff-on-failure
 
 docs: clean-docs
 	. venv/bin/activate; \
@@ -35,14 +34,26 @@ live-docs: clean-docs
 	. venv/bin/activate; \
 	sphinx-autobuild docs docs/_build/html
 
-clean: clean-dist
-	rm -rf venv .pytest_cache ./**/__pycache__
-	rm -f .coverage coverage.xml ./**/*.pyc
-
-clean-dist:
-	rm -rf dist build .egg .eggs sec_edgar_downloader.egg-info
-
 build-dist: clean-dist
 	. venv/bin/activate; \
 	pip install -U flit; \
 	flit build
+
+deep-clean-dry-run:
+	git clean -xdn
+
+deep-clean:
+	git clean -xdf
+
+clean-env:
+	rm -rf venv .tox
+
+clean-dist:
+	rm -rf dist build *.egg *.eggs *.egg-info
+
+clean-docs:
+	rm -rf docs/_build
+
+clean: clean-env clean-dist clean-docs
+	rm -rf .pytest_cache ./**/__pycache__ .mypy_cache
+	rm -f .coverage coverage.xml ./**/*.pyc
