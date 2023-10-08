@@ -77,22 +77,24 @@ def test_save_document(tmp_path):
     not (Path(__file__).parent / "test_data").exists(), reason="test data is required"
 )
 @pytest.mark.parametrize(
-    "limit,after_date,before_date,include_amends,expected_num_results",
+    "form,limit,after_date,before_date,include_amends,expected_num_results",
     [
         # Test limit handling
-        (3, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 3),
-        (sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 27),
+        ("10-K", 3, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 3),
+        ("10-K", sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, False, 27),
         # Test amends handling
-        (sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, True, 29),
+        ("10-K", sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, True, 29),
         # Test date range handling
-        (sys.maxsize, date(2008, 1, 1), date(2012, 1, 1), False, 4),
+        ("10-K", sys.maxsize, date(2008, 1, 1), date(2012, 1, 1), False, 4),
+        # Regression test for issue #129
+        ("DEF 14A", sys.maxsize, DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE, True, 29),
     ],
 )
 def test_aggregate_filings_to_download_given_multiple_pages(
     user_agent,
-    form_10k,
     apple_cik,
     accession_number_to_metadata,
+    form: str,
     limit: int,
     after_date: date,
     before_date: date,
@@ -101,7 +103,7 @@ def test_aggregate_filings_to_download_given_multiple_pages(
 ):
     download_metadata = DownloadMetadata(
         download_folder=Path("."),
-        form=form_10k,
+        form=form,
         cik=apple_cik,
         limit=limit,
         after=after_date,
@@ -122,8 +124,8 @@ def test_aggregate_filings_to_download_given_multiple_pages(
     assert len(result) == expected_num_results
     for td in result:
         metadata = accession_number_to_metadata[td.accession_number]
-        assert metadata["form"] == form_10k or (
-            include_amends and metadata["form"] == f"{form_10k}/A"
+        assert metadata["form"] == form or (
+            include_amends and metadata["form"] == f"{form}/A"
         )
         assert metadata["filingDate"] >= after_date
         assert metadata["filingDate"] <= before_date
@@ -155,7 +157,7 @@ def test_get_to_download_given_html(apple_cik, accession_number, form_8k_primary
     assert result.details_doc_suffix == ".html"
 
 
-# Regression test for https://github.com/jadchaar/sec-edgar-downloader/issues/126
+# Regression test for issue #126
 def test_get_to_download_given_cik_with_trailing_zero():
     result = get_to_download(
         "0000312070", "0000950103-23-014290", "dp200734_424b2-5333pps.htm"

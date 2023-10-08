@@ -23,6 +23,11 @@ def form_10k() -> str:
 
 
 @pytest.fixture(scope="session")
+def form_def_14a() -> str:
+    return "DEF 14A"
+
+
+@pytest.fixture(scope="session")
 def apple_cik() -> str:
     return "0000320193"
 
