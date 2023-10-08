@@ -62,8 +62,9 @@ tag:
 	@read -p "Has __version__ been updated for release? (Y/N): " choice; \
 	if [ "$$(echo "$$choice" | tr '[:upper:]' '[:lower:]')" = "y" ]; then \
 		TAG_VERSION=$$(grep -oE '([0-9]+\.[0-9]+\.[0-9]+)' sec_edgar_downloader/_version.py); \
-		echo "Creating and pushing Git tag for v$$TAG_VERSION"; \
+		echo "Creating and pushing Git tag: $$TAG_VERSION"; \
 		git tag $$TAG_VERSION master; \
+		git push origin $$TAG_VERSION; \
 	else \
 		echo "Aborting."; \
 	fi
