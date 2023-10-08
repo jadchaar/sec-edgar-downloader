@@ -1,4 +1,4 @@
-.PHONY: auto test docs clean
+.PHONY: auto test docs clean tag
 
 auto: build311
 
@@ -57,3 +57,13 @@ clean-docs:
 clean: clean-env clean-dist clean-docs
 	rm -rf .pytest_cache ./**/__pycache__ .mypy_cache
 	rm -f .coverage coverage.xml ./**/*.pyc
+
+tag:
+	@read -p "Has __version__ been updated for release? (Y/N): " choice; \
+	if [ "$$(echo "$$choice" | tr '[:upper:]' '[:lower:]')" = "y" ]; then \
+		TAG_VERSION=$$(grep -oE '([0-9]+\.[0-9]+\.[0-9]+)' sec_edgar_downloader/_version.py); \
+		echo "Creating and pushing Git tag for v$$TAG_VERSION"; \
+		git tag $$TAG_VERSION master; \
+	else \
+		echo "Aborting."; \
+	fi
