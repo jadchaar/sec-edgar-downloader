@@ -1,5 +1,15 @@
 # Changelog
 
+## 5.0.2 - 10/8/23
+
+### New
+
+- Added official support for Python 3.12.
+
+### Fixed
+
+- Fixed a bug that prevented filing types ending in `A` (e.g. DEF 14A, 2-A, N-54A) from downloading.
+
 ## 5.0.1 - 9/30/23
 
 ### Fixed
