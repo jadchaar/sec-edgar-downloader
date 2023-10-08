@@ -76,12 +76,11 @@ def aggregate_filings_to_download(
         for acc_num, form, doc, f_date in zip(  # noqa: B905
             accession_numbers, forms, documents, filing_dates
         ):
+            is_amend = form.endswith(AMENDS_SUFFIX)
+            form = form[:-2] if is_amend else form
             if (
-                form.rstrip(AMENDS_SUFFIX) != download_metadata.form
-                or (
-                    not download_metadata.include_amends
-                    and form.endswith(AMENDS_SUFFIX)
-                )
+                form != download_metadata.form
+                or (not download_metadata.include_amends and is_amend)
                 or not within_requested_date_range(download_metadata, f_date)
             ):
                 continue

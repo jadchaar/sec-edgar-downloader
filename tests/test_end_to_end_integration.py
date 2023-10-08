@@ -69,12 +69,26 @@ def test_integration_apple_10_k_given_include_amends(
     dl, dl_path = network_downloader
     assert directory_is_empty(dl_path)
 
-    dl, dl_path = network_downloader
-    assert directory_is_empty(dl_path)
-
     dl.get(form_10k, apple_cik, before=date(2023, 9, 1), include_amends=True)
 
     downloaded_file_path = dl_path / ROOT_SAVE_FOLDER_NAME / apple_cik / form_10k
+    downloaded_acc_nums = downloaded_file_path.glob("*")
+    forms = downloaded_file_path.glob("*/*.txt")
+
+    assert len(list(downloaded_acc_nums)) == len(list(forms)) == 29
+    assert all(form.stat() > 0 for form in forms)
+
+
+# Integration test for issue #129
+def test_integration_apple_def_14a_given_include_amends(
+    network_downloader, form_def_14a, apple_cik
+):
+    dl, dl_path = network_downloader
+    assert directory_is_empty(dl_path)
+
+    dl.get(form_def_14a, apple_cik, before=date(2023, 10, 7), include_amends=True)
+
+    downloaded_file_path = dl_path / ROOT_SAVE_FOLDER_NAME / apple_cik / form_def_14a
     downloaded_acc_nums = downloaded_file_path.glob("*")
     forms = downloaded_file_path.glob("*/*.txt")
 
