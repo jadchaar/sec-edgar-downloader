@@ -67,6 +67,7 @@ class Downloader:
         before: Optional[Date] = None,
         include_amends: bool = False,
         download_details: bool = False,
+        skip_accession_numbers: Optional[set[str]] = None,
     ) -> int:
         """Download filings and save them to disk.
 
@@ -84,6 +85,7 @@ class Downloader:
             Defaults to False.
         :param download_details: denotes whether to download human-readable and easily
             parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to False.
+        :param skip_accession_numbers: Set of accession numbers to skip when downloading.
         :return: number of filings downloaded.
 
         Usage::
@@ -173,6 +175,7 @@ class Downloader:
                 download_details,
                 # Save ticker if passed in to form file system path for saving filings
                 ticker=ticker_or_cik if not is_cik(ticker_or_cik) else None,
+                skip_accession_numbers=skip_accession_numbers,
             ),
             self.user_agent,
         )
