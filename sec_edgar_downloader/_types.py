@@ -20,7 +20,7 @@ class DownloadMetadata:
     include_amends: bool = False
     download_details: bool = False
     ticker: Optional[str] = None
-    skip_accession_numbers: Optional[set[str]] = None
+    accession_numbers_to_skip: Optional[set[str]] = None
 
 
 @dataclass
