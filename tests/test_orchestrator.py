@@ -353,6 +353,7 @@ def test_fetch_and_save_filings_given_accession_numbers_to_skip(
     assert mock_download_filing.call_count == 1
     assert mock_save_document.call_count == 1
 
+
 def test_fetch_and_save_filings_given_exception(user_agent, form_10k, apple_cik):
     limit = 2
     download_metadata = DownloadMetadata(

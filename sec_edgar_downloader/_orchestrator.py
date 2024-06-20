@@ -131,7 +131,11 @@ def fetch_and_save_filings(download_metadata: DownloadMetadata, user_agent: str)
     successfully_downloaded = 0
     to_download = aggregate_filings_to_download(download_metadata, user_agent)
     if download_metadata.accession_numbers_to_skip is not None:
-        to_download = [td for td in to_download if td.accession_number not in download_metadata.accession_numbers_to_skip]
+        to_download = [
+            td
+            for td in to_download
+            if td.accession_number not in download_metadata.accession_numbers_to_skip
+        ]
 
     for td in to_download:
         try:
