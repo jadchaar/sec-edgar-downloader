@@ -1,4 +1,5 @@
 """End-to-end integration tests."""
+
 from datetime import date
 from pathlib import Path
 

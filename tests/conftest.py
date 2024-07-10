@@ -1,4 +1,5 @@
 """Pytest fixtures for testing suite."""
+
 import json
 import shutil
 from datetime import date, datetime
