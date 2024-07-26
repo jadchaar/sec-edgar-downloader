@@ -313,6 +313,47 @@ def test_fetch_and_save_filings_given_paths_that_already_exist(
     assert mock_save_document.call_count == 0
 
 
+def test_fetch_and_save_filings_given_accession_numbers_to_skip(
+    user_agent, form_10k, apple_cik
+):
+    limit = 2
+    download_metadata = DownloadMetadata(
+        download_folder=Path("."),
+        form=form_10k,
+        cik=apple_cik,
+        limit=limit,
+        after=DEFAULT_AFTER_DATE,
+        before=DEFAULT_BEFORE_DATE,
+        include_amends=False,
+        download_details=False,
+        accession_numbers_to_skip={"acc_num_0"},
+    )
+
+    to_download_list = [
+        ToDownload(
+            raw_filing_uri=f"raw_{i}",
+            primary_doc_uri=f"pd_{i}",
+            accession_number=f"acc_num_{i}",
+            details_doc_suffix=".xml",
+        )
+        for i in range(limit)
+    ]
+
+    with patch(
+        "sec_edgar_downloader._orchestrator.aggregate_filings_to_download",
+        new=lambda x, y: to_download_list,
+    ), patch(
+        "sec_edgar_downloader._orchestrator.download_filing", autospec=True
+    ) as mock_download_filing, patch(
+        "sec_edgar_downloader._orchestrator.save_document", autospec=True
+    ) as mock_save_document:
+        num_downloaded = fetch_and_save_filings(download_metadata, user_agent)
+
+    assert num_downloaded == 1
+    assert mock_download_filing.call_count == 1
+    assert mock_save_document.call_count == 1
+
+
 def test_fetch_and_save_filings_given_exception(user_agent, form_10k, apple_cik):
     limit = 2
     download_metadata = DownloadMetadata(

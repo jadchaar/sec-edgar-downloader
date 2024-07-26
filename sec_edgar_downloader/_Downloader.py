@@ -1,6 +1,6 @@
 import sys
 from pathlib import Path
-from typing import ClassVar, List, Optional
+from typing import ClassVar, List, Optional, Set
 
 from ._constants import DEFAULT_AFTER_DATE, DEFAULT_BEFORE_DATE
 from ._constants import SUPPORTED_FORMS as _SUPPORTED_FORMS
@@ -67,6 +67,7 @@ class Downloader:
         before: Optional[Date] = None,
         include_amends: bool = False,
         download_details: bool = False,
+        accession_numbers_to_skip: Optional[Set[str]] = None,
     ) -> int:
         """Download filings and save them to disk.
 
@@ -84,6 +85,7 @@ class Downloader:
             Defaults to False.
         :param download_details: denotes whether to download human-readable and easily
             parseable filing detail documents (e.g. form 4 XML, 8-K HTML). Defaults to False.
+        :param accession_numbers_to_skip: Set of accession numbers to skip when downloading.
         :return: number of filings downloaded.
 
         Usage::
@@ -173,6 +175,7 @@ class Downloader:
                 download_details,
                 # Save ticker if passed in to form file system path for saving filings
                 ticker=ticker_or_cik if not is_cik(ticker_or_cik) else None,
+                accession_numbers_to_skip=accession_numbers_to_skip,
             ),
             self.user_agent,
         )
