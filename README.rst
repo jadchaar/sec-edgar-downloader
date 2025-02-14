@@ -1,9 +1,9 @@
 sec-edgar-downloader
 ====================
 
-.. image:: https://github.com/jadchaar/sec-edgar-downloader/workflows/tests/badge.svg?branch=master
+.. image:: https://github.com/jadchaar/sec-edgar-downloader/actions/workflows/continuous_integration.yml/badge.svg?branch=master
     :alt: Build Status
-    :target: https://github.com/jadchaar/sec-edgar-downloader/actions?query=branch%3Amaster+workflow%3Atests
+    :target: https://github.com/jadchaar/sec-edgar-downloader/actions/workflows/continuous_integration.yml?query=branch%3Amaster+workflow%3Atests
 
 .. image:: https://codecov.io/gh/jadchaar/sec-edgar-downloader/branch/master/graph/badge.svg
     :alt: Coverage Status
