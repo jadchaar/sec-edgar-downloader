@@ -1,14 +1,15 @@
 .PHONY: auto test docs clean tag
 
-auto: build311
+auto: build313
 
 build38: PYTHON_VER = python3.8
 build39: PYTHON_VER = python3.9
 build310: PYTHON_VER = python3.10
 build311: PYTHON_VER = python3.11
 build312: PYTHON_VER = python3.12
+build312: PYTHON_VER = python3.13
 
-build38 build39 build310 build311 build312: clean
+build38 build39 build310 build311 build312 build313: clean
 	$(PYTHON_VER) -m venv venv
 	. venv/bin/activate; \
 	pip install -U pip setuptools wheel; \
