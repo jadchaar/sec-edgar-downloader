@@ -1,5 +1,17 @@
 # Changelog
 
+## 5.0.3 - 2/14/25
+
+### New
+
+- Added official support for Python 3.13.
+- Added Dependabot config for automated dependency updates.
+- Added `accession_numbers_to_skip` parameter to `get()` to skip downloading of specific accession numbers.
+
+### Changed
+
+- Locked Pyrate limiter to v3.6+ to ensure maximum compatibility and performance.
+
 ## 5.0.2 - 10/8/23
 
 ### New
