@@ -25,7 +25,7 @@ jobs:
           - os: windows-latest
             path: ~\AppData\Local\pip\Cache
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}
@@ -64,7 +64,7 @@ jobs:
           - os: windows-latest
             path: ~\AppData\Local\pip\Cache
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/cache@v4
         with:
           path: ${{ matrix.path }}
@@ -85,7 +85,7 @@ jobs:
     name: Linting
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: actions/cache@v4
         with:
           path: ~/.cache/pip
