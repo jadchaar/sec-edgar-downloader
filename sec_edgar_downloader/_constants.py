@@ -264,6 +264,7 @@ SUPPORTED_FORMS = {
     "N-MFP",
     "N-MFP1",
     "N-MFP2",
+    "N-MFP3",
     "N-PX",
     "N-Q",
     "NO ACT",
