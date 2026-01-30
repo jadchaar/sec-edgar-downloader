@@ -1,2 +1,2 @@
-pyrate-limiter>=3.6.0
+pyrate-limiter>=4.0.0
 requests

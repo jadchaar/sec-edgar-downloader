@@ -1,5 +1,15 @@
 # Changelog
 
+## 6.0.0 - 1/30/26
+
+### Changed
+
+- **BREAKING**: Dropped support for Python 3.8 and 3.9. This package now requires Python 3.10+.
+- **BREAKING**: Upgraded pyrate-limiter from 3.x to 4.x.
+  - Migrated to pyrate-limiter 4.x API: removed `raise_when_fail` and `max_delay` parameters from Limiter initialization.
+  - Changed decorator pattern from `@limiter(mapping_function)` to `@limiter.as_decorator(name="...", weight=1)`.
+  - Rate limiting behavior remains functionally the same: 10 requests per second with blocking by default.
+
 ## 5.0.3 - 2/13/25
 
 ### New
