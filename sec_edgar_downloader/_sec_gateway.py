@@ -16,18 +16,12 @@ from ._constants import (
 # https://www.sec.gov/os/webmaster-faq#developers
 SEC_THROTTLE_LIMIT_RATE = Rate(SEC_REQUESTS_PER_SEC_MAX, Duration.SECOND)
 
-# Wait up to 60 seconds for the rate-limiter bucket to refill.
-# If the bucket does NOT refill, an exception will be raised.
-limiter = Limiter(
-    SEC_THROTTLE_LIMIT_RATE, raise_when_fail=True, max_delay=60_000
-).as_decorator()
+# In v4.x, blocking=True (default) will wait until a permit is available.
+# buffer_ms adds a small delay buffer to account for timing variations (default: 50ms).
+limiter = Limiter(SEC_THROTTLE_LIMIT_RATE)
 
 
-def limiter_mapping(*args):
-    return "sec_global_rate_limit", 1
-
-
-@limiter(limiter_mapping)
+@limiter.as_decorator(name="sec_global_rate_limit", weight=1)
 def _call_sec(uri: str, user_agent: str, host: str) -> Response:
     resp = requests.get(
         uri,
