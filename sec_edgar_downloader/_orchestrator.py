@@ -35,11 +35,12 @@ def get_save_location(
         download_metadata.download_folder
         / ROOT_SAVE_FOLDER_NAME
         / company_identifier
-        / download_metadata.form
-        / accession_number
-        / save_filename
+        / save_filename.company_identifier.accession_number 
+        # Deleted to levels of folders that were coming up empty in my downloads, but appending the file name in case a new quiry results in multiple files.
     )
-
+# TODO: create and print object containing the path location, so download can be accessed easily. for example
+# pathobject = Path
+# print(pathobject + save_filename)
 
 def save_document(filing_contents: Any, save_path: Path) -> None:
     # TODO: resolve URLs so that images show up in HTML files?
