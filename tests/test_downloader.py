@@ -1,3 +1,4 @@
+import json
 import os
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -81,6 +82,41 @@ def test_supported_filings(_):
     dl = Downloader("foo", "bar@baz.com")
     expected = sorted(SUPPORTED_FORMS)
     assert dl.supported_forms == expected
+
+
+@pytest.mark.skipif(
+    not (Path(__file__).parent / "test_data").exists(), reason="test data is required"
+)
+def test_download_historical_10_k405(tmp_path):
+    def get_recorded_filings(uri, _):
+        json_path = (
+            Path(__file__).parent
+            / "test_data"
+            / "sample_api_responses"
+            / uri.rsplit("/", 1)[-1]
+        )
+        with json_path.open() as f:
+            return json.load(f)
+
+    with patch(
+        "sec_edgar_downloader._Downloader.get_ticker_to_cik_mapping", return_value={}
+    ), patch(
+        "sec_edgar_downloader._orchestrator.get_list_of_available_filings",
+        side_effect=get_recorded_filings,
+    ), patch(
+        "sec_edgar_downloader._orchestrator.download_filing",
+        return_value=b"historical filing",
+    ):
+        dl = Downloader("foo", "bar@baz.com", tmp_path)
+        assert dl.get("10-K405", "0000320193") == 2
+
+    filings_path = tmp_path / "sec-edgar-filings" / "0000320193" / "10-K405"
+    assert sorted(p.name for p in filings_path.iterdir()) == [
+        "0000912057-01-544436",
+        "0001047469-98-044981",
+    ]
+    for filing in filings_path.iterdir():
+        assert (filing / "full-submission.txt").read_bytes() == b"historical filing"
 
 
 @patch(
